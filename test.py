@@ -8,17 +8,17 @@
 # print(t3)
 
 from mazegenerator import MazeGenerator
-from cell import Cell
+from cell import MazeCell
 
 
 maze_generator = MazeGenerator(perfect=True)
 t = []
 
-maze: list[list[Cell]] = []
+maze: list[list[MazeCell]] = []
 for (y, row) in enumerate(maze_generator.maze):
     maze.append([])
     for (x, col) in enumerate(row):
-        maze[y].append(Cell(x, y, col, (15, 15), False, False))
+        maze[y].append(MazeCell(x, y, col, (15, 15), False))
 
 for row in maze:
     for col in row:
