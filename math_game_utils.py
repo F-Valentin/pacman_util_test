@@ -3,6 +3,8 @@ import math
 
 
 class Vec2:
+    __slots__ = ['x', 'y']
+
     def __init__(self, x: float, y: float):
         self.x = x
         self.y = y
@@ -11,7 +13,7 @@ class Vec2:
         return math.sqrt((other.x - self.x) ** 2 + (other.y - self.y) ** 2)
 
     def normalize(self) -> Vec2:
-        return self.__truediv__(self.length())
+        return self / self.length()
 
     def length(self) -> float:
         return math.sqrt(self.x ** 2 + self.y ** 2)
