@@ -11,3 +11,6 @@ class Cell:
         self.neighbors: list[tuple[int, int]] = [
             (x + 1, y), (x - 1, y), (x, y - 1), (x, y + 1)]
         self.ft_pattern: bool = ft_pattern
+
+    def __str__(self) -> str:
+        return f"cell pos: ({self.x}, {self.y})"
