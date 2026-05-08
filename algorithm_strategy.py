@@ -47,8 +47,6 @@ class DFSStrategy(PathfindingStrategy):
         return final_path
 
 
-
-
 class BFSStrategy(PathfindingStrategy):
     def find_path(self, start: MazeCell, dest: MazeCell, maze: Maze) -> list[MazeCell] | None:
         pass
