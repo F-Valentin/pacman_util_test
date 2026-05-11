@@ -2,19 +2,18 @@ import arcade
 import arcade.gui
 
 
-
 class GameView(arcade.View):
     def __init__(self):
         super().__init__()
-        
+
         self.sprite_list = arcade.SpriteList()
 
         self.mon_animation = arcade.load_animated_gif("pacman.gif",)
         self.mon_animation.scale = 0.1
-        
+
         self.mon_animation.center_x = 400
         self.mon_animation.center_y = 400
-        
+
         self.sprite_list.append(self.mon_animation)
 
     def on_update(self, delta_time):
@@ -30,14 +29,14 @@ class MenuView(arcade.View):
         super().__init__()
         # 1. Le Manager est le "chef" qui gère tous les boutons
         self.manager = arcade.gui.UIManager()
-        self.manager.enable() # On active la détection du clic
+        self.manager.enable()  # On active la détection du clic
 
-        # 2. On crée une boîte pour organiser nos boutons (ici, alignés verticalement)
+        # 2. On crée une boîte pour organiser nos boutons
         self.v_box = arcade.gui.UIBoxLayout()
 
         # 3. Création du bouton
         start_button = arcade.gui.UIFlatButton(text="START", width=200)
-        self.v_box.add(start_button) # On ajoute le bouton dans la boîte
+        self.v_box.add(start_button)  # On ajoute le bouton dans la boîte
 
         # 4. Définir l'action du clic sur le bouton
         # --- DANS MenuView (extrait) ---
@@ -45,8 +44,8 @@ class MenuView(arcade.View):
         @start_button.event("on_click")
         def on_click_start(event):
             # IMPORTANT : On éteint le gestionnaire de clics du menu
-            self.manager.disable() 
-            
+            self.manager.disable()
+
             game_view = GameView()
             self.window.show_view(game_view)
 
@@ -64,4 +63,4 @@ class MenuView(arcade.View):
 
     def on_draw(self):
         self.clear()
-        self.manager.draw() # On demande au manager de dessiner les boutons
+        self.manager.draw()  # On demande au manager de dessiner les boutons

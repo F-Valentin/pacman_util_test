@@ -1,5 +1,6 @@
 from maze import Maze
 
+
 class MazeCell:
     """MazeCellule class used to create better coordinate system."""
 
@@ -13,8 +14,8 @@ class MazeCell:
         self.neighbors: list[tuple[int, int]] = [
             (x + 1, y), (x - 1, y), (x, y - 1), (x, y + 1)]
 
-    def get_valid_path_neighbors(self, 
-                                   maze: Maze):
+    def get_valid_path_neighbors(self,
+                                 maze: Maze):
         """get valid path neighbor"""
         north, south, east, west = 0b0001, 0b0100, 0b0010, 0b1000
         maze_grid = maze.maze

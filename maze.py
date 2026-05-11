@@ -6,7 +6,8 @@ if TYPE_CHECKING:
 
 
 class Maze:
-    def __init__(self, maze: list[list[MazeCell]], size: tuple[int, int]) -> None:
+    def __init__(self, maze: list[list[MazeCell]],
+                 size: tuple[int, int]) -> None:
         self.maze = maze
         self.width = size[0]
         self.height = size[1]
