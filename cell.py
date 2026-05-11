@@ -13,9 +13,9 @@ class MazeCell:
         self.has_visited: bool = has_visited
         self.neighbors: list[tuple[int, int]] = [
             (x + 1, y), (x - 1, y), (x, y - 1), (x, y + 1)]
+        self.center: tuple[int, int]
 
-    def get_valid_path_neighbors(self,
-                                 maze: Maze):
+    def get_valid_path_neighbors(self, maze: Maze):
         """get valid path neighbor"""
         north, south, east, west = 0b0001, 0b0100, 0b0010, 0b1000
         maze_grid = maze.maze
@@ -42,6 +42,3 @@ class MazeCell:
         neighbors = [maze_grid[c[1]][c[0]] for c in valid_coords]
 
         return neighbors if neighbors else None
-
-    def __str__(self) -> str:
-        return f"cell pos: ({self.x}, {self.y})"
