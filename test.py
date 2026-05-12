@@ -5,8 +5,8 @@ import arcade
 
 
 TILE_SIZE: int = 50
-SCREEN_WIDTH: int = 850
-SCREEN_HEIGHT: int = 850
+SCREEN_WIDTH: int = 800
+SCREEN_HEIGHT: int = 800
 MOVEMENT_SPEED: int = 2.5
 
 
@@ -32,7 +32,7 @@ for row in maze:
 class Player:
     def __init__(self, start_x: float, start_y: float) -> None:
         self.sprite = arcade.load_animated_gif("pacman.gif")
-        self.sprite.scale = 0.1
+        self.sprite.scale = 0.09
         self.sprite.center_x = start_x
         self.sprite.center_y = start_y
 
@@ -44,7 +44,6 @@ class Player:
 
         self.direction: str = None
         self.next_direction: str = None
-        self.next_wanted_direction: str = None
 
     def update(self, delta_time: float) -> None:
         self._sprite_list.update_animation(delta_time)
@@ -75,6 +74,7 @@ class Level(arcade.View):
 
                     self.player.change_x = 0
                     self.player.change_y = 0
+                    cell.has_pacgum = False
 
                     if (self.player.next_direction == "UP"
                             and not cell.walls & 0b0001):
@@ -124,11 +124,15 @@ class Level(arcade.View):
                 if cell.walls & 0b1000:
                     arcade.draw_line(*tl, *bl, arcade.color.BLUE, 2)
 
-                arcade.draw_circle_filled(
-                    sx + TILE_SIZE // 2,
-                    sy + TILE_SIZE // 2,
-                    3, arcade.color.WHITE
-                )
+                if cell.has_pacgum:
+                    arcade.draw_circle_filled(
+                        sx + TILE_SIZE // 2,
+                        sy + TILE_SIZE // 2,
+                        3, arcade.color.WHITE
+                    )
+
+                if cell.walls == 0x0f:
+                    cell.has_pacgum = False
 
     def on_key_press(self, key: int, modifiers: int) -> None:
         if key in (arcade.key.UP, arcade.key.W):

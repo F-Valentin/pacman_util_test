@@ -14,6 +14,7 @@ class MazeCell:
         self.neighbors: list[tuple[int, int]] = [
             (x + 1, y), (x - 1, y), (x, y - 1), (x, y + 1)]
         self.center: tuple[int, int]
+        self.has_pacgum: bool = True
 
     def get_valid_path_neighbors(self, maze: Maze):
         """get valid path neighbor"""

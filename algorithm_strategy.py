@@ -28,7 +28,6 @@ class DFSStrategy(PathfindingStrategy):
         queue.append(start)
         while queue:
             curr_cell: MazeCell = queue.pop()
-
             if curr_cell.has_visited:
                 continue
 
