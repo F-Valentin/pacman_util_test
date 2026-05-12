@@ -44,6 +44,7 @@ class Player:
 
         self.direction: str = None
         self.next_direction: str = None
+        self.next_wanted_direction: str = None
 
     def update(self, delta_time: float) -> None:
         self._sprite_list.update_animation(delta_time)
@@ -71,28 +72,32 @@ class Level(arcade.View):
             for cell in row:
                 if cell.center == (int(self.player.sprite.center_x),
                    int(self.player.sprite.center_y)):
+
                     self.player.change_x = 0
                     self.player.change_y = 0
+
                     if (self.player.next_direction == "UP"
-                        and not cell.walls & 0b0001):
+                            and not cell.walls & 0b0001):
                         self.player.next_direction = None
+                        self.player.direction = "UP"
                         self.player.change_y = MOVEMENT_SPEED
                     elif (self.player.next_direction == "DOWN"
                           and not cell.walls & 0b0100):
                         self.player.next_direction = None
+                        self.player.direction = "DOWN"
                         self.player.change_y = -MOVEMENT_SPEED
                     elif (self.player.next_direction == "RIGHT"
                           and not cell.walls & 0b0010):
                         self.player.next_direction = None
+                        self.player.direction = "RIGHT"
                         self.player.change_x = MOVEMENT_SPEED
                     elif (self.player.next_direction == "LEFT"
                           and not cell.walls & 0b1000):
                         self.player.next_direction = None
+                        self.player.direction = "LEFT"
                         self.player.change_x = -MOVEMENT_SPEED
                     else:
-                        self.player.next_direction = None
-                        self.player.change_x = 0
-                        self.player.change_y = 0
+                        self.player.next_direction = self.player.direction
 
     def on_draw(self) -> None:
         self.window.clear()
