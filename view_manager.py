@@ -14,9 +14,8 @@ class ViewManager:
             view = self._views[view_name]
         except KeyError as e:
             raise e
+
         self._window.show_view(view)
-
-
 
     def switch_view(self, view_name: str) -> bool:
         try:
@@ -26,5 +25,4 @@ class ViewManager:
             return False
 
         self._window.show_view(view)
-
         return True
