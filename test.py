@@ -2,7 +2,7 @@ import arcade
 
 from cell import MazeCell
 from mazegenerator import MazeGenerator
-from player import Player
+from player import PACMANPlayer
 from game_seting import GameSettings
 from maze import MazeRenderer
 
@@ -30,7 +30,7 @@ class TestLevel(arcade.View):
         self.renderer = MazeRenderer(
             maze, settings, self.offset_x, self.offset_y, self.maze_h
         )
-        self.player = Player(
+        self.player = PACMANPlayer(
             *self._compute_player_start(), settings
         )
 
