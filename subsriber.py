@@ -1,18 +1,7 @@
 from abc import ABC, abstractmethod
 
-class ISubcriber(ABC):
-    def __init__(self):
-        self.subscribers = []
 
-    @abstractmethod
-    def add_subscriber(self):
-        pass
-
-    @abstractmethod
-    def remove_subscriber(self):
-        pass
-
-class IPlayerSubscriber(ABC, ISubcriber):
+class IPlayerSubscriber(ABC):
     @abstractmethod
     def on_player_death(self):
         pass
@@ -26,7 +15,7 @@ class IPlayerSubscriber(ABC, ISubcriber):
         pass
 
 
-class IGhostSubscriber(ABC, ISubcriber):
+class IGhostSubscriber(ABC):
     @abstractmethod
     def on_ghost_dead(self):
         pass
