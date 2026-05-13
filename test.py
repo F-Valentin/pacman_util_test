@@ -8,9 +8,10 @@ TILE_SIZE: int = 50
 SCREEN_WIDTH: int = 800
 SCREEN_HEIGHT: int = 800
 MOVEMENT_SPEED: int = 2.5
+MAZE_SIZE = 40
 
 
-generator = MazeGenerator(size=(15, 15), perfect=False)
+generator = MazeGenerator(size=(MAZE_SIZE, MAZE_SIZE), perfect=False)
 
 MAZE_W: int = len(generator.maze[0])
 MAZE_H: int = len(generator.maze)
@@ -60,11 +61,16 @@ class Level(arcade.View):
         super().__init__()
         self.maze = maze
 
-        center_x = OFFSET_X + MAZE_W * TILE_SIZE // 2
-        center_y = OFFSET_Y + MAZE_H * TILE_SIZE // 2
+        if MAZE_SIZE % 2 != 0:
+            center_x = OFFSET_X + MAZE_W * TILE_SIZE // 2
+            center_y = OFFSET_Y + MAZE_H * TILE_SIZE // 2
+        else:
+            center_x = OFFSET_X + MAZE_W * TILE_SIZE // 2 - TILE_SIZE // 2
+            center_y = OFFSET_Y + MAZE_H * TILE_SIZE // 2 - TILE_SIZE // 2
+
         self.player = Player(center_x, center_y)
 
-    def on_update(self, delta_time: float) -> None:
+    def on_fixed_update(self, delta_time: float) -> None:
         self.player.update(delta_time)
 
         for row in self.maze:
@@ -78,21 +84,25 @@ class Level(arcade.View):
 
                     if (self.player.next_direction == "UP"
                             and not cell.walls & 0b0001):
+                        self.player.sprite.angle = -90
                         self.player.next_direction = None
                         self.player.direction = "UP"
                         self.player.change_y = MOVEMENT_SPEED
                     elif (self.player.next_direction == "DOWN"
                           and not cell.walls & 0b0100):
+                        self.player.sprite.angle = 90
                         self.player.next_direction = None
                         self.player.direction = "DOWN"
                         self.player.change_y = -MOVEMENT_SPEED
                     elif (self.player.next_direction == "RIGHT"
                           and not cell.walls & 0b0010):
+                        self.player.sprite.angle = 0
                         self.player.next_direction = None
                         self.player.direction = "RIGHT"
                         self.player.change_x = MOVEMENT_SPEED
                     elif (self.player.next_direction == "LEFT"
                           and not cell.walls & 0b1000):
+                        self.player.sprite.angle = 180
                         self.player.next_direction = None
                         self.player.direction = "LEFT"
                         self.player.change_x = -MOVEMENT_SPEED
