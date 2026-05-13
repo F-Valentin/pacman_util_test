@@ -1,6 +1,9 @@
 from abc import ABC, abstractmethod
 
 class ISubcriber(ABC):
+    def __init__(self):
+        self.subscribers = []
+
     @abstractmethod
     def add_subscriber(self):
         pass
@@ -9,13 +12,7 @@ class ISubcriber(ABC):
     def remove_subscriber(self):
         pass
 
-class IPlayerSubscriber(ISubcriber):
-    def add_subscriber(self):
-        pass
-    
-    def remove_subscriber(self):
-        pass
-
+class IPlayerSubscriber(ABC, ISubcriber):
     @abstractmethod
     def on_player_death(self):
         pass
@@ -29,13 +26,7 @@ class IPlayerSubscriber(ISubcriber):
         pass
 
 
-class IGhostSubscriber(ISubcriber):
-    def add_subscriber(self):
-        pass
-    
-    def remove_subscriber(self):
-        pass
-
+class IGhostSubscriber(ABC, ISubcriber):
     @abstractmethod
     def on_ghost_dead(self):
         pass
