@@ -1,148 +1,114 @@
-from cell import MazeCell
-from mazegenerator import MazeGenerator
-from typing import List
 import arcade
 
-
-TILE_SIZE: int = 50
-SCREEN_WIDTH: int = 800
-SCREEN_HEIGHT: int = 800
-MOVEMENT_SPEED: int = 2.5
-MAZE_SIZE = 40
-
-
-generator = MazeGenerator(size=(MAZE_SIZE, MAZE_SIZE), perfect=False)
-
-MAZE_W: int = len(generator.maze[0])
-MAZE_H: int = len(generator.maze)
-
-OFFSET_X: int = (SCREEN_WIDTH - MAZE_W * TILE_SIZE) // 2
-OFFSET_Y: int = (SCREEN_HEIGHT - MAZE_H * TILE_SIZE) // 2
-
-maze: List[List[MazeCell]] = [[MazeCell(x, y, col, (MAZE_W, MAZE_H), False)
-                              for x, col in enumerate(row)]
-                              for y, row in enumerate(generator.maze)]
-
-for row in maze:
-    for cell in row:
-        cell.center = (
-            OFFSET_X + cell.x * TILE_SIZE + TILE_SIZE // 2,
-            OFFSET_Y + (MAZE_H - 1 - cell.y) * TILE_SIZE + TILE_SIZE // 2)
+from cell import MazeCell
+from mazegenerator import MazeGenerator
+from player import Player
+from game_seting import GameSettings
+from maze import MazeRenderer
 
 
-class Player:
-    def __init__(self, start_x: float, start_y: float) -> None:
-        self.sprite = arcade.load_animated_gif("pacman.gif")
-        self.sprite.scale = 0.09
-        self.sprite.center_x = start_x
-        self.sprite.center_y = start_y
+class TestLevel(arcade.View):
+    def __init__(self, maze: list[list[MazeCell]], settings: GameSettings,
+                 ) -> None:
 
-        self.change_x: float = 0.0
-        self.change_y: float = 0.0
-
-        self._sprite_list = arcade.SpriteList()
-        self._sprite_list.append(self.sprite)
-
-        self.direction: str = None
-        self.next_direction: str = None
-
-    def update(self, delta_time: float) -> None:
-        self._sprite_list.update_animation(delta_time)
-
-        self.sprite.center_x += self.change_x
-        self.sprite.center_y += self.change_y
-
-    def draw(self) -> None:
-        self._sprite_list.draw()
-
-
-class Level(arcade.View):
-    def __init__(self, maze: List[List[MazeCell]]) -> None:
         super().__init__()
         self.maze = maze
+        self.settings = settings
+        self._time_accumulator: float = 0.0
 
-        if MAZE_SIZE % 2 != 0:
-            center_x = OFFSET_X + MAZE_W * TILE_SIZE // 2
-            center_y = OFFSET_Y + MAZE_H * TILE_SIZE // 2
-        else:
-            center_x = OFFSET_X + MAZE_W * TILE_SIZE // 2 - TILE_SIZE // 2
-            center_y = OFFSET_Y + MAZE_H * TILE_SIZE // 2 - TILE_SIZE // 2
+        tile_size = settings.tile_size
+        self.maze_w: int = len(maze[0])
+        self.maze_h: int = len(maze)
+        self.offset_x: int = (
+            (settings.screen_width - self.maze_w * tile_size) // 2
+        )
+        self.offset_y: int = (
+            (settings.screen_height - self.maze_h * tile_size) // 2
+        )
 
-        self.player = Player(center_x, center_y)
+        self._setup_cells()
+        self.renderer = MazeRenderer(
+            maze, settings, self.offset_x, self.offset_y, self.maze_h
+        )
+        self.player = Player(
+            *self._compute_player_start(), settings
+        )
 
-    def on_fixed_update(self, delta_time: float) -> None:
-        self.player.update(delta_time)
+    def _compute_player_start(self) -> tuple[int, int]:
+        tile_size = self.settings.tile_size
+        half = self.maze_w * tile_size // 2
+        offset = 0 if self.settings.maze_size % 2 != 0 else -tile_size // 2
+        return (
+            self.offset_x + half + offset,
+            self.offset_y + half + offset,
+        )
+
+    def _setup_cells(self) -> None:
+        tile_size = self.settings.tile_size
+        for row in self.maze:
+            for cell in row:
+                cell.center = (
+                    self.offset_x + cell.x * tile_size + tile_size // 2,
+                    self.offset_y
+                    + (self.maze_h - 1 - cell.y) * tile_size
+                    + tile_size // 2,
+                )
+                cell.has_pacgum = cell.walls != 0x0F
+
+    def on_update(self, delta_time: float) -> None:
+        self._time_accumulator += delta_time
+        time_step: float = 1 / 60
+        while self._time_accumulator >= time_step:
+            self._fixed_update(time_step)
+            self._time_accumulator -= time_step
+
+    def _fixed_update(self, dt: float) -> None:
+        self.player.update(dt)
+        player_pixel_x = int(self.player.sprite.center_x)
+        player_pixel_y = int(self.player.sprite.center_y)
 
         for row in self.maze:
             for cell in row:
-                if cell.center == (int(self.player.sprite.center_x),
-                   int(self.player.sprite.center_y)):
+                if cell.center != (player_pixel_x, player_pixel_y):
+                    continue
+                self._handle_hub(cell)
+                break
 
-                    self.player.change_x = 0
-                    self.player.change_y = 0
-                    cell.has_pacgum = False
+    def _handle_hub(self, cell: MazeCell) -> None:
+        cell.has_pacgum = False
+        self.player.change_x = 0.0
+        self.player.change_y = 0.0
+        speed = self.settings.movement_speed
+        next_dir = self.player.next_direction
 
-                    if (self.player.next_direction == "UP"
-                            and not cell.walls & 0b0001):
-                        self.player.sprite.angle = -90
-                        self.player.next_direction = None
-                        self.player.direction = "UP"
-                        self.player.change_y = MOVEMENT_SPEED
-                    elif (self.player.next_direction == "DOWN"
-                          and not cell.walls & 0b0100):
-                        self.player.sprite.angle = 90
-                        self.player.next_direction = None
-                        self.player.direction = "DOWN"
-                        self.player.change_y = -MOVEMENT_SPEED
-                    elif (self.player.next_direction == "RIGHT"
-                          and not cell.walls & 0b0010):
-                        self.player.sprite.angle = 0
-                        self.player.next_direction = None
-                        self.player.direction = "RIGHT"
-                        self.player.change_x = MOVEMENT_SPEED
-                    elif (self.player.next_direction == "LEFT"
-                          and not cell.walls & 0b1000):
-                        self.player.sprite.angle = 180
-                        self.player.next_direction = None
-                        self.player.direction = "LEFT"
-                        self.player.change_x = -MOVEMENT_SPEED
-                    else:
-                        self.player.next_direction = self.player.direction
+        if next_dir == "UP" and not cell.walls & 0b0001:
+            self.player.sprite.angle = -90
+            self.player.next_direction = None
+            self.player.direction = "UP"
+            self.player.change_y = speed
+        elif next_dir == "DOWN" and not cell.walls & 0b0100:
+            self.player.sprite.angle = 90
+            self.player.next_direction = None
+            self.player.direction = "DOWN"
+            self.player.change_y = -speed
+        elif next_dir == "RIGHT" and not cell.walls & 0b0010:
+            self.player.sprite.angle = 0
+            self.player.next_direction = None
+            self.player.direction = "RIGHT"
+            self.player.change_x = speed
+        elif next_dir == "LEFT" and not cell.walls & 0b1000:
+            self.player.sprite.angle = 180
+            self.player.next_direction = None
+            self.player.direction = "LEFT"
+            self.player.change_x = -speed
+        else:
+            self.player.next_direction = self.player.direction
 
     def on_draw(self) -> None:
         self.window.clear()
-        self._draw_maze()
+        self.renderer.draw_walls()
+        self.renderer.draw_pacgums()
         self.player.draw()
-
-    def _draw_maze(self) -> None:
-        for row in self.maze:
-            for cell in row:
-                sx = cell.x * TILE_SIZE + OFFSET_X
-                sy = (MAZE_H - 1 - cell.y) * TILE_SIZE + OFFSET_Y
-
-                bl = (sx, sy)
-                br = (sx + TILE_SIZE, sy)
-                tl = (sx, sy + TILE_SIZE)
-                tr = (sx + TILE_SIZE, sy + TILE_SIZE)
-
-                if cell.walls & 0b0001:
-                    arcade.draw_line(*tl, *tr, arcade.color.BLUE, 2)
-                if cell.walls & 0b0010:
-                    arcade.draw_line(*tr, *br, arcade.color.BLUE, 2)
-                if cell.walls & 0b0100:
-                    arcade.draw_line(*bl, *br, arcade.color.BLUE, 2)
-                if cell.walls & 0b1000:
-                    arcade.draw_line(*tl, *bl, arcade.color.BLUE, 2)
-
-                if cell.has_pacgum:
-                    arcade.draw_circle_filled(
-                        sx + TILE_SIZE // 2,
-                        sy + TILE_SIZE // 2,
-                        3, arcade.color.WHITE
-                    )
-
-                if cell.walls == 0x0f:
-                    cell.has_pacgum = False
 
     def on_key_press(self, key: int, modifiers: int) -> None:
         if key in (arcade.key.UP, arcade.key.W):
@@ -155,11 +121,24 @@ class Level(arcade.View):
             self.player.next_direction = "RIGHT"
 
 
-def main() -> None:
-    window = arcade.Window(SCREEN_WIDTH, SCREEN_HEIGHT, "Pac-Man")
-    window.show_view(Level(maze))
-    arcade.run()
-
-
-if __name__ == "__main__":
-    main()
+settings = GameSettings()
+generator = MazeGenerator(
+    size=(settings.maze_size, settings.maze_size),
+    perfect=False,
+)
+maze_w = len(generator.maze[0])
+maze_h = len(generator.maze)
+maze: list[list[MazeCell]] = [
+    [
+        MazeCell(x, y, col, (maze_w, maze_h), False)
+        for x, col in enumerate(row)
+    ]
+    for y, row in enumerate(generator.maze)
+]
+window = arcade.Window(
+    settings.screen_width,
+    settings.screen_height,
+    "Pac-Man",
+)
+window.show_view(TestLevel(maze, settings))
+arcade.run()
