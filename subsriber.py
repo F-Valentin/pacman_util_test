@@ -11,11 +11,11 @@ class IPlayerSubscriber(ABC):
         pass
 
     @abstractmethod
-    def on_player_complete_level(self):
+    def on_player_completed_level(self):
         pass
 
 
 class IGhostSubscriber(ABC):
     @abstractmethod
-    def on_ghost_dead(self):
+    def on_ghost_death(self):
         pass
