@@ -1,6 +1,7 @@
 import arcade
 import logging
 
+
 class ViewManager:
     def __init__(self, window: arcade.Window) -> None:
         self._window = window
@@ -8,14 +9,6 @@ class ViewManager:
 
     def add_view(self, view_name: str, view: arcade.View):
         self._views[view_name] = view
-
-    def switch_view(self, view_name: str):
-        try:
-            view = self._views[view_name]
-        except KeyError as e:
-            raise e
-
-        self._window.show_view(view)
 
     def switch_view(self, view_name: str) -> bool:
         try:
