@@ -4,10 +4,10 @@ from maze import Maze
 
 
 class PathfindingStrategy(ABC):
-    @abstractmethod
-    def find_paths(self, start: Cell, dest: Cell,
-                   maze: Maze) -> list[list[Cell]] | None:
-        pass
+    # @abstractmethod
+    # def find_paths(self, start: Cell, dest: Cell,
+    #                maze: Maze) -> list[list[Cell]] | None:
+    #     pass
 
     @abstractmethod
     def find_path(self, start: Cell, dest: Cell,

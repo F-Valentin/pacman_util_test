@@ -15,71 +15,109 @@ class LevelSwitcher(ABC):
     def next_level(self) -> bool:
         pass
 
+# class Level(arcade.View):
+#     def __init__(self, player: Player, ghosts: list[Ghost], maze: Maze, level_switcher: LevelSwitcher) -> None:
+#         self._player = player
+#         self._ghosts = ghosts
+#         self._maze = maze
+#         self._level_switcher = level_switcher
 
-class MazeRenderer:
-    def __init__(self, maze: list[list[Cell]], settings: GameSettings,
-                 offset_x: int, offset_y: int, maze_h: int) -> None:
-
-        self.maze = maze
-        self.settings = settings
-        self.offset_x = offset_x
-        self.offset_y = offset_y
-        self.maze_h = maze_h
-        self._wall_points = self._build_wall_points()
-
-    def _build_wall_points(self) -> list[tuple[float, float]]:
-        wall_points: list[tuple[float, float]] = []
-        tile_size = self.settings.tile_size
-        for row in self.maze:
-            for cell in row:
-                screen_x = cell.x * tile_size + self.offset_x
-                screen_y = (
-                    (self.maze_h - 1 - cell.y) * tile_size + self.offset_y
-                )
-                top_left = (screen_x, screen_y + tile_size)
-                top_right = (screen_x + tile_size, screen_y + tile_size)
-                bottom_left = (screen_x, screen_y)
-                bottom_right = (screen_x + tile_size, screen_y)
-                if cell.walls & 0b0001:
-                    wall_points += [top_left, top_right]
-                if cell.walls & 0b0010:
-                    wall_points += [top_right, bottom_right]
-                if cell.walls & 0b0100:
-                    wall_points += [bottom_left, bottom_right]
-                if cell.walls & 0b1000:
-                    wall_points += [top_left, bottom_left]
-        return wall_points
-
-    def draw_walls(self) -> None:
-        arcade.draw_lines(self._wall_points, arcade.color.BLUE, 2)
-
-    def draw_pacgums(self) -> None:
-        tile_size = self.settings.tile_size
-        for row in self.maze:
-            for cell in row:
-                if not cell.has_pacgum:
-                    continue
-                screen_x = cell.x * tile_size + self.offset_x
-                screen_y = (
-                    (self.maze_h - 1 - cell.y) * tile_size + self.offset_y
-                )
-                arcade.draw_circle_filled(screen_x + tile_size // 2,
-                                          screen_y + tile_size // 2,
-                                          3, arcade.color.WHITE)
-
+#     def on_draw(self) -> None:
+#         self.window.clear()
+#         self._maze.draw()
+#         self._player.draw()
 
 class Level(arcade.View):
-    def __init__(self, player: Player, ghosts: list[Ghost], maze: Maze, maze_renderer: MazeRenderer, level_switcher: LevelSwitcher) -> None:
+    def __init__(self, player: Player, maze: Maze) -> None:
+        super().__init__()
         self._player = player
-        self._ghosts = ghosts
         self._maze = maze
-        self._level_switcher = level_switcher
-        self.renderer = maze_renderer
+        self._time_accumulator = 0
     
+    def _compute_player_start(self) -> tuple[int, int]:
+        tile_size = self._maze.tile_size
+        half = self._maze.width * tile_size // 2
+        print(half)
+        offset = 0 if self._maze.width % 2 != 0 else -tile_size // 2
+        return (
+            int(self._maze.offset_x + half + offset),
+            int(self._maze.offset_y + half + offset),
+        )
+
+    def _setup_cells(self) -> None:
+        tile_size = self._maze.tile_size
+        for row in self._maze.grid:
+            for cell in row:
+                cell.center = (
+                    int(self._maze.offset_x + cell.x * tile_size + tile_size // 2),
+                    int(self._maze.offset_y
+                    + (self._maze.height - 1 - cell.y) * tile_size
+                    + tile_size // 2),
+                )
+                cell.has_pacgum = cell.walls != 0x0F
+
+    def on_update(self, delta_time: float) -> None:
+        self._time_accumulator += delta_time
+        time_step: float = 1 / 60
+        while self._time_accumulator >= time_step:
+            self._fixed_update(time_step)
+            self._time_accumulator -= time_step
+
+    def _fixed_update(self, dt: float) -> None:
+        self._player.update(dt)
+        player_pixel_x = int(self._player.sprite.center_x)
+        player_pixel_y = int(self._player.sprite.center_y)
+
+        for row in self._maze.grid:
+            for cell in row:
+                if cell.center != (player_pixel_x, player_pixel_y):
+                    continue
+                self._handle_hub(cell)
+                break
+
+    def _handle_hub(self, cell: Cell) -> None:
+        cell.has_pacgum = False
+        self._player.change_x = 0.0
+        self._player.change_y = 0.0
+        speed = 2.5
+        next_dir = self._player.next_direction
+
+        if next_dir == "UP" and not cell.walls & 0b0001:
+            self._player.sprite.angle = -90
+            self._player.next_direction = None
+            self._player.direction = "UP"
+            self._player.change_y = speed
+        elif next_dir == "DOWN" and not cell.walls & 0b0100:
+            self._player.sprite.angle = 90
+            self._player.next_direction = None
+            self._player.direction = "DOWN"
+            self._player.change_y = -speed
+        elif next_dir == "RIGHT" and not cell.walls & 0b0010:
+            self._player.sprite.angle = 0
+            self._player.next_direction = None
+            self._player.direction = "RIGHT"
+            self._player.change_x = speed
+        elif next_dir == "LEFT" and not cell.walls & 0b1000:
+            self._player.sprite.angle = 180
+            self._player.next_direction = None
+            self._player.direction = "LEFT"
+            self._player.change_x = -speed
+        else:
+            self._player.next_direction = self._player.direction
+
+    def on_key_press(self, key: int, modifiers: int) -> None:
+        if key in (arcade.key.UP, arcade.key.W):
+            self._player.next_direction = "UP"
+        elif key in (arcade.key.DOWN, arcade.key.S):
+            self._player.next_direction = "DOWN"
+        elif key in (arcade.key.LEFT, arcade.key.A):
+            self._player.next_direction = "LEFT"
+        elif key in (arcade.key.RIGHT, arcade.key.D):
+            self._player.next_direction = "RIGHT"
+
     def on_draw(self) -> None:
         self.window.clear()
-        self.renderer.draw_walls()
-        self.renderer.draw_pacgums()
+        self._maze.draw()
         self._player.draw()
 
 class LevelFactory:
@@ -105,8 +143,8 @@ class LevelFactory:
 
 
     def create_level(self) -> Level:
-        maze_generator = MazeGenerator()
-        tile_size = 60
+        maze_generator = MazeGenerator(self.maze_size)
+        tile_size = 50
         maze: list[list[Cell]] = []
 
         for (y, row) in enumerate(maze_generator.maze):
@@ -114,21 +152,17 @@ class LevelFactory:
             for (x, col) in enumerate(row):
                 maze[y].append(Cell(x, y, col, (self.maze_size[0], self.maze_size[1]), False))
 
-        maze_generator = MazeGenerator()
-        maze_w: int = len(maze[0])
-        maze_h: int = len(maze)
-        tile_size = 60
         
         offset_x: int = (
-            (self.game_settings.screen_width - maze_w * tile_size) // 2
+            (self.game_settings.screen_width - self.maze_size[0] * tile_size) // 2
         )
 
         offset_y: int = (
-            (self.game_settings.screen_height - maze_h * tile_size) // 2)
+            (self.game_settings.screen_height - self.maze_size[1] * tile_size) // 2)
 
-        maze_renderer = MazeRenderer(maze, self.game_settings, offset_x, offset_y, maze_h)
-        m = Maze(maze, self.maze_size)
-        return Level(Player(), self._create_enemies(), m, maze_renderer, self.level_switcher)  
+        m = Maze(maze, self.maze_size, (offset_x, offset_y))
+        #return Level(Player(), self._create_enemies(), m, self.level_switcher)  
+        return Level(Player(), m)
 
 
 class LevelManager(LevelSwitcher):

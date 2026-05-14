@@ -2,9 +2,9 @@ import arcade
 
 from cell import Cell
 from mazegenerator import MazeGenerator
-from player import PACMANPlayer
+from player import Player
 from game_seting import GameSettings
-from maze import MazeRenderer
+from maze import Maze
 
 
 class TestLevel(arcade.View):
