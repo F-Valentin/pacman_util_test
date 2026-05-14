@@ -1,33 +1,33 @@
 from abc import ABC, abstractmethod
-from cell import MazeCell
+from cell import Cell
 from maze import Maze
 
 
 class PathfindingStrategy(ABC):
     @abstractmethod
-    def find_paths(self, start: MazeCell, dest: MazeCell,
-                   maze: Maze) -> list[list[MazeCell]] | None:
+    def find_paths(self, start: Cell, dest: Cell,
+                   maze: Maze) -> list[list[Cell]] | None:
         pass
 
     @abstractmethod
-    def find_path(self, start: MazeCell, dest: MazeCell,
-                  maze: Maze) -> list[MazeCell] | None:
+    def find_path(self, start: Cell, dest: Cell,
+                  maze: Maze) -> list[Cell] | None:
         pass
 
 
 class DFSStrategy(PathfindingStrategy):
     # first problem the ghost can go to a place where the player is not present
-    # second the player is not a MazeCell, perhaps we will a field maze_pos
+    # second the player is not a Cell, perhaps we will a field maze_pos
     # to the player
-    def find_path(self, start: MazeCell, dest: MazeCell,
-                  maze: Maze) -> list[MazeCell] | None:
-        final_path: list[MazeCell] = []
-        curr_path: list[MazeCell] = []
-        queue: list[MazeCell] = []
+    def find_path(self, start: Cell, dest: Cell,
+                  maze: Maze) -> list[Cell] | None:
+        final_path: list[Cell] = []
+        curr_path: list[Cell] = []
+        queue: list[Cell] = []
 
         queue.append(start)
         while queue:
-            curr_cell: MazeCell = queue.pop()
+            curr_cell: Cell = queue.pop()
             if curr_cell.has_visited:
                 continue
 
@@ -39,7 +39,7 @@ class DFSStrategy(PathfindingStrategy):
 
             curr_cell.has_visited = True
 
-            neighbors: list[MazeCell] | None = (
+            neighbors: list[Cell] | None = (
                 curr_cell.get_valid_path_neighbors(maze))
 
             if neighbors is None:
@@ -53,6 +53,6 @@ class DFSStrategy(PathfindingStrategy):
 
 
 class BFSStrategy(PathfindingStrategy):
-    def find_path(self, start: MazeCell, dest: MazeCell,
-                  maze: Maze) -> list[MazeCell] | None:
+    def find_path(self, start: Cell, dest: Cell,
+                  maze: Maze) -> list[Cell] | None:
         pass

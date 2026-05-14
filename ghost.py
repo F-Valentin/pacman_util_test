@@ -1,6 +1,6 @@
 import arcade
 from algorithm_strategy import PathfindingStrategy
-from subsriber import IGhostSubscriber
+from subsriber import IGhostSubscriber, IPlayerSubscriber
 
 
 class Ghost(arcade.Sprite):
@@ -15,7 +15,7 @@ class Ghost(arcade.Sprite):
         self._strategy = strategy
 
         self._subscribers: list[IGhostSubscriber] = []
-
+    
     @property
     def strategy(self) -> PathfindingStrategy:
         return self._strategy

@@ -1,6 +1,6 @@
 import arcade
 
-from cell import MazeCell
+from cell import Cell
 from mazegenerator import MazeGenerator
 from player import PACMANPlayer
 from game_seting import GameSettings
@@ -8,7 +8,7 @@ from maze import MazeRenderer
 
 
 class TestLevel(arcade.View):
-    def __init__(self, maze: list[list[MazeCell]], settings: GameSettings,
+    def __init__(self, maze: list[list[Cell]], settings: GameSettings,
                  ) -> None:
 
         super().__init__()
@@ -74,7 +74,7 @@ class TestLevel(arcade.View):
                 self._handle_hub(cell)
                 break
 
-    def _handle_hub(self, cell: MazeCell) -> None:
+    def _handle_hub(self, cell: Cell) -> None:
         cell.has_pacgum = False
         self.player.change_x = 0.0
         self.player.change_y = 0.0
@@ -128,9 +128,9 @@ generator = MazeGenerator(
 )
 maze_w = len(generator.maze[0])
 maze_h = len(generator.maze)
-maze: list[list[MazeCell]] = [
+maze: list[list[Cell]] = [
     [
-        MazeCell(x, y, col, (maze_w, maze_h), False)
+        Cell(x, y, col, (maze_w, maze_h), False)
         for x, col in enumerate(row)
     ]
     for y, row in enumerate(generator.maze)

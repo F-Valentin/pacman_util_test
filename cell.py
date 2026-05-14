@@ -1,8 +1,8 @@
 from maze import Maze
 
 
-class MazeCell:
-    """MazeCellule class used to create better coordinate system."""
+class Cell:
+    """Cellule class used to create better coordinate system."""
 
     def __init__(self, x: int, y: int, walls: int, size: tuple[int, int],
                  has_visited: bool):
