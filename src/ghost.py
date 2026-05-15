@@ -1,6 +1,6 @@
 import arcade
 from algorithm_strategy import PathfindingStrategy
-from subsriber import IGhostSubscriber, IPlayerSubscriber
+from subscriber import IGhostSubscriber, IPlayerSubscriber
 
 
 class Ghost(arcade.Sprite):

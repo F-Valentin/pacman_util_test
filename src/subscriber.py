@@ -9,8 +9,7 @@ class IPacgumSubscriber(Protocol):
 class IPlayerDeathSubscriber(Protocol):
     def on_player_death(self) -> None: ...
 
-class IPlayerSubscriber(Protocol): 
-    def kaka(self): ...
+class IPlayerSubscriber(Protocol): ...
 
 
 class IGhostSubscriber(Protocol):

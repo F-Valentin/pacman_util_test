@@ -1,4 +1,4 @@
-from subsriber import IPlayerDeathSubscriber, IPlayerSubscriber
+from subscriber import IPlayerDeathSubscriber, IPlayerSubscriber
 
 
 import arcade

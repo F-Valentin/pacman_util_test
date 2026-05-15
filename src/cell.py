@@ -1,4 +1,4 @@
-from subsriber import IPacgumSubscriber
+from subscriber import IPacgumSubscriber
 from pacgum import Pacgum
 
 class Cell:
