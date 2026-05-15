@@ -1,5 +1,5 @@
 from subsriber import IPlayerDeathSubscriber, IPlayerSubscriber
-from functools import singledispatch
+from functools import singledispatchmethod
 
 
 import arcade
@@ -71,7 +71,7 @@ class Player:
         if cell.has_pacgum:
             cell.pacgum_eaten()
             
-    @singledispatch
+    @singledispatchmethod
     def add_subscriber(self, subscriber: IPlayerSubscriber) -> None:
         self._subscribers.append(subscriber)
     
@@ -79,7 +79,7 @@ class Player:
     def _(self, subscriber: IPlayerDeathSubscriber) -> None:
         self._on_death_subsribers.append(subscriber)
 
-    @singledispatch
+    @singledispatchmethod
     def remove_subscriber(self, subscriber: IPlayerSubscriber) -> None:
         self._subscribers.remove(subscriber)
     
