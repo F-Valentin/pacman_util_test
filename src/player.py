@@ -2,13 +2,11 @@ from subsriber import IPlayerSubscriber
 
 import arcade
 from typing import Optional
-# from game_seting import GameSettings
 from cell import Cell
 
 
 class Player:
     def __init__(self) -> None:
-        # self.settings = settings
         self.sprite: arcade.TextureAnimationSprite = arcade.load_animated_gif(
             "../assets/pacman.gif")
         self.sprite.scale = 0.09

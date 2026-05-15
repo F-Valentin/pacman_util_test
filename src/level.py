@@ -8,7 +8,7 @@ from maze import Maze
 from cell import Cell
 from game_configuration import GameConfig
 from algorithm_strategy import PathfindingStrategy
-from game_seting import GameSettings
+from game_setting import GameSettings
 
 
 class LevelSwitcher(ABC):

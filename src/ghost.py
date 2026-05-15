@@ -15,7 +15,7 @@ class Ghost(arcade.Sprite):
         self._strategy = strategy
 
         self._subscribers: list[IGhostSubscriber] = []
-    
+
     @property
     def strategy(self) -> PathfindingStrategy:
         return self._strategy

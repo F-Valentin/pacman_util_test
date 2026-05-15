@@ -3,8 +3,6 @@ from typing import TYPE_CHECKING
 
 import arcade
 
-from game_seting import GameSettings
-
 if TYPE_CHECKING:
     from cell import Cell
 
@@ -47,7 +45,7 @@ class Maze:
             for cell in row:
                 screen_x = cell.x * tile_size + self.offset_x
                 screen_y = (
-                    (self.height- 1 - cell.y) * tile_size + self.offset_y
+                    (self.height - 1 - cell.y) * tile_size + self.offset_y
                 )
                 top_left = (screen_x, screen_y + tile_size)
                 top_right = (screen_x + tile_size, screen_y + tile_size)
@@ -74,12 +72,12 @@ class Maze:
                     continue
                 screen_x = cell.x * tile_size + self.offset_x
                 screen_y = (
-                    (self.height- 1 - cell.y) * tile_size + self.offset_y
+                    (self.height - 1 - cell.y) * tile_size + self.offset_y
                 )
                 arcade.draw_circle_filled(screen_x + tile_size // 2,
                                           screen_y + tile_size // 2,
                                           3, arcade.color.WHITE)
-    
+
     def draw(self):
         self._draw_walls()
         self._draw_pacgums()
