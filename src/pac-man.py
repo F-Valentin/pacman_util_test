@@ -7,7 +7,7 @@ from algorithm_strategy import DFSStrategy
 
 def main():
 
-    game_config = GameConfig("../config.json")
+    game_config = GameConfig("config.json")
     window = arcade.Window(
         width=game_config.screen_width,
         height=game_config.screen_height)

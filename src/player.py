@@ -8,7 +8,7 @@ from cell import Cell
 class Player:
     def __init__(self) -> None:
         self.sprite: arcade.TextureAnimationSprite = arcade.load_animated_gif(
-            "../assets/pacman.gif")
+            "assets/pacman.gif")
         self.sprite.scale = 0.09
         self.sprite.center_x = 0
         self.sprite.center_y = 0
