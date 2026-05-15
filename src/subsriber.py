@@ -8,6 +8,9 @@ class IPlayerSubscriber(ABC):
     def on_player_ate_super_pacgum(self):
         pass
 
+    def on_player_ate_pacgum(self, cell_pos: tuple[int, int]):
+        pass
+
     def on_player_completed_level(self):
         pass
 

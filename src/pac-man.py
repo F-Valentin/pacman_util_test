@@ -25,11 +25,8 @@ def main():
         level_switcher=level_manager,
         game_settings=game_settings)
     level1 = level_factory.create_level()
-    level1._setup_cells()
     window.show_view(level1)
     arcade.run()
-    # set the position of the player with set_position
-    # player.set_position()
 
 
 if __name__ == "__main__":

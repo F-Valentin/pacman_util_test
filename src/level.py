@@ -36,18 +36,7 @@ class Level(arcade.View):
         self._maze = maze
         self._time_accumulator = 0
 
-    def _setup_cells(self) -> None:
-        tile_size = self._maze.tile_size
-        for row in self._maze.grid:
-            for cell in row:
-                cell.center = (
-                    int(self._maze.offset_x + cell.x *
-                        tile_size + tile_size // 2),
-                    int(self._maze.offset_y
-                        + (self._maze.height - 1 - cell.y) * tile_size
-                        + tile_size // 2),
-                )
-                cell.has_pacgum = cell.walls != 0x0F
+    
 
     def on_update(self, delta_time: float) -> None:
         self._time_accumulator += delta_time
@@ -66,7 +55,6 @@ class Level(arcade.View):
                 if cell.center != (player_pixel_x, player_pixel_y):
                     continue
                 self._player.move_to_next_cell(cell)
-                cell.has_pacgum = False
                 break
 
     def on_key_press(self, key: int, modifiers: int) -> None:
@@ -121,12 +109,12 @@ class LevelFactory:
     def create_level(self) -> Level:
         maze_generator = MazeGenerator(self.maze_size)
         tile_size = 50
-        maze: list[list[Cell]] = []
+        grid: list[list[Cell]] = []
 
         for (y, row) in enumerate(maze_generator.maze):
-            maze.append([])
+            grid.append([])
             for (x, col) in enumerate(row):
-                maze[y].append(
+                grid[y].append(
                     Cell(
                         x,
                         y,
@@ -144,12 +132,13 @@ class LevelFactory:
             (self.game_settings.screen_height -
              self.maze_size[1] * tile_size) // 2)
 
-        m = Maze(maze, self.maze_size, (offset_x, offset_y))
-        (p_x, p_y) = self._compute_player_start(m)
+        maze = Maze(grid, self.maze_size, (offset_x, offset_y))
+        (p_x, p_y) = self._compute_player_start(maze)
         self._player.set_position(p_x, p_y)
+        self._player.add_subscriber(maze)
         # return Level(Player(), self._create_enemies(), m,
         # self.level_switcher)
-        return Level(self._player, m)
+        return Level(self._player, maze)
 
 
 class LevelManager(LevelSwitcher):

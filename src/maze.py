@@ -1,12 +1,13 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
+from subsriber import IPlayerSubscriber
 
 import arcade
 
 if TYPE_CHECKING:
     from cell import Cell
 
-class Maze:
+class Maze(IPlayerSubscriber):
     def __init__(self, maze: list[list[Cell]],
                  size: tuple[float, float], top_left_coord: tuple[float, float]) -> None:
         self._grid = maze
@@ -16,6 +17,7 @@ class Maze:
         self._offset_y: float = top_left_coord[1]
         self._tile_size: int = 50
         self._wall_points = self._build_wall_points()
+        self._setup_cells()
 
     @property
     def grid(self) -> list[list[Cell]]:
@@ -40,6 +42,24 @@ class Maze:
     @property
     def tile_size(self) -> int:
         return self._tile_size
+    
+    def on_player_ate_pacgum(self, cell_pos: tuple[int, int]):
+        (x, y) = cell_pos
+        cell = self.grid[y][x]
+        cell.has_pacgum = False
+
+    def _setup_cells(self) -> None:
+        tile_size = self.tile_size
+        for row in self.grid:
+            for cell in row:
+                cell.center = (
+                    int(self.offset_x + cell.x *
+                        tile_size + tile_size // 2),
+                    int(self.offset_y
+                        + (self.height - 1 - cell.y) * tile_size
+                        + tile_size // 2),
+                )
+                cell.has_pacgum = cell.walls != 0x0F
 
     def _build_wall_points(self) -> list[tuple[float, float]]:
         wall_points: list[tuple[float, float]] = []

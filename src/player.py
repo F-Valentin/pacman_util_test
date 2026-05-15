@@ -38,6 +38,7 @@ class Player:
         self.sprite.center_x = x
         self.sprite.center_y = y
 
+    # _handle_hub old name
     def move_to_next_cell(self, cell: Cell) -> None:
         self.change_x = 0.0
         self.change_y = 0.0
@@ -66,6 +67,10 @@ class Player:
             self.change_x = -speed
         else:
             self.next_direction = self.direction
+        
+        if cell.has_pacgum:
+            self.eat_pacgum((cell.x, cell.y))
+            
 
     def add_subscriber(self, subscriber: IPlayerSubscriber) -> None:
         self._subscribers.append(subscriber)
@@ -76,6 +81,10 @@ class Player:
     def die(self) -> None:
         for subscriber in self._subscribers:
             subscriber.on_player_death()
+
+    def eat_pacgum(self, cell_pos: tuple[int, int]) -> None:
+        for subscriber in self._subscribers:
+            subscriber.on_player_ate_pacgum(cell_pos)
 
     def eat_super_pacgum(self) -> None:
         for subscriber in self._subscribers:
