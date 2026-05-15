@@ -14,6 +14,9 @@ class GameConfig:
         self.points_per_super_pacgum = 100
         self.points_per_ghost = 200
 
+        self.screen_width = 800
+        self.screen_height = 800
+
         self.raw_data = None
 
         self._load_config()

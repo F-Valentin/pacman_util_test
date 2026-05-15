@@ -8,7 +8,6 @@ from maze import Maze
 from cell import Cell
 from game_configuration import GameConfig
 from algorithm_strategy import PathfindingStrategy
-from game_setting import GameSettings
 
 
 class LevelSwitcher(ABC):
@@ -35,8 +34,6 @@ class Level(arcade.View):
         self._player = player
         self._maze = maze
         self._time_accumulator = 0
-
-    
 
     def on_update(self, delta_time: float) -> None:
         self._time_accumulator += delta_time
@@ -79,8 +76,7 @@ class LevelFactory:
                  game_config: GameConfig,
                  ghost_strategy: PathfindingStrategy,
                  maze_size: tuple[int, int],
-                 level_switcher: LevelSwitcher,
-                 game_settings: GameSettings
+                 level_switcher: LevelSwitcher
                  ) -> None:
         self.nb_of_ghosts = 4
         self._player = player
@@ -88,7 +84,6 @@ class LevelFactory:
         self.maze_size = maze_size
         self.game_config = game_config
         self.level_switcher = level_switcher
-        self.game_settings = game_settings
 
     def _create_enemies(self):
         ghosts = []
@@ -99,7 +94,6 @@ class LevelFactory:
     def _compute_player_start(self, maze: Maze) -> tuple[int, int]:
         tile_size = maze.tile_size
         half = maze.width * tile_size // 2
-        print(half)
         offset = 0 if maze.width % 2 != 0 else -tile_size // 2
         return (
             int(maze.offset_x + half + offset),
@@ -124,12 +118,12 @@ class LevelFactory:
                         False))
 
         offset_x: int = (
-            (self.game_settings.screen_width -
+            (self.game_config.screen_width -
              self.maze_size[0] * tile_size) // 2
         )
 
         offset_y: int = (
-            (self.game_settings.screen_height -
+            (self.game_config.screen_height -
              self.maze_size[1] * tile_size) // 2)
 
         maze = Maze(grid, self.maze_size, (offset_x, offset_y))
