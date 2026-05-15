@@ -10,7 +10,7 @@ class Player:
         #self.settings = settings
         self.sprite = arcade.load_animated_gif("pacman.gif")
         self.sprite.scale = 0.09
-        self.sprite.center_x = 0 
+        self.sprite.center_x = 0
         self.sprite.center_y = 0
 
         self.change_x: float = 0.0

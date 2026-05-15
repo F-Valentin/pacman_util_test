@@ -1,6 +1,3 @@
-from maze import Maze
-
-
 class Cell:
     """Cellule class used to create better coordinate system."""
 
