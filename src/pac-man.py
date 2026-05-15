@@ -2,8 +2,6 @@ import arcade
 from game_configuration import GameConfig
 from level import LevelFactory, LevelManager
 from player import Player
-from cell import Cell
-from mazegenerator import MazeGenerator
 from game_setting import GameSettings
 from algorithm_strategy import DFSStrategy
 
