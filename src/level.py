@@ -17,8 +17,7 @@ class LevelSwitcher(ABC):
         pass
 
 # class Level(arcade.View):
-#     def __init__(self, player: Player, ghosts: list[Ghost], maze: Maze,
-#                  level_switcher: LevelSwitcher) -> None:
+#     def __init__(self, player: Player, ghosts: list[Ghost], maze: Maze, level_switcher: LevelSwitcher) -> None:
 #         self._player = player
 #         self._ghosts = ghosts
 #         self._maze = maze
@@ -37,25 +36,17 @@ class Level(arcade.View):
         self._maze = maze
         self._time_accumulator = 0
 
-    def _compute_player_start(self) -> tuple[int, int]:
-        tile_size = self._maze.tile_size
-        half = self._maze.width * tile_size // 2
-        offset = 0 if self._maze.width % 2 != 0 else -tile_size // 2
-        return (
-            int(self._maze.offset_x + half + offset),
-            int(self._maze.offset_y + half + offset),
-        )
-
     def _setup_cells(self) -> None:
         tile_size = self._maze.tile_size
         for row in self._maze.grid:
             for cell in row:
                 cell.center = (
-                    int(self._maze.offset_x + cell.x * tile_size + tile_size // 2),
+                    int(self._maze.offset_x + cell.x *
+                        tile_size + tile_size // 2),
                     int(self._maze.offset_y
                         + (self._maze.height - 1 - cell.y) * tile_size
                         + tile_size // 2),
-                    )
+                )
                 cell.has_pacgum = cell.walls != 0x0F
 
     def on_update(self, delta_time: float) -> None:
@@ -74,38 +65,9 @@ class Level(arcade.View):
             for cell in row:
                 if cell.center != (player_pixel_x, player_pixel_y):
                     continue
-                self._handle_hub(cell)
+                self._player.move_to_next_cell(cell)
+                cell.has_pacgum = False
                 break
-
-    def _handle_hub(self, cell: Cell) -> None:
-        cell.has_pacgum = False
-        self._player.change_x = 0.0
-        self._player.change_y = 0.0
-        speed = 2.5
-        next_dir = self._player.next_direction
-
-        if next_dir == "UP" and not cell.walls & 0b0001:
-            self._player.sprite.angle = -90
-            self._player.next_direction = None
-            self._player.direction = "UP"
-            self._player.change_y = speed
-        elif next_dir == "DOWN" and not cell.walls & 0b0100:
-            self._player.sprite.angle = 90
-            self._player.next_direction = None
-            self._player.direction = "DOWN"
-            self._player.change_y = -speed
-        elif next_dir == "RIGHT" and not cell.walls & 0b0010:
-            self._player.sprite.angle = 0
-            self._player.next_direction = None
-            self._player.direction = "RIGHT"
-            self._player.change_x = speed
-        elif next_dir == "LEFT" and not cell.walls & 0b1000:
-            self._player.sprite.angle = 180
-            self._player.next_direction = None
-            self._player.direction = "LEFT"
-            self._player.change_x = -speed
-        else:
-            self._player.next_direction = self._player.direction
 
     def on_key_press(self, key: int, modifiers: int) -> None:
         if key in (arcade.key.UP, arcade.key.W):
@@ -125,6 +87,7 @@ class Level(arcade.View):
 
 class LevelFactory:
     def __init__(self,
+                 player: Player,
                  game_config: GameConfig,
                  ghost_strategy: PathfindingStrategy,
                  maze_size: tuple[int, int],
@@ -132,6 +95,7 @@ class LevelFactory:
                  game_settings: GameSettings
                  ) -> None:
         self.nb_of_ghosts = 4
+        self._player = player
         self.ghost_strategy = ghost_strategy
         self.maze_size = maze_size
         self.game_config = game_config
@@ -144,6 +108,16 @@ class LevelFactory:
             ghosts.append(Ghost("", self.ghost_strategy))
         return ghosts
 
+    def _compute_player_start(self, maze: Maze) -> tuple[int, int]:
+        tile_size = maze.tile_size
+        half = maze.width * tile_size // 2
+        print(half)
+        offset = 0 if maze.width % 2 != 0 else -tile_size // 2
+        return (
+            int(maze.offset_x + half + offset),
+            int(maze.offset_y + half + offset),
+        )
+
     def create_level(self) -> Level:
         maze_generator = MazeGenerator(self.maze_size)
         tile_size = 50
@@ -152,23 +126,30 @@ class LevelFactory:
         for (y, row) in enumerate(maze_generator.maze):
             maze.append([])
             for (x, col) in enumerate(row):
-                maze[y].append(Cell(x, y, col, (self.maze_size[0],
-                                                self.maze_size[1]), False))
+                maze[y].append(
+                    Cell(
+                        x,
+                        y,
+                        col,
+                        (self.maze_size[0],
+                         self.maze_size[1]),
+                        False))
 
         offset_x: int = (
-            (self.game_settings.screen_width - self.maze_size[0] * tile_size)
-            // 2
+            (self.game_settings.screen_width -
+             self.maze_size[0] * tile_size) // 2
         )
 
         offset_y: int = (
-            (self.game_settings.screen_height - self.maze_size[1] * tile_size)
-            // 2
-        )
+            (self.game_settings.screen_height -
+             self.maze_size[1] * tile_size) // 2)
 
         m = Maze(maze, self.maze_size, (offset_x, offset_y))
+        (p_x, p_y) = self._compute_player_start(m)
+        self._player.set_position(p_x, p_y)
         # return Level(Player(), self._create_enemies(), m,
-        #        self.level_switcher)
-        return Level(Player(), m)
+        # self.level_switcher)
+        return Level(self._player, m)
 
 
 class LevelManager(LevelSwitcher):
