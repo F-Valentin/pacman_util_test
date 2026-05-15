@@ -6,37 +6,40 @@ import arcade
 if TYPE_CHECKING:
     from cell import Cell
 
-
 class Maze:
     def __init__(self, maze: list[list[Cell]],
                  size: tuple[float, float], top_left_coord: tuple[float, float]) -> None:
-        self.grid = maze
-        self.width = size[0]
-        self.height = size[1]
-        self.offset_x: float = top_left_coord[0]
-        self.offset_y: float = top_left_coord[1]
-        self.tile_size: int = 50
+        self._grid = maze
+        self._width = size[0]
+        self._height = size[1]
+        self._offset_x: float = top_left_coord[0]
+        self._offset_y: float = top_left_coord[1]
+        self._tile_size: int = 50
         self._wall_points = self._build_wall_points()
 
-    # @property
-    # def grid(self) -> list[list[Cell]]:
-    #     return self._grid
+    @property
+    def grid(self) -> list[list[Cell]]:
+        return self._grid
 
-    # @property
-    # def width(self) -> float:
-    #     return self._width
+    @property
+    def width(self) -> float:
+        return self._width
 
-    # @property
-    # def height(self) -> float:
-    #     return self._height
+    @property
+    def height(self) -> float:
+        return self._height
 
-    # @property
-    # def offset_x(self) -> float:
-    #     return self._offset_x
+    @property
+    def offset_x(self) -> float:
+        return self._offset_x
 
-    # @property
-    # def offset_y(self) -> float:
-    #     return self._offset_y
+    @property
+    def offset_y(self) -> float:
+        return self._offset_y
+
+    @property
+    def tile_size(self) -> int:
+        return self._tile_size
 
     def _build_wall_points(self) -> list[tuple[float, float]]:
         wall_points: list[tuple[float, float]] = []
