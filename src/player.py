@@ -1,4 +1,6 @@
-from subsriber import IPlayerSubscriber
+from subsriber import IPlayerDeathSubscriber, IPlayerSubscriber
+from functools import singledispatch
+
 
 import arcade
 from typing import Optional
@@ -24,10 +26,8 @@ class Player:
         self.direction: Optional[str] = None
         self.next_direction: Optional[str] = None
         self._subscribers: list[IPlayerSubscriber] = []
+        self._on_death_subsribers: list[IPlayerDeathSubscriber] = []
 
-    @property
-    def subscribers(self) -> list[IPlayerSubscriber]:
-        return self._subscribers
 
     def update(self, dt: float) -> None:
         self._sprite_list.update_animation(dt)
@@ -69,30 +69,32 @@ class Player:
             self.next_direction = self.direction
         
         if cell.has_pacgum:
-            self.eat_pacgum((cell.x, cell.y))
+            cell.pacgum_eaten()
             
-
+    @singledispatch
     def add_subscriber(self, subscriber: IPlayerSubscriber) -> None:
         self._subscribers.append(subscriber)
+    
+    @add_subscriber.register
+    def _(self, subscriber: IPlayerDeathSubscriber) -> None:
+        self._on_death_subsribers.append(subscriber)
 
+    @singledispatch
     def remove_subscriber(self, subscriber: IPlayerSubscriber) -> None:
         self._subscribers.remove(subscriber)
+    
+    @remove_subscriber.register
+    def _(self, subscriber: IPlayerDeathSubscriber) -> None:
+        self._on_death_subsribers.remove(subscriber)
 
-    def die(self) -> None:
-        for subscriber in self._subscribers:
-            subscriber.on_player_death()
+    # def die(self) -> None:
+    #     for subscriber in self._on_death_subsribers:
+    #         subscriber.on_player_death()
 
-    def eat_pacgum(self, cell_pos: tuple[int, int]) -> None:
-        for subscriber in self._subscribers:
-            subscriber.on_player_ate_pacgum(cell_pos)
-
-    def eat_super_pacgum(self) -> None:
-        for subscriber in self._subscribers:
-            subscriber.on_player_ate_super_pacgum()
-
-    def level_completed(self) -> None:
-        for subscriber in self._subscribers:
-            subscriber.on_player_completed_level()
 
     def draw(self) -> None:
         self._sprite_list.draw()
+
+    # def level_completed(self) -> None:
+    #     for subscriber in self._subscribers:
+    #         subscriber.on_player_completed_level()

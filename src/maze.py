@@ -1,13 +1,11 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
-from subsriber import IPlayerSubscriber
-
 import arcade
 
 if TYPE_CHECKING:
     from cell import Cell
 
-class Maze(IPlayerSubscriber):
+class Maze:
     def __init__(self, maze: list[list[Cell]],
                  size: tuple[float, float], top_left_coord: tuple[float, float]) -> None:
         self._grid = maze

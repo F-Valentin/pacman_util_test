@@ -1,21 +1,17 @@
-from abc import ABC, abstractmethod
+from typing import Protocol
 
 
-class IPlayerSubscriber(ABC):
-    def on_player_death(self):
-        pass
+class IPacgumSubscriber(Protocol):
+    def on_pacgum_eaten(self) -> None: ...
 
-    def on_player_ate_super_pacgum(self):
-        pass
+    def on_super_pacgum_eaten(self) -> None: ...
 
-    def on_player_ate_pacgum(self, cell_pos: tuple[int, int]):
-        pass
+class IPlayerDeathSubscriber(Protocol):
+    def on_player_death(self) -> None: ...
 
-    def on_player_completed_level(self):
-        pass
+class IPlayerSubscriber(Protocol): 
+    def kaka(self): ...
 
 
-class IGhostSubscriber(ABC):
-    @abstractmethod
-    def on_ghost_death(self):
-        pass
+class IGhostSubscriber(Protocol):
+    def on_ghost_death(self) -> None: ...
