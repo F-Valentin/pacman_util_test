@@ -3,6 +3,7 @@ from game_configuration import GameConfig
 from level import LevelFactory, LevelManager
 from player import Player
 from algorithm_strategy import DFSStrategy
+from view_manager import ViewManager
 
 
 def main() -> None:
@@ -11,7 +12,8 @@ def main() -> None:
     window = arcade.Window(
         width=game_config.screen_width,
         height=game_config.screen_height)
-    level_manager = LevelManager(window)
+    view_manager = ViewManager(window)
+    level_manager = LevelManager(window, view_manager)
     player = Player()
     level_factory = LevelFactory(
         player=player,

@@ -8,11 +8,12 @@ from maze import Maze
 from cell import Cell
 from game_configuration import GameConfig
 from algorithm_strategy import PathfindingStrategy
+from view_manager import ViewManager
 
 
 class LevelSwitcher(ABC):
     @abstractmethod
-    def next_level(self) -> bool:
+    def next_level(self) -> None:
         pass
 
 # class Level(arcade.View):
@@ -137,18 +138,18 @@ class LevelFactory:
 
 
 class LevelManager(LevelSwitcher):
-    def __init__(self, window: arcade.Window) -> None:
+    def __init__(self, window: arcade.Window, view_manager: ViewManager) -> None:
         self._window = window
         self._levels: list[Level] = []
+        self._view_manager = view_manager
         self._current_level_idx = 0
 
     def append_levels(self, levels: list[Level]) -> None:
         self._levels.extend(levels)
 
-    def next_level(self) -> bool:
+    def next_level(self):
         if self._current_level_idx < len(self._levels) - 1:
             self._current_level_idx += 1
             self._window.show_view(self._levels[self._current_level_idx])
-            return True
 
-        return False
+        #self._view_manager.switch_view("win_view") is not implement yes
