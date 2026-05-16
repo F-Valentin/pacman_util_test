@@ -138,10 +138,9 @@ class LevelFactory:
 
 
 class LevelManager(LevelSwitcher):
-    def __init__(self, window: arcade.Window, view_manager: ViewManager) -> None:
+    def __init__(self, window: arcade.Window) -> None:
         self._window = window
         self._levels: list[Level] = []
-        self._view_manager = view_manager
         self._current_level_idx = 0
 
     def append_levels(self, levels: list[Level]) -> None:
@@ -151,5 +150,3 @@ class LevelManager(LevelSwitcher):
         if self._current_level_idx < len(self._levels) - 1:
             self._current_level_idx += 1
             self._window.show_view(self._levels[self._current_level_idx])
-
-        #self._view_manager.switch_view("win_view") is not implement yes

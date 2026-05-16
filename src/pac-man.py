@@ -13,7 +13,7 @@ def main() -> None:
         width=game_config.screen_width,
         height=game_config.screen_height)
     view_manager = ViewManager(window)
-    level_manager = LevelManager(window, view_manager)
+    level_manager = LevelManager(window)
     player = Player()
     level_factory = LevelFactory(
         player=player,
