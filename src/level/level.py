@@ -1,14 +1,14 @@
 import arcade
 
 from abc import ABC, abstractmethod
-from mazegenerator import MazeGenerator
-from player import Player
-from ghost import Ghost
-from maze import Maze
-from cell import Cell
-from game_configuration import GameConfig
-from algorithm_strategy import PathfindingStrategy
-from view_manager import ViewManager
+from maze.mazegenerator import MazeGenerator
+from player.player import Player
+from enemy.ghost import Ghost
+from maze.maze import Maze
+from maze.cell import Cell
+from game.game_configuration import GameConfig
+from algorithms.algorithm_strategy import PathfindingStrategy
+from subscriber import ILevelManagerSubscriber
 
 
 class LevelSwitcher(ABC):
@@ -142,11 +142,27 @@ class LevelManager(LevelSwitcher):
         self._window = window
         self._levels: list[Level] = []
         self._current_level_idx = 0
+        self._subscribers: list[ILevelManagerSubscriber] = []
+
+    def add_subscriber(self, subscriber: ILevelManagerSubscriber) -> None:
+        self._subscribers.append(subscriber)
+
+    def remove_subscriber(self, subscriber: ILevelManagerSubscriber) -> None:
+        self._subscribers.remove(subscriber)
+
+    def append_level(self, level: Level) -> None:
+        self._levels.append(level)
 
     def append_levels(self, levels: list[Level]) -> None:
         self._levels.extend(levels)
+    
+    def all_levels_completed(self) -> None:
+        for subscriber in self._subscribers:
+            subscriber.on_all_levels_completed()
 
-    def next_level(self):
+    def next_level(self) -> None:
         if self._current_level_idx < len(self._levels) - 1:
             self._current_level_idx += 1
             self._window.show_view(self._levels[self._current_level_idx])
+        
+        self.all_levels_completed()

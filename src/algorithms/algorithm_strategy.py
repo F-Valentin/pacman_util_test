@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
-from cell import Cell
-from maze import Maze
+from maze.cell import Cell
+from maze.maze import Maze
 
 
 class PathfindingStrategy(ABC):

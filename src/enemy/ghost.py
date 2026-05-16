@@ -1,5 +1,5 @@
 import arcade
-from algorithm_strategy import PathfindingStrategy
+from algorithms.algorithm_strategy import PathfindingStrategy
 from subscriber import IGhostSubscriber
 from arcade import TextureAnimationSprite, SpriteList
 

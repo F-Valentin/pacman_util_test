@@ -3,7 +3,7 @@ from subscriber import IPlayerDeathSubscriber, IPlayerSubscriber
 
 import arcade
 from typing import Optional
-from cell import Cell
+from maze.cell import Cell
 from arcade import SpriteList, TextureAnimationSprite
 
 

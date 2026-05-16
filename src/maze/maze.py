@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 import arcade
 
 if TYPE_CHECKING:
-    from cell import Cell
+    from maze.cell import Cell
 
 
 class Maze:
