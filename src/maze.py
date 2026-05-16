@@ -44,11 +44,6 @@ class Maze:
     def tile_size(self) -> int:
         return self._tile_size
 
-    def on_player_ate_pacgum(self, cell_pos: tuple[int, int]) -> None:
-        (x, y) = cell_pos
-        cell = self.grid[y][x]
-        cell.has_pacgum = False
-
     def _setup_cells(self) -> None:
         tile_size = self.tile_size
         for row in self.grid:

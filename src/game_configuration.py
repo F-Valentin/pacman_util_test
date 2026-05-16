@@ -45,7 +45,7 @@ class GameConfig:
         try:
             with open(self.file_path, 'r', encoding='utf-8') as f:
                 self.raw_data = hjson.load(f)
-        except hjson.JSONDecodeError as e:
+        except hjson.HjsonDecodeError as e:
             raise ValueError("The file provided is not a valid JSON.") from e
         except PermissionError as e:
             raise PermissionError(
