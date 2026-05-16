@@ -5,7 +5,7 @@ from player import Player
 from algorithm_strategy import DFSStrategy
 
 
-def main():
+def main() -> None:
 
     game_config = GameConfig("config.json")
     window = arcade.Window(

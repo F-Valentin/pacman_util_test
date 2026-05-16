@@ -5,16 +5,19 @@ import arcade
 if TYPE_CHECKING:
     from cell import Cell
 
+
 class Maze:
     def __init__(self, maze: list[list[Cell]],
-                 size: tuple[float, float], top_left_coord: tuple[float, float]) -> None:
+                 size: tuple[float, float], top_left_coord: tuple[float, float]
+                 ) -> None:
         self._grid = maze
-        self._width = size[0]
-        self._height = size[1]
+        self._width: float = size[0]
+        self._height: float = size[1]
         self._offset_x: float = top_left_coord[0]
         self._offset_y: float = top_left_coord[1]
         self._tile_size: int = 50
-        self._wall_points = self._build_wall_points()
+        self._wall_points: list[tuple[float, float]
+                                ] = self._build_wall_points()
         self._setup_cells()
 
     @property
@@ -40,8 +43,8 @@ class Maze:
     @property
     def tile_size(self) -> int:
         return self._tile_size
-    
-    def on_player_ate_pacgum(self, cell_pos: tuple[int, int]):
+
+    def on_player_ate_pacgum(self, cell_pos: tuple[int, int]) -> None:
         (x, y) = cell_pos
         cell = self.grid[y][x]
         cell.has_pacgum = False
@@ -99,6 +102,6 @@ class Maze:
                                           screen_y + tile_size // 2,
                                           3, arcade.color.WHITE)
 
-    def draw(self):
+    def draw(self) -> None:
         self._draw_walls()
         self._draw_pacgums()

@@ -1,6 +1,7 @@
 import arcade
 from algorithm_strategy import PathfindingStrategy
-from subscriber import IGhostSubscriber, IPlayerSubscriber
+from subscriber import IGhostSubscriber
+from arcade import TextureAnimationSprite, SpriteList
 
 
 class Ghost(arcade.Sprite):
@@ -8,8 +9,9 @@ class Ghost(arcade.Sprite):
                  strategy: PathfindingStrategy) -> None:
         super().__init__()
 
-        self._sprite_list: arcade.SpriteList = arcade.SpriteList()
-        self._animation = arcade.load_animated_gif(path_to_animation)
+        self._sprite_list: SpriteList[arcade.Sprite] = SpriteList()
+        self._animation: TextureAnimationSprite = arcade.load_animated_gif(
+            path_to_animation)
         self._sprite_list.append(self._animation)
 
         self._strategy = strategy

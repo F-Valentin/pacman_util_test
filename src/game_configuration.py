@@ -17,7 +17,7 @@ class GameConfig:
         self.screen_width = 800
         self.screen_height = 800
 
-        self.raw_data = None
+        self.raw_data: dict[str, int | bool] = {}
 
         self._load_config()
 

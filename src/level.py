@@ -16,7 +16,9 @@ class LevelSwitcher(ABC):
         pass
 
 # class Level(arcade.View):
-#     def __init__(self, player: Player, ghosts: list[Ghost], maze: Maze, level_switcher: LevelSwitcher) -> None:
+#     def __init__(self,
+# player: Player,
+# ghosts: list[Ghost], maze: Maze, level_switcher: LevelSwitcher) -> None:
 #         self._player = player
 #         self._ghosts = ghosts
 #         self._maze = maze
@@ -33,7 +35,7 @@ class Level(arcade.View):
         super().__init__()
         self._player = player
         self._maze = maze
-        self._time_accumulator = 0
+        self._time_accumulator: float = 0
 
     def on_update(self, delta_time: float) -> None:
         self._time_accumulator += delta_time
@@ -85,7 +87,7 @@ class LevelFactory:
         self.game_config = game_config
         self.level_switcher = level_switcher
 
-    def _create_enemies(self):
+    def _create_enemies(self) -> list[Ghost]:
         ghosts = []
         for _ in range(self.nb_of_ghosts):
             ghosts.append(Ghost("", self.ghost_strategy))

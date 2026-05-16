@@ -1,6 +1,7 @@
 from subscriber import IPacgumSubscriber
 from pacgum import Pacgum
 
+
 class Cell:
     """Cellule class used to create better coordinate system."""
 
@@ -24,6 +25,6 @@ class Cell:
     def remove_subscriber(self, subscriber: IPacgumSubscriber) -> None:
         self._subscribers.remove(subscriber)
 
-    def pacgum_eaten(self):
+    def pacgum_eaten(self) -> None:
         self.has_pacgum = False
         # notify level to change score

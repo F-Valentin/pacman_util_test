@@ -4,11 +4,12 @@ from subscriber import IPlayerDeathSubscriber, IPlayerSubscriber
 import arcade
 from typing import Optional
 from cell import Cell
+from arcade import SpriteList, TextureAnimationSprite
 
 
 class Player:
     def __init__(self) -> None:
-        self.sprite: arcade.TextureAnimationSprite = arcade.load_animated_gif(
+        self.sprite: TextureAnimationSprite = arcade.load_animated_gif(
             "assets/pacman.gif")
         self.sprite.scale = 0.09
         self.sprite.center_x = 0
@@ -17,8 +18,7 @@ class Player:
         self.change_x: float = 0.0
         self.change_y: float = 0.0
 
-        self._sprite_list: arcade.SpriteList[arcade.TextureAnimationSprite] = arcade.SpriteList(
-        )
+        self._sprite_list: SpriteList[TextureAnimationSprite] = SpriteList()
         self._sprite_list.append(self.sprite)
 
         self.speed: float = 2.5
@@ -27,13 +27,12 @@ class Player:
         self._subscribers: list[IPlayerSubscriber] = []
         self._on_death_subsribers: list[IPlayerDeathSubscriber] = []
 
-
     def update(self, dt: float) -> None:
         self._sprite_list.update_animation(dt)
         self.sprite.center_x += self.change_x
         self.sprite.center_y += self.change_y
 
-    def set_position(self, x: int, y: int):
+    def set_position(self, x: int, y: int) -> None:
         self.sprite.center_x = x
         self.sprite.center_y = y
 
@@ -66,26 +65,26 @@ class Player:
             self.change_x = -speed
         else:
             self.next_direction = self.direction
-        
+
         if cell.has_pacgum:
             cell.pacgum_eaten()
-            
+
     def add_player_subscriber(self, subscriber: IPlayerSubscriber) -> None:
         self._subscribers.append(subscriber)
-    
+
     def add_death_subscriber(self, subscriber: IPlayerDeathSubscriber) -> None:
         self._on_death_subsribers.append(subscriber)
 
     def remove_player_subscriber(self, subscriber: IPlayerSubscriber) -> None:
         self._subscribers.remove(subscriber)
-    
-    def remove_death_subscriber(self, subscriber: IPlayerDeathSubscriber) -> None:
+
+    def remove_death_subscriber(
+            self, subscriber: IPlayerDeathSubscriber) -> None:
         self._on_death_subsribers.remove(subscriber)
 
     # def die(self) -> None:
     #     for subscriber in self._on_death_subsribers:
     #         subscriber.on_player_death()
-
 
     def draw(self) -> None:
         self._sprite_list.draw()

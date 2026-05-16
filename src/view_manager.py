@@ -7,7 +7,7 @@ class ViewManager:
         self._window = window
         self._views: dict[str, arcade.View] = {}
 
-    def add_view(self, view_name: str, view: arcade.View):
+    def add_view(self, view_name: str, view: arcade.View) -> None:
         self._views[view_name] = view
 
     def switch_view(self, view_name: str) -> bool:

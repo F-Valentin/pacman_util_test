@@ -6,10 +6,13 @@ class IPacgumSubscriber(Protocol):
 
     def on_super_pacgum_eaten(self) -> None: ...
 
+
 class IPlayerDeathSubscriber(Protocol):
     def on_player_death(self) -> None: ...
 
-class IPlayerSubscriber(Protocol): ...
+
+class IPlayerSubscriber(Protocol):
+    ...
 
 
 class IGhostSubscriber(Protocol):
