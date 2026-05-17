@@ -8,7 +8,7 @@ from arcade import SpriteList, TextureAnimationSprite
 
 
 class Player:
-    def __init__(self) -> None:
+    def __init__(self, lives: int) -> None:
         self.sprite: TextureAnimationSprite = arcade.load_animated_gif(
             "assets/pacman.gif")
         self.sprite.scale = 0.09
@@ -22,6 +22,7 @@ class Player:
         self._sprite_list.append(self.sprite)
 
         self.speed: float = 2.5
+        self.lives = lives
         self.direction: Optional[str] = None
         self.next_direction: Optional[str] = None
         self._subscribers: list[IPlayerSubscriber] = []

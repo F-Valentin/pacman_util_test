@@ -23,17 +23,18 @@ def main() -> None:
     view_manager = ViewManager(window)
     game_state = GameState(view_manager)
     level_manager = LevelManager(window)
-    player = Player()
+    player = Player(game_config.lives)
     level_factory = LevelFactory(
         player=player,
         game_config=game_config,
         ghost_strategy=DFSStrategy(),
-        maze_size=(5, 5),
+        maze_size=(3, 3),
         level_switcher=level_manager)
     player.add_death_subscriber(game_state)
     level_manager.add_subscriber(game_state)
     level1 = level_factory.create_level()
-    level_manager.append_level(level1)
+    level2 = level_factory.create_level()
+    level_manager.append_levels([level1, level2])
     window.show_view(level1)
     arcade.run()
 
