@@ -109,20 +109,18 @@ class LevelFactory:
              "corner": (0, 0)},
             {"asset": "assets/pinky.png",
              "corner": (0, self.maze_size[0] - 1)},
-            {"asset": "assets/inky.png",  
+            {"asset": "assets/inky.png",
              "corner": (self.maze_size[1] - 1, 0)},
             {"asset": "assets/clyde.png",
              "corner": (self.maze_size[1] - 1, self.maze_size[0] - 1)}]
 
         for config in ghost_configs:
             ghost = Ghost(config["asset"], self.ghost_strategy)
-            ghost.scale = 0.06
 
             y_index, x_index = config["corner"]
             cell_target = maze.grid[y_index][x_index]
 
-            ghost.center_x = cell_target.center[0]
-            ghost.center_y = cell_target.center[1]
+            ghost.set_position(cell_target.center[0], cell_target.center[1])
 
             ghosts.append(ghost)
 
