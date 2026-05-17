@@ -6,6 +6,7 @@ from player.player import Player
 from algorithms.algorithm_strategy import DFSStrategy
 from view_manager import ViewManager
 from game.game_state import GameState
+from views import WinView
 
 
 def main() -> None:
@@ -21,6 +22,7 @@ def main() -> None:
         width=game_config.screen_width,
         height=game_config.screen_height)
     view_manager = ViewManager(window)
+    view_manager.add_view("win_view", WinView())
     game_state = GameState(view_manager)
     level_manager = LevelManager(window)
     player = Player(game_config.lives)
@@ -33,8 +35,9 @@ def main() -> None:
     player.add_death_subscriber(game_state)
     level_manager.add_subscriber(game_state)
     level1 = level_factory.create_level()
-    level2 = level_factory.create_level()
-    level_manager.append_levels([level1, level2])
+    # level2 = level_factory.create_level()
+    # level_manager.append_levels([level1, level2])
+    level_manager.append_level(level1)
     window.show_view(level1)
     arcade.run()
 

@@ -7,7 +7,7 @@ class GameState:
 
     def on_all_levels_completed(self) -> None:
         # TODO
-        # self._view_manager.switch_view("win_view")
+        #self._view_manager.switch_view("win_view")
         pass
 
     def on_player_death(self) -> None:
