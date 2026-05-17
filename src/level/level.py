@@ -155,7 +155,7 @@ class LevelManager(LevelSwitcher):
 
     def append_levels(self, levels: list[Level]) -> None:
         self._levels.extend(levels)
-    
+
     def all_levels_completed(self) -> None:
         for subscriber in self._subscribers:
             subscriber.on_all_levels_completed()
