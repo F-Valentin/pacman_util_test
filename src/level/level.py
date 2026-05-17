@@ -164,5 +164,5 @@ class LevelManager(LevelSwitcher):
         if self._current_level_idx < len(self._levels) - 1:
             self._current_level_idx += 1
             self._window.show_view(self._levels[self._current_level_idx])
-        
-        self.all_levels_completed()
+        else:
+            self.all_levels_completed()
