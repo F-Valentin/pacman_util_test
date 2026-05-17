@@ -1,21 +1,14 @@
 import arcade
 from algorithms.algorithm_strategy import PathfindingStrategy
 from subscriber import IGhostSubscriber
-from arcade import TextureAnimationSprite, SpriteList
 
 
 class Ghost(arcade.Sprite):
-    def __init__(self, path_to_animation: str,
+    def __init__(self, path_to_sprite: str,
                  strategy: PathfindingStrategy) -> None:
-        super().__init__()
-
-        self._sprite_list: SpriteList[arcade.Sprite] = SpriteList()
-        self._animation: TextureAnimationSprite = arcade.load_animated_gif(
-            path_to_animation)
-        self._sprite_list.append(self._animation)
+        super().__init__(path_to_sprite)
 
         self._strategy = strategy
-
         self._subscribers: list[IGhostSubscriber] = []
 
     @property

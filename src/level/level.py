@@ -32,10 +32,15 @@ class LevelSwitcher(ABC):
 
 
 class Level(arcade.View):
-    def __init__(self, player: Player, maze: Maze) -> None:
+    def __init__(self, player: Player, maze: Maze,
+                 ghosts: list[Ghost]) -> None:
         super().__init__()
         self._player = player
         self._maze = maze
+
+        self._ghosts = arcade.SpriteList()
+        self._ghosts.extend(ghosts)
+
         self._time_accumulator: float = 0
 
     def on_update(self, delta_time: float) -> None:
@@ -47,6 +52,9 @@ class Level(arcade.View):
 
     def _fixed_update(self, dt: float) -> None:
         self._player.update(dt)
+
+        self._ghosts.update()
+
         player_pixel_x = int(self._player.sprite.center_x)
         player_pixel_y = int(self._player.sprite.center_y)
 
@@ -71,6 +79,7 @@ class Level(arcade.View):
         self.window.clear()
         self._maze.draw()
         self._player.draw()
+        self._ghosts.draw()
 
 
 class LevelFactory:
@@ -88,10 +97,31 @@ class LevelFactory:
         self.game_config = game_config
         self.level_switcher = level_switcher
 
-    def _create_enemies(self) -> list[Ghost]:
+    def _create_enemies(self, maze: Maze) -> list[Ghost]:
         ghosts = []
-        for _ in range(self.nb_of_ghosts):
-            ghosts.append(Ghost("", self.ghost_strategy))
+
+        ghost_configs = [
+            {"asset": "assets/blinky.png",
+             "corner": (0, 0)},
+            {"asset": "assets/pinky.png",
+             "corner": (0, self.maze_size[0] - 1)},
+            {"asset": "assets/inky.png",  
+             "corner": (self.maze_size[1] - 1, 0)},
+            {"asset": "assets/clyde.png",
+             "corner": (self.maze_size[1] - 1, self.maze_size[0] - 1)}]
+
+        for config in ghost_configs:
+            ghost = Ghost(config["asset"], self.ghost_strategy)
+            ghost.scale = 0.06
+
+            y_index, x_index = config["corner"]
+            cell_target = maze.grid[y_index][x_index]
+
+            ghost.center_x = cell_target.center[0]
+            ghost.center_y = cell_target.center[1]
+
+            ghosts.append(ghost)
+
         return ghosts
 
     def _compute_player_start(self, maze: Maze) -> tuple[int, int]:
@@ -132,9 +162,12 @@ class LevelFactory:
         maze = Maze(grid, self.maze_size, (offset_x, offset_y))
         (p_x, p_y) = self._compute_player_start(maze)
         self._player.set_position(p_x, p_y)
+
+        enemies = self._create_enemies(maze)
+
         # return Level(Player(), self._create_enemies(), m,
         # self.level_switcher)
-        return Level(self._player, maze)
+        return Level(self._player, maze, enemies)
 
 
 class LevelManager(LevelSwitcher):
