@@ -39,8 +39,7 @@ class Level(arcade.View):
         self._maze = maze
         self._level_switcher = level_switcher
 
-        self._ghosts = arcade.SpriteList()
-        self._ghosts.extend(ghosts)
+        self._ghosts: list[Ghost] = ghosts
 
         self._time_accumulator: float = 0
 
