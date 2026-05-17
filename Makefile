@@ -3,7 +3,7 @@ PYTHON = python3
 VENV = venv
 BIN = $(VENV)/bin
 MAIN = src/pac-man.py
-CONFIG_FILE ?= config.json
+CONFIG_FILE ?= config/config.json
 
 .PHONY: install run debug clean lint
 .SILENT:
@@ -11,7 +11,7 @@ CONFIG_FILE ?= config.json
 install:
 	$(PYTHON) -m venv $(VENV)
 	$(BIN)/pip install --upgrade pip
-	$(BIN)/pip install -r requirements.txt
+	$(BIN)/pip install -r config/requirements.txt
 
 run:
 	$(BIN)/python $(MAIN) $(CONFIG_FILE)

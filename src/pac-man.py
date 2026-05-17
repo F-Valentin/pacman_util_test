@@ -1,4 +1,5 @@
 import arcade
+import sys
 from game.game_configuration import GameConfig
 from level.level import LevelFactory, LevelManager
 from player.player import Player
@@ -9,7 +10,13 @@ from game.game_state import GameState
 
 def main() -> None:
 
-    game_config = GameConfig("config.json")
+    if len(sys.argv) != 2:
+        print("Usage: python3 pac-man.py <config_file.json>")
+        return
+
+    file_path = sys.argv[1]
+
+    game_config = GameConfig(file_path)
     window = arcade.Window(
         width=game_config.screen_width,
         height=game_config.screen_height)
