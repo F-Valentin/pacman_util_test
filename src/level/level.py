@@ -57,7 +57,8 @@ class Level(arcade.View):
     def _fixed_update(self, dt: float) -> None:
         self._player.update(dt)
 
-        self._ghosts.update()
+        for ghost in self._ghosts:
+            ghost.update()
 
         player_pixel_x = int(self._player.sprite.center_x)
         player_pixel_y = int(self._player.sprite.center_y)
@@ -83,7 +84,8 @@ class Level(arcade.View):
         self.window.clear()
         self._maze.draw()
         self._player.draw()
-        self._ghosts.draw()
+        for ghost in self._ghosts:
+            ghost.draw()
 
 
 class LevelFactory:
