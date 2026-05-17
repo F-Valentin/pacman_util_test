@@ -33,10 +33,11 @@ class LevelSwitcher(ABC):
 
 class Level(arcade.View):
     def __init__(self, player: Player, maze: Maze,
-                 ghosts: list[Ghost]) -> None:
+                 ghosts: list[Ghost], level_switcher: LevelSwitcher) -> None:
         super().__init__()
         self._player = player
         self._maze = maze
+        self._level_switcher = level_switcher
 
         self._ghosts = arcade.SpriteList()
         self._ghosts.extend(ghosts)
@@ -47,6 +48,10 @@ class Level(arcade.View):
         self._time_accumulator += delta_time
         time_step: float = 1 / 60
         while self._time_accumulator >= time_step:
+            if not self._maze.nb_of_pacgum:
+                self._level_switcher.next_level()
+                break
+
             self._fixed_update(time_step)
             self._time_accumulator -= time_step
 
@@ -167,7 +172,7 @@ class LevelFactory:
 
         # return Level(Player(), self._create_enemies(), m,
         # self.level_switcher)
-        return Level(self._player, maze, enemies)
+        return Level(self._player, maze, enemies, self.level_switcher)
 
 
 class LevelManager(LevelSwitcher):

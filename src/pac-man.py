@@ -28,7 +28,7 @@ def main() -> None:
         player=player,
         game_config=game_config,
         ghost_strategy=DFSStrategy(),
-        maze_size=(15, 15),
+        maze_size=(5, 5),
         level_switcher=level_manager)
     player.add_death_subscriber(game_state)
     level_manager.add_subscriber(game_state)

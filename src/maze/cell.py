@@ -27,4 +27,5 @@ class Cell:
 
     def pacgum_eaten(self) -> None:
         self.has_pacgum = False
-        # notify level to change score
+        for subscriber in self._subscribers:
+            subscriber.on_pacgum_eaten()
