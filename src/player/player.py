@@ -82,10 +82,13 @@ class Player:
     def remove_death_subscriber(
             self, subscriber: IPlayerDeathSubscriber) -> None:
         self._on_death_subsribers.remove(subscriber)
+    
+    # TODO
+    # def collide_with_enemies(self, )
 
-    # def die(self) -> None:
-    #     for subscriber in self._on_death_subsribers:
-    #         subscriber.on_player_death()
+    def die(self) -> None:
+        for subscriber in self._on_death_subsribers:
+            subscriber.on_player_death()
 
     def draw(self) -> None:
         self._sprite_list.draw()
