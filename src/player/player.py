@@ -18,6 +18,8 @@ class Player:
         self.change_x: float = 0.0
         self.change_y: float = 0.0
 
+        self.actual_cell: Cell = None
+
         self._sprite_list: SpriteList[TextureAnimationSprite] = SpriteList()
         self._sprite_list.append(self.sprite)
 

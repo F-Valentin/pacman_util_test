@@ -18,6 +18,8 @@ class Ghost():
         self.change_x: float = 0.0
         self.change_y: float = 0.0
 
+        self.actual_cell: Cell = None
+
         self._sprite_list: SpriteList[arcade.Sprite] = SpriteList()
         self._sprite_list.append(self.sprite)
 
@@ -25,9 +27,10 @@ class Ghost():
 
         self.algo = algo
 
-    def set_position(self, x: int, y: int) -> None:
+    def set_position(self, x: int, y: int, cell: Cell) -> None:
         self.sprite.center_x = x
         self.sprite.center_y = y
+        self.actual_cell = cell
 
     def update(self, dt: float) -> None:
         self._sprite_list.update(dt)
