@@ -167,7 +167,8 @@ class LevelFactory:
 
         maze = Maze(grid, self.maze_size, (offset_x, offset_y))
         (p_x, p_y) = self._compute_player_start(maze)
-        self._player.set_position(p_x, p_y)
+        target_cell = maze.grid[maze.height // 2][maze.width // 2]
+        self._player.set_position(p_x, p_y, target_cell)
 
         enemies = self._create_enemies(maze)
 

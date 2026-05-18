@@ -18,4 +18,4 @@ class DFSStrategy(PathfindingStrategy):
         self.maze = maze
 
     def find_path(self, start: Cell, dest: Cell) -> list[Cell] | None:
-        print("test")
+        print((start.x, start.y), (dest.x, dest.y))

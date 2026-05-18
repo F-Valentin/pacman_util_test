@@ -35,9 +35,10 @@ class Player:
         self.sprite.center_x += self.change_x
         self.sprite.center_y += self.change_y
 
-    def set_position(self, x: int, y: int) -> None:
+    def set_position(self, x: int, y: int, cell: Cell) -> None:
         self.sprite.center_x = x
         self.sprite.center_y = y
+        self.actual_cell = cell
 
     def move_to_next_cell(self, cell: Cell) -> None:
         self.change_x = 0.0
@@ -83,7 +84,7 @@ class Player:
     def remove_death_subscriber(
             self, subscriber: IPlayerDeathSubscriber) -> None:
         self._on_death_subsribers.remove(subscriber)
-    
+
     # TODO
     # def collide_with_enemies(self, )
 
