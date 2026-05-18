@@ -3,7 +3,7 @@ import sys
 from game.game_configuration import GameConfig
 from level.level import LevelFactory, LevelManager
 from player.player import Player
-from algorithms.algorithm_strategy import DFSStrategy
+from algorithms.algorithm_strategy import BFSStrategy
 from view_manager import ViewManager
 from game.game_state import GameState
 from views import WinView

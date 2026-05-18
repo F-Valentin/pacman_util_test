@@ -7,7 +7,7 @@ from enemy.ghost import Ghost
 from maze.maze import Maze
 from maze.cell import Cell
 from game.game_configuration import GameConfig
-from algorithms.algorithm_strategy import PathfindingStrategy, DFSStrategy
+from algorithms.algorithm_strategy import PathfindingStrategy, BFSStrategy
 from subscriber import ILevelManagerSubscriber
 
 
@@ -63,6 +63,7 @@ class Level(arcade.View):
         player_pixel_x = int(self._player.sprite.center_x)
         player_pixel_y = int(self._player.sprite.center_y)
 
+        print(f"gost:{ghost.actual_cell}")
         ghost.move_to_next_cell()
 
         for row in self._maze.grid:
@@ -118,7 +119,7 @@ class LevelFactory:
              "corner": (self.maze_size[1] - 1, self.maze_size[0] - 1)}]
 
         for config in ghost_configs:
-            ghost = Ghost(config["asset"], DFSStrategy(self._player, maze))
+            ghost = Ghost(config["asset"], BFSStrategy(self._player, maze))
 
             y_index, x_index = config["corner"]
             cell_target = maze.grid[y_index][x_index]

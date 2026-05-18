@@ -41,8 +41,9 @@ class Ghost():
         self._sprite_list.draw()
 
     def move_to_next_cell(self) -> None:
-        self.algo.find_path(self.actual_cell)
-        # next_cell: Cell = self.algo.find_path(self.actual_cell)
+        next_cell: Cell = self.algo.find_path(self.actual_cell)
+        for n in next_cell:
+            print(n.center)
 
     @property
     def subscribers(self) -> list[IGhostSubscriber]:
