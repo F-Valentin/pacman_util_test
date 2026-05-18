@@ -37,7 +37,6 @@ class Player:
         self.sprite.center_x = x
         self.sprite.center_y = y
 
-    # _handle_hub old name
     def move_to_next_cell(self, cell: Cell) -> None:
         self.change_x = 0.0
         self.change_y = 0.0
