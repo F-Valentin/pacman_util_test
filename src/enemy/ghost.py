@@ -1,5 +1,6 @@
 import arcade
 from arcade import SpriteList
+from maze.cell import Cell
 from subscriber import IGhostSubscriber
 from algorithms.algorithm_strategy import PathfindingStrategy
 
@@ -10,6 +11,12 @@ class Ghost():
                  algo: PathfindingStrategy) -> None:
         self.sprite: arcade.Sprite = arcade.Sprite(path_to_sprite)
         self.sprite.scale = 0.06
+        self.sprite.center_x = 0
+        self.sprite.center_y = 0
+        self.speed: float = 1.75
+
+        self.change_x: float = 0.0
+        self.change_y: float = 0.0
 
         self._sprite_list: SpriteList[arcade.Sprite] = SpriteList()
         self._sprite_list.append(self.sprite)
@@ -22,11 +29,16 @@ class Ghost():
         self.sprite.center_x = x
         self.sprite.center_y = y
 
-    def update(self) -> None:
-        self._sprite_list.update()
+    def update(self, dt: float) -> None:
+        self._sprite_list.update(dt)
+        self.sprite.center_x += self.change_x
+        self.sprite.center_y += self.change_y
 
     def draw(self) -> None:
         self._sprite_list.draw()
+
+    def move_to_next_cell(self, cell: Cell) -> None:
+        speed: float = self.speed
 
     @property
     def subscribers(self) -> list[IGhostSubscriber]:
