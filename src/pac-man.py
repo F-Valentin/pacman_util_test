@@ -29,7 +29,6 @@ def main() -> None:
     level_factory = LevelFactory(
         player=player,
         game_config=game_config,
-        ghost_strategy=DFSStrategy(),
         maze_size=(3, 3),
         level_switcher=level_manager)
     player.add_death_subscriber(game_state)

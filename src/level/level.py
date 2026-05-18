@@ -7,7 +7,7 @@ from enemy.ghost import Ghost
 from maze.maze import Maze
 from maze.cell import Cell
 from game.game_configuration import GameConfig
-from algorithms.algorithm_strategy import PathfindingStrategy
+from algorithms.algorithm_strategy import PathfindingStrategy, DFSStrategy
 from subscriber import ILevelManagerSubscriber
 
 
@@ -58,7 +58,7 @@ class Level(arcade.View):
         self._player.update(dt)
 
         for ghost in self._ghosts:
-            ghost.update()
+            ghost.update(dt)
 
         player_pixel_x = int(self._player.sprite.center_x)
         player_pixel_y = int(self._player.sprite.center_y)
@@ -92,13 +92,11 @@ class LevelFactory:
     def __init__(self,
                  player: Player,
                  game_config: GameConfig,
-                 ghost_strategy: PathfindingStrategy,
                  maze_size: tuple[int, int],
                  level_switcher: LevelSwitcher
                  ) -> None:
         self.nb_of_ghosts = 4
         self._player = player
-        self.ghost_strategy = ghost_strategy
         self.maze_size = maze_size
         self.game_config = game_config
         self.level_switcher = level_switcher
@@ -117,12 +115,14 @@ class LevelFactory:
              "corner": (self.maze_size[1] - 1, self.maze_size[0] - 1)}]
 
         for config in ghost_configs:
-            ghost = Ghost(config["asset"], self.ghost_strategy)
+            ghost = Ghost(config["asset"], DFSStrategy(self._player, maze))
 
             y_index, x_index = config["corner"]
             cell_target = maze.grid[y_index][x_index]
 
             ghost.set_position(cell_target.center[0], cell_target.center[1])
+
+            ghost.algo.find_path()
 
             ghosts.append(ghost)
 
