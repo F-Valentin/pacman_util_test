@@ -40,8 +40,9 @@ class Ghost():
     def draw(self) -> None:
         self._sprite_list.draw()
 
-    def move_to_next_cell(self, cell: Cell) -> None:
-        speed: float = self.speed
+    def move_to_next_cell(self) -> None:
+        self.algo.find_path(self.actual_cell)
+        # next_cell: Cell = self.algo.find_path(self.actual_cell)
 
     @property
     def subscribers(self) -> list[IGhostSubscriber]:

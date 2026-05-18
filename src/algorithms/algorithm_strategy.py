@@ -17,5 +17,7 @@ class DFSStrategy(PathfindingStrategy):
         self.player = player
         self.maze = maze
 
-    def find_path(self, start: Cell, dest: Cell) -> list[Cell] | None:
+    def find_path(self, start: Cell) -> list[Cell] | None:
+        dest = self.player.actual_cell
+
         print((start.x, start.y), (dest.x, dest.y))

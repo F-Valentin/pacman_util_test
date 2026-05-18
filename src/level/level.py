@@ -63,6 +63,8 @@ class Level(arcade.View):
         player_pixel_x = int(self._player.sprite.center_x)
         player_pixel_y = int(self._player.sprite.center_y)
 
+        ghost.move_to_next_cell()
+
         for row in self._maze.grid:
             for cell in row:
                 if cell.center != (player_pixel_x, player_pixel_y):
@@ -123,8 +125,6 @@ class LevelFactory:
 
             ghost.set_position(cell_target.center[0], cell_target.center[1],
                                cell_target)
-
-            ghost.algo.find_path(ghost.actual_cell, self._player.actual_cell)
 
             ghosts.append(ghost)
 
