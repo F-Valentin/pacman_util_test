@@ -82,6 +82,7 @@ class Player:
         self.change_x = 0
         self.change_y = 0
         self.direction = None
+        self.next_direction = None
 
         x_idx = int((x  - maze.offset_x) / maze.tile_size)
         y_idx = int((y - maze.offset_y) / maze.tile_size)
