@@ -9,6 +9,7 @@ from maze.cell import Cell
 from game.game_configuration import GameConfig
 from algorithms.algorithm_strategy import PathfindingStrategy, BFSStrategy
 from subscriber import ILevelManagerSubscriber
+from game.game_collision import check_collision
 
 
 class PauseView(arcade.View):
@@ -88,7 +89,7 @@ class Level(arcade.View):
             ghost_pixel_x = int(ghost.sprite.center_x)
             ghost_pixel_y = int(ghost.sprite.center_y)
 
-            if arcade.check_for_collision(self._player.sprite, ghost.sprite):
+            if check_collision(self._player.sprite, ghost.sprite):
                 self.window.show_view(PauseView(self))
 
             for row in self._maze.grid:
