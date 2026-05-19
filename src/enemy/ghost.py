@@ -9,12 +9,12 @@ class Ghost():
 
     def __init__(self, path_to_sprite: str,
                  algo: PathfindingStrategy,
-                 difficulty_id: int) -> None:
+                 difficulty_id: int, speed: float) -> None:
         self.sprite: arcade.Sprite = arcade.Sprite(path_to_sprite)
         self.sprite.scale = 0.06
         self.sprite.center_x = 0
         self.sprite.center_y = 0
-        self.speed: float = 2
+        self.speed = speed
 
         self.change_x: float = 0.0
         self.change_y: float = 0.0

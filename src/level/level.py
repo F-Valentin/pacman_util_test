@@ -11,6 +11,30 @@ from algorithms.algorithm_strategy import PathfindingStrategy, BFSStrategy
 from subscriber import ILevelManagerSubscriber
 
 
+class PauseView(arcade.View):
+    def __init__(self, previous_view: arcade.View):
+        super().__init__()
+        self._previous_view = previous_view
+
+    def on_draw(self):
+        # Draw player, for effect, on pause screen.
+        # The previous View (GameView) was passed in
+        # and saved in self.game_view.
+
+        # draw an orange filter over him
+        self.clear()
+        self._previous_view.on_draw()
+        pause = arcade.Text("PAUSED", self.window.width / 2,
+                            self.window.height / 2 + 100,
+                            arcade.color.WHITE,
+                            font_size=50, anchor_x="center")
+        pause.draw()
+
+    def on_key_press(self, key, _modifiers):
+        if key == arcade.key.ESCAPE:   # resume game
+            self.window.show_view(self._previous_view)
+
+
 class LevelSwitcher(ABC):
     @abstractmethod
     def next_level(self) -> None:
@@ -64,6 +88,9 @@ class Level(arcade.View):
             ghost_pixel_x = int(ghost.sprite.center_x)
             ghost_pixel_y = int(ghost.sprite.center_y)
 
+            if self._player.actual_cell == ghost.actual_cell:
+                self.window.show_view(PauseView(self))
+
             for row in self._maze.grid:
                 for cell in row:
                     if cell.center == (ghost_pixel_x, ghost_pixel_y):
@@ -91,6 +118,8 @@ class Level(arcade.View):
             self._player.next_direction = "LEFT"
         elif key in (arcade.key.RIGHT, arcade.key.D):
             self._player.next_direction = "RIGHT"
+        elif key == arcade.key.ESCAPE:
+            self.window.show_view(PauseView(self))
 
     def on_draw(self) -> None:
         self.window.clear()
@@ -119,20 +148,24 @@ class LevelFactory:
         ghost_configs = [
             {"asset": "assets/blinky.png",
              "corner": (0, 0),
-             "difficulty_id": 2},
+             "difficulty_id": 2,
+             "speed": 2},
             {"asset": "assets/pinky.png",
              "corner": (0, self.maze_size[0] - 1),
-             "difficulty_id": 8},
+             "difficulty_id": 8,
+             "speed": 1.25},
             {"asset": "assets/inky.png",
              "corner": (self.maze_size[1] - 1, 0),
-             "difficulty_id": 15},
+             "difficulty_id": 12,
+             "speed": 2},
             {"asset": "assets/clyde.png",
              "corner": (self.maze_size[1] - 1, self.maze_size[0] - 1),
-             "difficulty_id": 20}]
+             "difficulty_id": 17,
+             "speed": 1.25}]
 
         for config in ghost_configs:
             ghost = Ghost(config["asset"], BFSStrategy(self._player, maze),
-                          config["difficulty_id"])
+                          config["difficulty_id"], config["speed"])
 
             y_index, x_index = config["corner"]
             cell_target = maze.grid[y_index][x_index]
