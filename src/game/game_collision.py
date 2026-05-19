@@ -3,7 +3,7 @@ import math
 
 
 def check_collision(sprite_a: arcade.Sprite,
-                           sprite_b: arcade.Sprite) -> bool:
+                    sprite_b: arcade.Sprite) -> bool:
     dx = sprite_a.center_x - sprite_b.center_x
     dy = sprite_a.center_y - sprite_b.center_y
     distance = math.sqrt(dx**2 + dy**2)
