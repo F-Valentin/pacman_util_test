@@ -11,7 +11,7 @@ class Player:
     def __init__(self, lives: int) -> None:
         self.sprite: TextureAnimationSprite = arcade.load_animated_gif(
             "assets/pacman.gif")
-        self.sprite.scale = 0.09
+        self.sprite.scale = 0.16
         self.sprite.center_x = 0
         self.sprite.center_y = 0
 
@@ -23,7 +23,7 @@ class Player:
         self._sprite_list: SpriteList[TextureAnimationSprite] = SpriteList()
         self._sprite_list.append(self.sprite)
 
-        self.speed: float = 2.5
+        self.speed: float = 4.5
         self.lives = lives
         self.direction: Optional[str] = None
         self.next_direction: Optional[str] = None

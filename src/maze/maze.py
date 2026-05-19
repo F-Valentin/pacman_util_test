@@ -8,14 +8,15 @@ if TYPE_CHECKING:
 
 class Maze:
     def __init__(self, maze: list[list[Cell]],
-                 size: tuple[float, float], top_left_coord: tuple[float, float]
-                 ) -> None:
+                 size: tuple[float, float],
+                 top_left_coord: tuple[float, float],
+                 tile_size: int) -> None:
         self._grid = maze
         self._width: float = size[0]
         self._height: float = size[1]
         self._offset_x: float = top_left_coord[0]
         self._offset_y: float = top_left_coord[1]
-        self._tile_size: int = 50
+        self._tile_size: int = tile_size
         self._wall_points: list[tuple[float, float]
                                 ] = self._build_wall_points()
         self._setup_cells()

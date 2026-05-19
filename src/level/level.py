@@ -150,19 +150,19 @@ class LevelFactory:
             {"asset": "assets/blinky.png",
              "corner": (0, 0),
              "difficulty_id": 2,
-             "speed": 2},
+             "speed": 4},
             {"asset": "assets/pinky.png",
              "corner": (0, self.maze_size[0] - 1),
              "difficulty_id": 8,
-             "speed": 1.25},
+             "speed": 3},
             {"asset": "assets/inky.png",
              "corner": (self.maze_size[1] - 1, 0),
              "difficulty_id": 12,
-             "speed": 2},
+             "speed": 2.25},
             {"asset": "assets/clyde.png",
              "corner": (self.maze_size[1] - 1, self.maze_size[0] - 1),
              "difficulty_id": 17,
-             "speed": 1.25}]
+             "speed": 2.25}]
 
         for config in ghost_configs:
             ghost = Ghost(config["asset"], BFSStrategy(self._player, maze),
@@ -189,7 +189,7 @@ class LevelFactory:
 
     def create_level(self) -> Level:
         maze_generator = MazeGenerator(self.maze_size)
-        tile_size = 50
+        tile_size = self.game_config.tile_size
         grid: list[list[Cell]] = []
 
         for (y, row) in enumerate(maze_generator.maze):
@@ -213,7 +213,7 @@ class LevelFactory:
             (self.game_config.screen_height -
              self.maze_size[1] * tile_size) // 2)
 
-        maze = Maze(grid, self.maze_size, (offset_x, offset_y))
+        maze = Maze(grid, self.maze_size, (offset_x, offset_y), tile_size)
         (p_x, p_y) = self._compute_player_start(maze)
         target_cell = maze.grid[maze.height // 2][maze.width // 2]
         self._player.set_position(p_x, p_y, target_cell)

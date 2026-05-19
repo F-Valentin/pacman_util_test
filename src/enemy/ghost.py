@@ -12,7 +12,7 @@ class Ghost():
                  difficulty_id: int, speed: float) -> None:
         self.sprite: arcade.Sprite = arcade.Sprite(path_to_sprite,
                                                    hit_box_algorithm="Detailed")
-        self.sprite.scale = 0.06
+        self.sprite.scale = 0.1
         self.sprite.center_x = 0
         self.sprite.center_y = 0
         self.speed = speed
