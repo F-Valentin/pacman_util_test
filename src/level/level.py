@@ -11,7 +11,6 @@ from algorithms.algorithm_strategy import PathfindingStrategy, BFSStrategy
 from subscriber import ILevelManagerSubscriber
 from game.game_collision import check_collision
 
-
 class PauseView(arcade.View):
     def __init__(self, previous_view: arcade.View):
         super().__init__()
@@ -67,7 +66,9 @@ class Level(arcade.View):
         self._ghosts: list[Ghost] = ghosts
 
         self._time_accumulator: float = 0
-
+    
+    def on_show_view(self) -> None:
+        print("level show")
     def on_update(self, delta_time: float) -> None:
         self._time_accumulator += delta_time
         time_step: float = 1 / 60
@@ -90,7 +91,12 @@ class Level(arcade.View):
             ghost_pixel_y = int(ghost.sprite.center_y)
 
             if check_collision(self._player.sprite, ghost.sprite):
-                self.window.show_view(PauseView(self))
+                self._player.lives -= 1
+                if not self._player.lives:
+                    self._player.die()
+                self._player.restart(self._maze)
+                self.restart_ghosts_pos()
+                return
 
             for row in self._maze.grid:
                 for cell in row:
@@ -121,6 +127,38 @@ class Level(arcade.View):
             self._player.next_direction = "RIGHT"
         elif key == arcade.key.ESCAPE:
             self.window.show_view(PauseView(self))
+    
+    def restart_ghosts_pos(self):
+        # marche pas 
+        ghost_configs = [
+            {"asset": "assets/blinky.png",
+             "corner": (0, 0),
+             "difficulty_id": 2,
+             "speed": 4},
+            {"asset": "assets/pinky.png",
+             "corner": (0, self._maze.width - 1),
+             "difficulty_id": 8,
+             "speed": 3},
+            {"asset": "assets/inky.png",
+             "corner": (self._maze.height - 1, 0),
+             "difficulty_id": 12,
+             "speed": 2.25},
+            {"asset": "assets/clyde.png",
+             "corner": (self._maze.height - 1, self._maze.width - 1),
+             "difficulty_id": 17,
+             "speed": 2.25}]
+
+        i = 0
+        for config in ghost_configs:
+            y_index, x_index = config["corner"]
+            cell_target = self._maze.grid[y_index][x_index]
+
+            self._ghosts[i].set_position(cell_target.center[0], cell_target.center[1],
+                               cell_target)
+            self._ghosts[i].current_path = []
+            self._ghosts[i].change_x = 0
+            self._ghosts[i].change_y = 0
+            i += 1
 
     def on_draw(self) -> None:
         self.window.clear()

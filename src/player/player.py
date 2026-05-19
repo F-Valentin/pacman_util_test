@@ -1,3 +1,4 @@
+from maze.maze import Maze
 from subscriber import IPlayerDeathSubscriber, IPlayerSubscriber
 
 
@@ -71,6 +72,21 @@ class Player:
 
         if cell.has_pacgum:
             cell.pacgum_eaten()
+    
+    def restart(self, maze: Maze) -> None:
+        tile_size = maze.tile_size
+        half = maze.width * tile_size // 2
+        offset = 0 if maze.width % 2 != 0 else -tile_size // 2
+        x: int = int(maze.offset_x + half + offset)
+        y: int = int(maze.offset_y + half + offset)
+        self.change_x = 0
+        self.change_y = 0
+        self.direction = None
+
+        x_idx = int((x  - maze.offset_x) / maze.tile_size)
+        y_idx = int((y - maze.offset_y) / maze.tile_size)
+        cell = maze.grid[y_idx][x_idx]
+        self.set_position(x, y, cell)
 
     def add_player_subscriber(self, subscriber: IPlayerSubscriber) -> None:
         self._subscribers.append(subscriber)
@@ -89,6 +105,7 @@ class Player:
     # def collide_with_enemies(self, )
 
     def die(self) -> None:
+        print("die")
         for subscriber in self._on_death_subsribers:
             subscriber.on_player_death()
 
@@ -98,3 +115,4 @@ class Player:
     # def level_completed(self) -> None:
     #     for subscriber in self._subscribers:
     #         subscriber.on_player_completed_level()
+
