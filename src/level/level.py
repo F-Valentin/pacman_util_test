@@ -55,16 +55,24 @@ class Level(arcade.View):
             self._time_accumulator -= time_step
 
     def _fixed_update(self, dt: float) -> None:
-        self._player.update(dt)
 
+        self._player.update(dt)
         for ghost in self._ghosts:
             ghost.update(dt)
 
+        for ghost in self._ghosts:
+            ghost_pixel_x = int(ghost.sprite.center_x)
+            ghost_pixel_y = int(ghost.sprite.center_y)
+
+            for row in self._maze.grid:
+                for cell in row:
+                    if cell.center == (ghost_pixel_x, ghost_pixel_y):
+                        ghost.actual_cell = cell
+                        ghost.move_to_next_cell()
+                        break
+
         player_pixel_x = int(self._player.sprite.center_x)
         player_pixel_y = int(self._player.sprite.center_y)
-
-        print(f"gost:{ghost.actual_cell}")
-        ghost.move_to_next_cell()
 
         for row in self._maze.grid:
             for cell in row:
@@ -110,16 +118,21 @@ class LevelFactory:
 
         ghost_configs = [
             {"asset": "assets/blinky.png",
-             "corner": (0, 0)},
+             "corner": (0, 0),
+             "difficulty_id": 2},
             {"asset": "assets/pinky.png",
-             "corner": (0, self.maze_size[0] - 1)},
+             "corner": (0, self.maze_size[0] - 1),
+             "difficulty_id": 8},
             {"asset": "assets/inky.png",
-             "corner": (self.maze_size[1] - 1, 0)},
+             "corner": (self.maze_size[1] - 1, 0),
+             "difficulty_id": 15},
             {"asset": "assets/clyde.png",
-             "corner": (self.maze_size[1] - 1, self.maze_size[0] - 1)}]
+             "corner": (self.maze_size[1] - 1, self.maze_size[0] - 1),
+             "difficulty_id": 20}]
 
         for config in ghost_configs:
-            ghost = Ghost(config["asset"], BFSStrategy(self._player, maze))
+            ghost = Ghost(config["asset"], BFSStrategy(self._player, maze),
+                          config["difficulty_id"])
 
             y_index, x_index = config["corner"]
             cell_target = maze.grid[y_index][x_index]
