@@ -29,7 +29,7 @@ def main() -> None:
     level_factory = LevelFactory(
         player=player,
         game_config=game_config,
-        maze_size=(12, 12),
+        maze_size=(10, 10),
         level_switcher=level_manager)
     player.add_death_subscriber(game_state)
     level_manager.add_subscriber(game_state)
