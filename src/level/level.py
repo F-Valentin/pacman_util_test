@@ -88,7 +88,7 @@ class Level(arcade.View):
             ghost_pixel_x = int(ghost.sprite.center_x)
             ghost_pixel_y = int(ghost.sprite.center_y)
 
-            if self._player.actual_cell == ghost.actual_cell:
+            if arcade.check_for_collision(self._player.sprite, ghost.sprite):
                 self.window.show_view(PauseView(self))
 
             for row in self._maze.grid:
