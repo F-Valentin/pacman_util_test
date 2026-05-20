@@ -46,10 +46,10 @@ class Maze:
     @property
     def tile_size(self) -> int:
         return self._tile_size
-    
+
     def on_pacgum_eaten(self):
         self.nb_of_pacgum -= 1
-    
+
     def _subscribe_to_its_cells(self):
         for row in self.grid:
             for cell in row:
@@ -67,10 +67,10 @@ class Maze:
                         + tile_size // 2),
                 )
                 cell.has_pacgum = cell.walls != 0x0F
-    # TODO 
+    # TODO
     # def remove_pacgum_at_entity_pos():
     #     pass
-    
+
     def _get_nb_of_pacgum(self) -> int:
         nb_of_pacgum = 0
 
@@ -78,7 +78,7 @@ class Maze:
             for cell in row:
                 if cell.has_pacgum:
                     nb_of_pacgum += 1
-        
+
         return nb_of_pacgum
 
     def _build_wall_points(self) -> list[tuple[float, float]]:

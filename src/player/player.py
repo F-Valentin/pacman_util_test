@@ -72,7 +72,7 @@ class Player:
 
         if cell.has_pacgum:
             cell.pacgum_eaten()
-    
+
     def restart(self, maze: Maze) -> None:
         tile_size = maze.tile_size
         half = maze.width * tile_size // 2
@@ -84,7 +84,7 @@ class Player:
         self.direction = None
         self.next_direction = None
 
-        x_idx = int((x  - maze.offset_x) / maze.tile_size)
+        x_idx = int((x - maze.offset_x) / maze.tile_size)
         y_idx = int((y - maze.offset_y) / maze.tile_size)
         cell = maze.grid[y_idx][x_idx]
         self.set_position(x, y, cell)
@@ -116,4 +116,3 @@ class Player:
     # def level_completed(self) -> None:
     #     for subscriber in self._subscribers:
     #         subscriber.on_player_completed_level()
-

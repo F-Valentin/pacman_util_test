@@ -25,7 +25,9 @@ class BFSStrategy(PathfindingStrategy):
         cell = self.maze.grid[y][x]
 
         def is_open(n_x: int, n_y: int) -> bool:
-            if not (0 <= n_x < self.maze.width and 0 <= n_y < self.maze.height):
+            if not (
+                    0 <= n_x < self.maze.width and 0 <= n_y < self.maze.height
+                    ):
                 return False
             n_cell = self.maze.grid[n_y][n_x]
             if n_cell.has_visited:

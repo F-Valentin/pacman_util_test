@@ -14,8 +14,10 @@ class IPlayerDeathSubscriber(Protocol):
 class IPlayerSubscriber(Protocol):
     ...
 
+
 class ILevelManagerSubscriber(Protocol):
     def on_all_levels_completed(self) -> None: ...
+
 
 class IGhostSubscriber(Protocol):
     def on_ghost_death(self) -> None: ...

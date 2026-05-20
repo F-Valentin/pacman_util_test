@@ -14,8 +14,8 @@ class GameConfig:
         self.points_per_super_pacgum = 100
         self.points_per_ghost = 200
 
-        self.screen_width = 1300
-        self.screen_height = 1300
+        self.screen_width = 100
+        self.screen_height = 1000
         self.tile_size: int = 72
 
         self.raw_data: dict[str, int | bool] = {}

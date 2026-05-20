@@ -4,7 +4,6 @@ from game.game_configuration import GameConfig
 from views import StartView
 
 
-
 def main() -> None:
 
     if len(sys.argv) != 2:

@@ -7,9 +7,10 @@ from enemy.ghost import Ghost
 from maze.maze import Maze
 from maze.cell import Cell
 from game.game_configuration import GameConfig
-from algorithms.algorithm_strategy import PathfindingStrategy, BFSStrategy
+from algorithms.algorithm_strategy import BFSStrategy
 from subscriber import ILevelManagerSubscriber
 from game.game_collision import check_collision
+
 
 class PauseView(arcade.View):
     def __init__(self, previous_view: arcade.View):
@@ -66,9 +67,10 @@ class Level(arcade.View):
         self._ghosts: list[Ghost] = ghosts
 
         self._time_accumulator: float = 0
-    
+
     def on_show_view(self) -> None:
         print("level show")
+
     def on_update(self, delta_time: float) -> None:
         self._time_accumulator += delta_time
         time_step: float = 1 / 60
@@ -127,14 +129,14 @@ class Level(arcade.View):
             self._player.next_direction = "RIGHT"
         elif key == arcade.key.ESCAPE:
             self.window.show_view(PauseView(self))
-    
+
     def restart_ghosts_pos(self):
         # marche pas 
         ghost_configs = [
             {"asset": "assets/blinky.png",
              "corner": (0, 0),
              "difficulty_id": 2,
-             "speed": 4},
+             "speed": 3},
             {"asset": "assets/pinky.png",
              "corner": (0, self._maze.width - 1),
              "difficulty_id": 8,
@@ -153,8 +155,9 @@ class Level(arcade.View):
             y_index, x_index = config["corner"]
             cell_target = self._maze.grid[y_index][x_index]
 
-            self._ghosts[i].set_position(cell_target.center[0], cell_target.center[1],
-                               cell_target)
+            self._ghosts[i].set_position(cell_target.center[0],
+                                         cell_target.center[1],
+                                         cell_target)
             self._ghosts[i].current_path = []
             self._ghosts[i].change_x = 0
             self._ghosts[i].change_y = 0
@@ -188,7 +191,7 @@ class LevelFactory:
             {"asset": "assets/blinky.png",
              "corner": (0, 0),
              "difficulty_id": 2,
-             "speed": 4},
+             "speed": 3},
             {"asset": "assets/pinky.png",
              "corner": (0, self.maze_size[0] - 1),
              "difficulty_id": 8,
