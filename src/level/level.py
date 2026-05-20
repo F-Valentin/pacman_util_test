@@ -212,6 +212,9 @@ class LevelFactory:
             y_index, x_index = config["corner"]
             cell_target = maze.grid[y_index][x_index]
 
+            cell_target.has_super_pacgum = True
+            cell_target.has_pacgum = False
+
             ghost.set_position(cell_target.center[0], cell_target.center[1],
                                cell_target)
 

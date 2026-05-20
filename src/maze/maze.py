@@ -111,15 +111,20 @@ class Maze:
         tile_size = self.tile_size
         for row in self.grid:
             for cell in row:
-                if not cell.has_pacgum:
+                if not cell.has_pacgum and not cell.has_super_pacgum:
                     continue
                 screen_x = cell.x * tile_size + self.offset_x
                 screen_y = (
                     (self.height - 1 - cell.y) * tile_size + self.offset_y
                 )
-                arcade.draw_circle_filled(screen_x + tile_size // 2,
-                                          screen_y + tile_size // 2,
-                                          3, arcade.color.WHITE)
+                if cell.has_super_pacgum:
+                    arcade.draw_circle_filled(screen_x + tile_size // 2,
+                                              screen_y + tile_size // 2,
+                                              10, arcade.color.WHITE)
+                else:
+                    arcade.draw_circle_filled(screen_x + tile_size // 2,
+                                              screen_y + tile_size // 2,
+                                              3, arcade.color.WHITE)
 
     def draw(self) -> None:
         self._draw_walls()

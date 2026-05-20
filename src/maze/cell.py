@@ -1,5 +1,4 @@
 from subscriber import IPacgumSubscriber
-from pacgum import Pacgum
 
 
 class Cell:
@@ -16,7 +15,7 @@ class Cell:
             (x + 1, y), (x - 1, y), (x, y - 1), (x, y + 1)]
         self.center: tuple[int, int]
         self.has_pacgum: bool = True
-        self.pacgum = Pacgum("normal", 10)
+        self.has_super_pacgum: bool = False
         self._subscribers: list[IPacgumSubscriber] = []
 
     def add_subscriber(self, subscriber: IPacgumSubscriber) -> None:
@@ -27,5 +26,7 @@ class Cell:
 
     def pacgum_eaten(self) -> None:
         self.has_pacgum = False
+        if self.has_super_pacgum:
+            self.has_super_pacgum = False
         for subscriber in self._subscribers:
             subscriber.on_pacgum_eaten()

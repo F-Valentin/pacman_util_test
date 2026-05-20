@@ -70,7 +70,7 @@ class Player:
         else:
             self.next_direction = self.direction
 
-        if cell.has_pacgum:
+        if cell.has_pacgum or cell.has_super_pacgum:
             cell.pacgum_eaten()
 
     def restart(self, maze: Maze) -> None:
