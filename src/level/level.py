@@ -191,7 +191,7 @@ class LevelFactory:
             {"asset": "assets/blinky.png",
              "corner": (0, 0),
              "difficulty_id": 2,
-             "speed": 3},
+             "speed": 4},
             {"asset": "assets/pinky.png",
              "corner": (0, self.maze_size[0] - 1),
              "difficulty_id": 8,
