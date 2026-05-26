@@ -1,11 +1,12 @@
 import arcade
 import sys
-from game.game_configuration import GameConfig
-from views import StartView
+from game import Game
+from game_configuration import GameConfig
+from views import MenuView
 
 
 def main() -> None:
-
+    """ Main function """
     if len(sys.argv) != 2:
         print("Usage: python3 pac-man.py <config_file.json>")
         return
@@ -13,11 +14,11 @@ def main() -> None:
     file_path = sys.argv[1]
 
     game_config = GameConfig(file_path)
-    window = arcade.Window(
-        width=game_config.screen_width,
-        height=game_config.screen_height)
-    start_view = StartView(window, game_config)
-    window.show_view(start_view)
+
+    window = arcade.Window(game_config.screen_width, game_config.screen_height)
+    game = Game(window, game_config)
+    window.show_view(MenuView(game))
+
     arcade.run()
 
 
