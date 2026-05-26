@@ -6,7 +6,7 @@ from dataclasses import dataclass
 class Pacgum:
     x: int
     y: int
-    alive: bool
+    visible: bool
     radius: float
     point: int
     color: tuple[int, int, int, int]

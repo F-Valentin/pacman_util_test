@@ -33,6 +33,7 @@ class Player(arcade.Sprite):
         self.animations: dict[str, arcade.SpriteList] = {}
         self._grid_coordinate: arcade.Vec2 = arcade.Vec2(0.0, 0.0)
         self.direction: Optional[PlayerDirection] = None
+        self._score: int = 0
         self.__maze = maze
 
     def setup(self) -> None:
@@ -93,7 +94,6 @@ class Player(arcade.Sprite):
         current_animation.update_animation(delta_time)
         current_animation[0].center_x = self.center_x
         current_animation[0].center_y = self.center_y
-
     
     def update(self, delta_time: float = 1/60, *args, **kwargs) -> None:
         self.__move(delta_time)
@@ -103,9 +103,15 @@ class Player(arcade.Sprite):
             px, py = int(self.center_x), int(self.center_y)
             cx, cy = int(cell.center.x), int(cell.center.y)
             if (px, py) == (cx, cy):
-                self.move_to_next_cell(cell)
+                if cell.pacgum and cell.has_pacgum():
+                    cell.hide_pacgum()
+                    self.__update_score(cell.pacgum.point)
 
+                self.move_to_next_cell(cell)
     
+    def __update_score(self, value: int) -> None:
+        self._score += value
+
     def move_to_next_cell(self, p_cell: Cell) -> None:
         north, east, south, west = 0b0001, 0b0010, 0b0100, 0b1000
         sprite: arcade.TextureAnimationSprite = self.animations[self.state][0]

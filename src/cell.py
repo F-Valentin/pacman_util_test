@@ -58,9 +58,15 @@ class Cell:
 
         if self.pacgum:
             self.pacgum.radius = radius
+    
+    def hide_pacgum(self) -> None:
+        if not self.pacgum:
+            raise ValueError("Trying to hide a pacgum, but the pacgum is None")
 
+        self.pacgum.visible = False
+    
     def has_pacgum(self) -> bool:
         if not self.pacgum:
             return False
 
-        return self.pacgum.alive
+        return self.pacgum.visible

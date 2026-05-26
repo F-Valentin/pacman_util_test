@@ -127,7 +127,7 @@ class Maze:
 
     def __draw_pacgums(self) -> None:
         for pacgum in self.__pacgums:
-            if pacgum.alive:
+            if pacgum.visible:
                 draw_pacgum(pacgum)
 
     def __draw_wall_points(self) -> None:
