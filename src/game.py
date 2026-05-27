@@ -3,6 +3,7 @@ from level import Level
 from entity.player import Player
 from maze import Maze
 from typing import TYPE_CHECKING
+from views import MenuView
 
 if TYPE_CHECKING:
     from game_configuration import GameConfig
@@ -12,6 +13,14 @@ class Game:
     def __init__(self, window: arcade.Window, game_config: GameConfig) -> None:
         self.__window = window
         self.__game_config = game_config
+        self.__menu_view: arcade.View
+    
+
+    def run(self) -> None:
+        self.__menu_view = MenuView(self)
+        self.__window.show_view(self.__menu_view)
+
+        arcade.run()
 
     def start(self) -> None:
         # 1 - create levels

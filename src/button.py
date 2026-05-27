@@ -2,7 +2,11 @@ import arcade
 from arcade.types import PathOrTexture
 from utils import Rect
 from collections.abc import Callable
+from enum import Enum
 
+class ButtonType(Enum):
+    START = 0
+    EXIT = 0
 
 class Button:
     def __init__(self, name: str, x: float, y: float,
@@ -24,6 +28,10 @@ class Button:
 
         self.__sprite.position = self.center
         self.__sprite_list.append(self.__sprite)
+    
+    @property
+    def name(self) -> str:
+        return self._name
 
     def set_alpha(self, value: int) -> None:
         self.__sprite.alpha = value
@@ -31,3 +39,15 @@ class Button:
     def draw(self) -> None:
         self.__sprite_list.draw()
         # arcade.draw_circle_filled(self.center.x, self.center.y, 6, arcade.color.WHITE)
+    
+    def collide_with_point(self, point: arcade.Vec2) -> bool:
+        rect = self.collision_rect
+
+        if (
+            point.x < rect.x or point.x > rect.x + rect.width
+            or point.y > rect.y or point.y < rect.y - rect.height
+        ):
+            return False
+
+        return True
+

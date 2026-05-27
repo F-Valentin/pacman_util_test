@@ -2,6 +2,7 @@ import arcade
 
 from entity.player import Player
 from maze import Maze
+from views import MenuView, PauseView
 
 
 class Level(arcade.View):
@@ -35,7 +36,8 @@ class Level(arcade.View):
         self.__player.set_next_direction(key=symbol)
 
         if symbol == arcade.key.SPACE:
-            self.restart_entity_position()
+            # self.restart_entity_position()
+            self.window.show_view(PauseView(self))
 
     def on_draw(self) -> None:
         self.clear()

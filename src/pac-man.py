@@ -17,9 +17,7 @@ def main() -> None:
 
     window = arcade.Window(game_config.screen_width, game_config.screen_height)
     game = Game(window, game_config)
-    window.show_view(MenuView(game))
-
-    arcade.run()
+    game.run()
 
 
 if __name__ == "__main__":
