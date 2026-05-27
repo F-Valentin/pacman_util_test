@@ -27,6 +27,7 @@ class Player(arcade.Sprite):
         super().__init__()
 
         self._lives: int = 0
+        self._default_position: arcade.Vec2 = arcade.Vec2(0.0, 0.0)
         self.next_direction: Optional[PlayerDirection] = None
         self.speed: float = 0.0
         self.state: PlayerState = PlayerState.MOVE
@@ -36,7 +37,10 @@ class Player(arcade.Sprite):
         self._score: int = 0
         self.__maze = maze
 
-    def setup(self) -> None:
+    def setup(self, position: arcade.Vec2) -> None:
+        self.center_x = position.x
+        self.center_y = position.y
+
         move_animation = arcade.load_animated_gif("assets/pacman.gif")
         move_animation.position = self.position
         move_animation.scale = 0.1
@@ -44,10 +48,17 @@ class Player(arcade.Sprite):
         move_sprite_list = arcade.SpriteList()
         move_sprite_list.append(move_animation)
         self.speed = 4.5 
+        self._default_position = position
         self.__update_grid_coordinate()
-        # print(len(move_sprite_list))
 
         self.animations["move"] = move_sprite_list
+    
+    def restart_position(self) -> None:
+        self.center_x = self._default_position.x
+        self.center_y = self._default_position.y
+        self.velocity = 0.0, 0.0
+        self.direction = None
+        self.next_direction = None
      
 
     def set_next_direction(self, key: int) -> None:
@@ -95,6 +106,12 @@ class Player(arcade.Sprite):
         current_animation[0].center_x = self.center_x
         current_animation[0].center_y = self.center_y
     
+    def __eat_pacgum(self, cell: Cell) -> None:
+        if cell.pacgum and cell.has_pacgum():
+            cell.hide_pacgum()
+            self.__update_score(cell.pacgum.point)
+            self.__maze.pacgum_eaten()
+
     def update(self, delta_time: float = 1/60, *args, **kwargs) -> None:
         self.__move(delta_time)
 
@@ -103,10 +120,7 @@ class Player(arcade.Sprite):
             px, py = int(self.center_x), int(self.center_y)
             cx, cy = int(cell.center.x), int(cell.center.y)
             if (px, py) == (cx, cy):
-                if cell.pacgum and cell.has_pacgum():
-                    cell.hide_pacgum()
-                    self.__update_score(cell.pacgum.point)
-
+                self.__eat_pacgum(cell)
                 self.move_to_next_cell(cell)
     
     def __update_score(self, value: int) -> None:

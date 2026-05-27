@@ -16,8 +16,8 @@ class Game:
     def start(self) -> None:
         # 1 - create levels
         # 2 - start the first level
-        maze_width = 10
-        maze_height = 10
+        maze_width = 3
+        maze_height = 3
         cell_size = 72
 
         offset_x: int = (
@@ -47,9 +47,8 @@ class Game:
         y = int(offset_y  + half + offset)
 
 
-        print((x, y))
-        player.position = (x, y)
-        player.setup()
+        p_position = arcade.Vec2(x, y)
+        player.setup(p_position)
         level = Level(player, maze)
         self.__window.show_view(level)
 

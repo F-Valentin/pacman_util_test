@@ -20,12 +20,22 @@ class Level(arcade.View):
         time_step: float = 1 / 60
 
         while self._time_accumulator >= time_step:
+            if not self.__maze.has_pacgums():
+                # go to next level
+                break
+
             self.__player.update(time_step)
        
             self._time_accumulator -= time_step
+    
+    def restart_entity_position(self) -> None:
+        self.__player.restart_position()
 
     def on_key_press(self, symbol: int, modifiers: int) -> None:
         self.__player.set_next_direction(key=symbol)
+
+        if symbol == arcade.key.SPACE:
+            self.restart_entity_position()
 
     def on_draw(self) -> None:
         self.clear()

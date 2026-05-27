@@ -15,6 +15,7 @@ class Maze:
         self._cell_size = cell_size
         self.__wall_points: list[tuple[float, float]] = []
         self.__pacgums: list[Pacgum] = []
+        self._nb_of_pacgums_visible = 0
 
     @property
     def grid(self) -> list[list[Cell]]:
@@ -35,6 +36,10 @@ class Maze:
     @property
     def cell_size(self) -> int:
         return self._cell_size
+    
+    def pacgum_eaten(self) -> None:
+        if self._nb_of_pacgums_visible > 0:
+            self._nb_of_pacgums_visible -= 1
 
     def setup(self) -> None:
         maze_generator = MazeGenerator((self.width, self.height))
@@ -51,6 +56,7 @@ class Maze:
             self.__setup_cells()
             self.__wall_points = self.__build_wall_points()
             self.__pacgums = self.__get_cells_pacgums()
+            self._nb_of_pacgums_visible = len(self.__pacgums)
 
     def __build_wall_points(self) -> list[tuple[float, float]]:
         wall_points: list[tuple[float, float]] = []
@@ -111,6 +117,9 @@ class Maze:
                     )
 
                     cell.add_pacgum(pacgum)
+    
+    def has_pacgums(self) -> bool:
+        return self._nb_of_pacgums_visible > 0
     
     def get_cell(self, x: int, y: int) -> Cell:
         return self._grid[y][x]
