@@ -57,12 +57,13 @@ class Game:
         y = int(offset_y  + half + offset)
 
         score_ui_y = offset_y + maze_height * cell_size + 100
+        hp_bar_pos = arcade.Vec2(offset_x, offset_y - 100)
 
 
         p_position = arcade.Vec2(x, y)
         score_ui_pos = arcade.Vec2(offset_x, score_ui_y)
 
-        player.setup(p_position, score_ui_pos)
+        player.setup(p_position, score_ui_pos, hp_bar_pos, self.__game_config.lives)
         level = Level(player, maze)
 
         self.__window.show_view(level)

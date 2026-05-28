@@ -27,7 +27,8 @@ class Player(arcade.Sprite):
     def __init__(self, maze: Maze) -> None:
         super().__init__()
 
-        self._lives: int = 0
+        self._current_lives = 0
+        self.lives: arcade.SpriteList[arcade.Sprite] = arcade.SpriteList()
         self._default_position: arcade.Vec2 = arcade.Vec2(0.0, 0.0)
         self.next_direction: Optional[PlayerDirection] = None
         self.speed: float = 0.0
@@ -39,10 +40,19 @@ class Player(arcade.Sprite):
         self.__maze = maze
         self.score_ui: ScoreUi
 
-    def setup(self, position: arcade.Vec2, score_ui_pos: arcade.Vec2) -> None:
+    def setup(self, position: arcade.Vec2, score_ui_pos: arcade.Vec2, hp_bar_pos: arcade.Vec2, lives: int) -> None:
         self.center_x = position.x
         self.center_y = position.y
         self.score_ui = ScoreUi(score_ui_pos, arcade.Text(f"score: {self._score}", score_ui_pos.x, score_ui_pos.y))
+        self._current_lives = lives
+
+        h_offset = 0
+        for _ in range(lives):
+            self.lives.append(
+                arcade.Sprite("assets/hp.png", 1, hp_bar_pos.x + h_offset, hp_bar_pos.y)
+            )
+            h_offset += 40
+
 
         move_animation = arcade.load_animated_gif("assets/pacman.gif")
         move_animation.position = self.position
@@ -189,3 +199,9 @@ class Player(arcade.Sprite):
     def draw(self) -> None:
         self.animations[self.state].draw()
         self.score_ui.score_text.draw()
+
+        for (i, live) in enumerate(self.lives):
+            if i >= self._current_lives:
+                live.alpha = 0
+        
+        self.lives.draw()
