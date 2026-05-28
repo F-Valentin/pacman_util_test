@@ -41,7 +41,7 @@ class Maze:
         if self._nb_of_pacgums_visible > 0:
             self._nb_of_pacgums_visible -= 1
 
-    def setup(self) -> None:
+    def setup(self, point_par_pacgum: int) -> None:
         maze_generator = MazeGenerator((self.width, self.height))
         grid: list[list[Cell]] = []
 
@@ -53,7 +53,7 @@ class Maze:
         self._grid = grid
 
         if self._grid:
-            self.__setup_cells()
+            self.__setup_cells(point_par_pacgum)
             self.__wall_points = self.__build_wall_points()
             self.__pacgums = self.__get_cells_pacgums()
             self._nb_of_pacgums_visible = len(self.__pacgums)
@@ -88,14 +88,14 @@ class Maze:
 
         return wall_points
 
-    def __setup_cells(self) -> None:
+    def __setup_cells(self, point_par_pacgum: int) -> None:
         cell_size: int = self._cell_size
 
         blocked: int = 0x0F
 
         pacgum_radius: float = 3.0
         pacgum_color: tuple[int, int, int, int] = arcade.color.WHITE
-        pacgum_point: int = 10
+        pacgum_point: int = point_par_pacgum
 
         for cells in self.grid:
             for cell in cells:

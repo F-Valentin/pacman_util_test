@@ -48,17 +48,23 @@ class Game:
             cell_size
         )
 
-        maze.setup()
+        maze.setup(self.__game_config.points_per_pacgum)
         player = Player(maze)
+
         half = maze_width * cell_size // 2
         offset = 0 if maze_width % 2 != 0 else -cell_size // 2
         x = int(offset_x + half + offset)
         y = int(offset_y  + half + offset)
 
+        score_ui_y = offset_y + maze_height * cell_size + 100
+
 
         p_position = arcade.Vec2(x, y)
-        player.setup(p_position)
+        score_ui_pos = arcade.Vec2(offset_x, score_ui_y)
+
+        player.setup(p_position, score_ui_pos)
         level = Level(player, maze)
+
         self.__window.show_view(level)
 
     def pause(self) -> None:

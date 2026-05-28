@@ -2,6 +2,7 @@ import arcade
 import math
 from enum import Enum
 from typing import TYPE_CHECKING, Optional
+from score import ScoreUi
 
 if TYPE_CHECKING:
     from entity.ghost import Ghost
@@ -36,10 +37,12 @@ class Player(arcade.Sprite):
         self.direction: Optional[PlayerDirection] = None
         self._score: int = 0
         self.__maze = maze
+        self.score_ui: ScoreUi
 
-    def setup(self, position: arcade.Vec2) -> None:
+    def setup(self, position: arcade.Vec2, score_ui_pos: arcade.Vec2) -> None:
         self.center_x = position.x
         self.center_y = position.y
+        self.score_ui = ScoreUi(score_ui_pos, arcade.Text(f"score: {self._score}", score_ui_pos.x, score_ui_pos.y))
 
         move_animation = arcade.load_animated_gif("assets/pacman.gif")
         move_animation.position = self.position
@@ -111,6 +114,13 @@ class Player(arcade.Sprite):
             cell.hide_pacgum()
             self.__update_score(cell.pacgum.point)
             self.__maze.pacgum_eaten()
+            self.update_score_ui()
+    
+    def update_score_ui(self) -> None:
+        x = self.score_ui.position.x
+        y = self.score_ui.position.y
+
+        self.score_ui.score_text =  arcade.Text(f"score: {self._score}", x, y)
 
     def update(self, delta_time: float = 1/60, *args, **kwargs) -> None:
         self.__move(delta_time)
@@ -178,3 +188,4 @@ class Player(arcade.Sprite):
 
     def draw(self) -> None:
         self.animations[self.state].draw()
+        self.score_ui.score_text.draw()
