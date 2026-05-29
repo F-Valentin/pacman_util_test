@@ -18,8 +18,7 @@ class Game:
         self._button_group: ButtonGroup
 
     def run(self) -> None:
-        self._button_group = ButtonGroup()
-        self._menu_view = MenuView(self, self._button_group)
+        self._menu_view = MenuView(self)
         self._window.show_view(self._menu_view)
 
         arcade.run()

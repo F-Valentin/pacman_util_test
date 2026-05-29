@@ -9,11 +9,11 @@ if TYPE_CHECKING:
     from game import Game
 
 class MenuView(arcade.View):
-    def __init__(self, game: Game, button_group: ButtonGroup) -> None:
+    def __init__(self, game: Game) -> None:
         super().__init__()
 
         self._game = game
-        self._button_group: ButtonGroup = button_group
+        self._button_group: ButtonGroup = ButtonGroup(4)
         self.setup()
 
     @property

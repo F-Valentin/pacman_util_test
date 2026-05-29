@@ -55,10 +55,10 @@ class Button:
         return True
 
 class ButtonGroup:
-    def __init__(self) -> None:
+    def __init__(self, capacity: int) -> None:
         self._buttons: list[Button] = []
         self.size: int = 0
-        self.capacity: int = 4
+        self.capacity: int = capacity
 
         self.current_button_idx: int = ButtonIndex.START
     
