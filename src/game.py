@@ -4,6 +4,7 @@ from entity.player import Player
 from maze import Maze
 from typing import TYPE_CHECKING
 from views import MenuView
+from button import ButtonGroup
 
 if TYPE_CHECKING:
     from game_configuration import GameConfig
@@ -14,10 +15,11 @@ class Game:
         self._window = window
         self._game_config = game_config
         self._menu_view: arcade.View
-    
+        self._button_group: ButtonGroup
 
     def run(self) -> None:
-        self._menu_view = MenuView(self)
+        self._button_group = ButtonGroup()
+        self._menu_view = MenuView(self, self._button_group)
         self._window.show_view(self._menu_view)
 
         arcade.run()
@@ -54,16 +56,19 @@ class Game:
         half = maze_width * cell_size // 2
         offset = 0 if maze_width % 2 != 0 else -cell_size // 2
         x = int(offset_x + half + offset)
-        y = int(offset_y  + half + offset)
+        y = int(offset_y + half + offset)
 
         score_ui_y = offset_y + maze_height * cell_size + 100
         hp_bar_pos = arcade.Vec2(offset_x, offset_y - 100)
 
-
         p_position = arcade.Vec2(x, y)
         score_ui_pos = arcade.Vec2(offset_x, score_ui_y)
 
-        player.setup(p_position, score_ui_pos, hp_bar_pos, self._game_config.lives)
+        player.setup(
+            p_position,
+            score_ui_pos,
+            hp_bar_pos,
+            self._game_config.lives)
         level = Level(player, maze)
 
         self._window.show_view(level)

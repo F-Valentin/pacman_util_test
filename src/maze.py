@@ -36,7 +36,7 @@ class Maze:
     @property
     def cell_size(self) -> int:
         return self._cell_size
-    
+
     def pacgum_eaten(self) -> None:
         if self._nb_of_pacgums_visible > 0:
             self._nb_of_pacgums_visible -= 1
@@ -106,7 +106,7 @@ class Maze:
 
                 center_y: int = int(
                     (self.height - 1 - cell.grid_y) * cell_size +
-                    self.bottom_left_pos.y + cell_size // 2) 
+                    self.bottom_left_pos.y + cell_size // 2)
 
                 cell.center = Vec2(center_x, center_y)
 
@@ -117,10 +117,10 @@ class Maze:
                     )
 
                     cell.add_pacgum(pacgum)
-    
+
     def has_pacgums(self) -> bool:
         return self._nb_of_pacgums_visible > 0
-    
+
     def get_cell(self, x: int, y: int) -> Cell:
         return self._grid[y][x]
 

@@ -21,11 +21,11 @@ class Level(arcade.View):
         time_step: float = 1 / 60
 
         while self._time_accumulator >= time_step:
-           
+
             if not self._maze.has_pacgums():
                 # go to next level
                 break
-                
+
             # if self._player.collide_with_ghost(ghosts):
             #    self._player.take_damage()
                 # if not self._player.current_lives:
@@ -34,9 +34,9 @@ class Level(arcade.View):
                 # self.restart_entity_position()
 
             self._player.update(time_step)
-       
+
             self._time_accumulator -= time_step
-    
+
     def restart_entity_position(self) -> None:
         self._player.restart_position()
 
