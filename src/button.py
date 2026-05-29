@@ -94,7 +94,11 @@ class ButtonGroup:
         button.set_alpha(200)
 
     def on_mouse_press(self, x: int, y: int) -> None:
-        pass
+        point = arcade.Vec2(x, y)
+
+        for button in self._buttons:
+            if button.collide_with_point(point):
+                button.trigger()
 
     def on_mouse_motion(self, x: int, y: int) -> None:
         pass

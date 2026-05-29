@@ -50,8 +50,9 @@ class MenuView(arcade.View):
     def on_key_press(self, symbol: int, modifiers: int) -> None:
         self._button_group.on_key_press(key=symbol)
 
-    # def on_mouse_press(self, x: int, y: int, button: int,
-    #                    modifiers: int) -> bool | None:
+    def on_mouse_press(self, x: int, y: int, button: int,
+                       modifiers: int) -> bool | None:
+        self._button_group.on_mouse_press(x, y)
        
     
     # def on_mouse_motion(self, x: int, y: int, dx: int, dy: int) -> bool | None:
