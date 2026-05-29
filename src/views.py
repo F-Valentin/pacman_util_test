@@ -20,7 +20,7 @@ class MenuView(arcade.View):
         self.current_button: Button
         self.buttons_len = 2
         self.current_button_idx: int = 0
-        self.__start_button: Button
+        self._start_button: Button
 
         self.setup()
 
@@ -33,7 +33,7 @@ class MenuView(arcade.View):
         return self._buttons
 
     def setup(self) -> None:
-        self.__start_button = Button(
+        self._start_button = Button(
             "start",
             self.window.width // 2,
             self.window.height // 2 + 100,
@@ -52,7 +52,7 @@ class MenuView(arcade.View):
             quit
         )
 
-        self.buttons.append(self.__start_button)
+        self.buttons.append(self._start_button)
         self.buttons.append(b1)
 
         self.current_button = self.buttons[self.current_button_idx]
@@ -80,10 +80,10 @@ class MenuView(arcade.View):
                        modifiers: int) -> bool | None:
         point = arcade.Vec2(x, y)
 
-        if self.__start_button.collide_with_point(point):
+        if self._start_button.collide_with_point(point):
             self.current_button_idx = ButtonIndex.START
-            self.__start_button.set_alpha(200)
-            self.__start_button.trigger()
+            self._start_button.set_alpha(200)
+            self._start_button.trigger()
 
     def on_draw(self) -> None:
         """ Draw everything """
@@ -95,23 +95,39 @@ class MenuView(arcade.View):
 class PauseView(arcade.View):
     def __init__(self,  previous_view: arcade.View) -> None:
         super().__init__()
-        self.__previous_view = previous_view
-        self.__resume_button: Button
+        self._previous_view = previous_view
+        self._resume_button: Button
     
     def resume(self) -> None:
         print("continue")
-        self.window.show_view(self.__previous_view)
+        self.window.show_view(self._previous_view)
     
 
     def on_show_view(self) -> None:
-        self.__resume_button = Button("resume", self.window.width // 2, self.window.height // 2 + 100, "assets/button/back01.png", self.resume)
+        self._resume_button = Button("resume", self.window.width // 2, self.window.height // 2 + 100, "assets/button/back01.png", self.resume)
     
     def on_key_press(self, symbol: int, modifiers: int) -> bool | None:
         if symbol == arcade.key.SPACE:
-            self.__resume_button.trigger()
+            self._resume_button.trigger()
 
     def on_draw(self) -> bool | None:
         self.clear()
 
-        self.__previous_view.on_draw()
-        self.__resume_button.draw()
+        self._previous_view.on_draw()
+        self._resume_button.draw()
+
+class EndGameView(arcade.View):
+    def __init__(self, win: bool, score: int, menu_view: MenuView) -> None:
+        self.win = win
+        self.score = score
+        self._menu_view = menu_view
+        self._quit_button: Button
+        self._menu_buttton: Button
+    
+    def on_show_view(self) -> None:
+        pass
+    
+    def on_draw(self) -> bool | None:
+        self.clear()
+        pass
+

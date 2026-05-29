@@ -9,31 +9,39 @@ class Level(arcade.View):
     def __init__(self, player: Player, maze: Maze) -> None:
         super().__init__()
 
-        self.__player = player
-        self.__maze = maze
+        self._player = player
+        self._maze = maze
         self._time_accumulator: float = 0
 
     def on_update(self, delta_time: float) -> None:
-        self.__fixed_update(delta_time)
+        self._fixed_update(delta_time)
 
-    def __fixed_update(self, delta_time: float) -> None:
+    def _fixed_update(self, delta_time: float) -> None:
         self._time_accumulator += delta_time
         time_step: float = 1 / 60
 
         while self._time_accumulator >= time_step:
-            if not self.__maze.has_pacgums():
+           
+            if not self._maze.has_pacgums():
                 # go to next level
                 break
+                
+            # if self._player.collide_with_ghost(ghosts):
+            #    self._player.take_damage()
+                # if not self._player.current_lives:
+                #     # game_over
+                #     pass
+                # self.restart_entity_position()
 
-            self.__player.update(time_step)
+            self._player.update(time_step)
        
             self._time_accumulator -= time_step
     
     def restart_entity_position(self) -> None:
-        self.__player.restart_position()
+        self._player.restart_position()
 
     def on_key_press(self, symbol: int, modifiers: int) -> None:
-        self.__player.set_next_direction(key=symbol)
+        self._player.set_next_direction(key=symbol)
 
         if symbol == arcade.key.SPACE:
             # self.restart_entity_position()
@@ -42,5 +50,5 @@ class Level(arcade.View):
     def on_draw(self) -> None:
         self.clear()
 
-        self.__maze.draw()
-        self.__player.draw()
+        self._maze.draw()
+        self._player.draw()

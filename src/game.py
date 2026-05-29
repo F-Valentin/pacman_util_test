@@ -11,14 +11,14 @@ if TYPE_CHECKING:
 
 class Game:
     def __init__(self, window: arcade.Window, game_config: GameConfig) -> None:
-        self.__window = window
-        self.__game_config = game_config
-        self.__menu_view: arcade.View
+        self._window = window
+        self._game_config = game_config
+        self._menu_view: arcade.View
     
 
     def run(self) -> None:
-        self.__menu_view = MenuView(self)
-        self.__window.show_view(self.__menu_view)
+        self._menu_view = MenuView(self)
+        self._window.show_view(self._menu_view)
 
         arcade.run()
 
@@ -30,12 +30,12 @@ class Game:
         cell_size = 72
 
         offset_x: int = (
-            (self.__game_config.screen_width -
+            (self._game_config.screen_width -
              maze_width * cell_size) // 2
         )
 
         offset_y: int = (
-            (self.__game_config.screen_height -
+            (self._game_config.screen_height -
              maze_height * cell_size) // 2
         )
 
@@ -48,7 +48,7 @@ class Game:
             cell_size
         )
 
-        maze.setup(self.__game_config.points_per_pacgum)
+        maze.setup(self._game_config.points_per_pacgum)
         player = Player(maze)
 
         half = maze_width * cell_size // 2
@@ -63,10 +63,10 @@ class Game:
         p_position = arcade.Vec2(x, y)
         score_ui_pos = arcade.Vec2(offset_x, score_ui_y)
 
-        player.setup(p_position, score_ui_pos, hp_bar_pos, self.__game_config.lives)
+        player.setup(p_position, score_ui_pos, hp_bar_pos, self._game_config.lives)
         level = Level(player, maze)
 
-        self.__window.show_view(level)
+        self._window.show_view(level)
 
     def pause(self) -> None:
         pass

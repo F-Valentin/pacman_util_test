@@ -13,8 +13,8 @@ class Maze:
         self._height = height
         self._bottom_left_pos = bottom_left_pos
         self._cell_size = cell_size
-        self.__wall_points: list[tuple[float, float]] = []
-        self.__pacgums: list[Pacgum] = []
+        self._wall_points: list[tuple[float, float]] = []
+        self._pacgums: list[Pacgum] = []
         self._nb_of_pacgums_visible = 0
 
     @property
@@ -53,12 +53,12 @@ class Maze:
         self._grid = grid
 
         if self._grid:
-            self.__setup_cells(point_par_pacgum)
-            self.__wall_points = self.__build_wall_points()
-            self.__pacgums = self.__get_cells_pacgums()
-            self._nb_of_pacgums_visible = len(self.__pacgums)
+            self._setup_cells(point_par_pacgum)
+            self._wall_points = self._build_wall_points()
+            self._pacgums = self._get_cells_pacgums()
+            self._nb_of_pacgums_visible = len(self._pacgums)
 
-    def __build_wall_points(self) -> list[tuple[float, float]]:
+    def _build_wall_points(self) -> list[tuple[float, float]]:
         wall_points: list[tuple[float, float]] = []
         cell_size: int = self._cell_size
         north, east, south, west = 0b0001, 0b0010, 0b0100, 0b1000
@@ -88,7 +88,7 @@ class Maze:
 
         return wall_points
 
-    def __setup_cells(self, point_par_pacgum: int) -> None:
+    def _setup_cells(self, point_par_pacgum: int) -> None:
         cell_size: int = self._cell_size
 
         blocked: int = 0x0F
@@ -124,7 +124,7 @@ class Maze:
     def get_cell(self, x: int, y: int) -> Cell:
         return self._grid[y][x]
 
-    def __get_cells_pacgums(self) -> list[Pacgum]:
+    def _get_cells_pacgums(self) -> list[Pacgum]:
         pacgums: list[Pacgum] = []
 
         for cells in self.grid:
@@ -134,14 +134,14 @@ class Maze:
 
         return pacgums
 
-    def __draw_pacgums(self) -> None:
-        for pacgum in self.__pacgums:
+    def _draw_pacgums(self) -> None:
+        for pacgum in self._pacgums:
             if pacgum.visible:
                 draw_pacgum(pacgum)
 
-    def __draw_wall_points(self) -> None:
-        arcade.draw_lines(self.__wall_points, arcade.color.BLUE, 2)
+    def _draw_wall_points(self) -> None:
+        arcade.draw_lines(self._wall_points, arcade.color.BLUE, 2)
 
     def draw(self) -> None:
-        self.__draw_wall_points()
-        self.__draw_pacgums()
+        self._draw_wall_points()
+        self._draw_pacgums()
