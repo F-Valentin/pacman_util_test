@@ -5,16 +5,14 @@ from maze import Maze
 from typing import TYPE_CHECKING
 from views import MenuView
 from button import ButtonGroup
-
-if TYPE_CHECKING:
-    from game_configuration import GameConfig
+from game_configuration import GameConfig
 
 
 class Game:
     def __init__(self, window: arcade.Window, game_config: GameConfig) -> None:
         self._window = window
         self._game_config = game_config
-        self._menu_view: arcade.View
+        self._menu_view: MenuView
         self._button_group: ButtonGroup
 
     def run(self) -> None:
@@ -68,7 +66,7 @@ class Game:
             score_ui_pos,
             hp_bar_pos,
             self._game_config.lives)
-        level = Level(player, maze)
+        level = Level(player, maze, self._game_config.level_max_time, self._menu_view)
 
         self._window.show_view(level)
 

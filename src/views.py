@@ -28,6 +28,8 @@ class MenuView(arcade.View):
             "assets/button/game01.png",
             self.game.start
         )
+        
+        start_button.set_alpha(200)
 
         def quit():
             print("quit")
@@ -94,28 +96,40 @@ class PauseView(arcade.View):
 
 class EndGameView(arcade.View):
     def __init__(self, win: bool, score: int, menu_view: MenuView) -> None:
+        super().__init__()
         self.text = "Win" if win else "Game Over"
         self.score = score
         self._menu_view = menu_view
-        self._quit_button: Button
-        self._menu_buttton: Button
+        self._button_group: ButtonGroup = ButtonGroup(2)
 
     def on_show_view(self) -> None:
-        self._menu_buttton = Button(
+        menu_buttton = Button(
             "menu_button",
             self.window.width // 2,
-            self.window.height // 2,
-            "",
+            self.window.height // 2 + 200,
+            "assets/button/back01.png",
             lambda _: self.window.show_view(
                 self._menu_view))
         
-        self._quit_button = Button("quit", 
+        menu_buttton.set_alpha(200)
+        
+        quit_button = Button("quit", 
             self.window.width // 2,
-            self.window.height // 2, "", lambda _: sys.exit(1))
+            self.window.height // 2, "assets/button/game01.png", lambda _: sys.exit(1))
+        
+        self._button_group.add_button(menu_buttton)
+        self._button_group.add_button(quit_button)
         
         # open save score to get the highscore
         # check if score > highscore change highscore else do nothing
+    
+    def on_key_press(self, symbol: int, modifiers: int) -> bool | None:
+        self._button_group.on_key_press(key=symbol)
+    
+    def on_mouse_press(self, x: int, y: int, button: int, modifiers: int) -> bool | None:
+        self._button_group.on_mouse_press(x, y)
 
     def on_draw(self) -> bool | None:
         self.clear()
-        pass
+
+        self._button_group.draw()

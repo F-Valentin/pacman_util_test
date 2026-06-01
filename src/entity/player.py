@@ -2,12 +2,10 @@ import arcade
 import math
 from enum import Enum
 from typing import TYPE_CHECKING, Optional
+from maze import Maze
 from score import ScoreUi
-
-if TYPE_CHECKING:
-    from entity.ghost import Ghost
-    from maze import Maze
-    from cell import Cell
+from cell import Cell
+from entity.ghost import Ghost
 
 
 class PlayerState(str, Enum):
@@ -36,7 +34,7 @@ class Player(arcade.Sprite):
         self.animations: dict[str, arcade.SpriteList] = {}
         self._grid_coordinate: arcade.Vec2 = arcade.Vec2(0.0, 0.0)
         self.direction: Optional[PlayerDirection] = None
-        self._score: int = 0
+        self.score: int = 0
         self._maze = maze
         self.score_ui: ScoreUi
     
@@ -47,7 +45,7 @@ class Player(arcade.Sprite):
     def setup(self, position: arcade.Vec2, score_ui_pos: arcade.Vec2, hp_bar_pos: arcade.Vec2, lives: int) -> None:
         self.center_x = position.x
         self.center_y = position.y
-        self.score_ui = ScoreUi(score_ui_pos, arcade.Text(f"score: {self._score}", score_ui_pos.x, score_ui_pos.y))
+        self.score_ui = ScoreUi(score_ui_pos, arcade.Text(f"score: {self.score}", score_ui_pos.x, score_ui_pos.y))
         self._current_lives = lives
 
         h_offset = 0
@@ -138,7 +136,7 @@ class Player(arcade.Sprite):
         x = self.score_ui.position.x
         y = self.score_ui.position.y
 
-        self.score_ui.score_text =  arcade.Text(f"score: {self._score}", x, y)
+        self.score_ui.score_text =  arcade.Text(f"score: {self.score}", x, y)
 
     def update(self, delta_time: float = 1/60, *args, **kwargs) -> None:
         self._move(delta_time)
@@ -152,7 +150,7 @@ class Player(arcade.Sprite):
                 self.move_to_next_cell(cell)
     
     def _update_score(self, value: int) -> None:
-        self._score += value
+        self.score += value
 
     def move_to_next_cell(self, p_cell: Cell) -> None:
         north, east, south, west = 0b0001, 0b0010, 0b0100, 0b1000

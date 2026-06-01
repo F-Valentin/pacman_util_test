@@ -11,12 +11,12 @@ class ButtonIndex(IntEnum):
 
 class Button:
     def __init__(self, name: str, x: float, y: float,
-                 path_to_images: str, trigger: Callable) -> None:
+                 path_to_image: str, trigger: Callable) -> None:
         self._name = name
 
         self.center: arcade.Vec2 = arcade.Vec2(x, y)
 
-        self._sprite: arcade.Sprite = arcade.Sprite(path_to_images)
+        self._sprite: arcade.Sprite = arcade.Sprite(path_to_image)
         self._sprite_list = arcade.SpriteList()
         self._sprite.position = self.center
         self._sprite_list.append(self._sprite)
