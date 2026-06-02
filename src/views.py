@@ -31,16 +31,12 @@ class MenuView(arcade.View):
         start_button.set_alpha(200)
         start_button.set_scale(2)
 
-        def quit():
-            print("quit")
-            sys.exit(0)
-
         exit = Button(
             "quit",
             self.window.width // 2,
             self.window.height // 2,
             "assets/button/quit/quit.png",
-            quit
+            lambda: sys.exit(0)
         )
 
         exit.set_scale(2)

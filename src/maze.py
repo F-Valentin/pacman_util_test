@@ -1,3 +1,5 @@
+from typing import Optional
+
 import arcade
 from arcade import Vec2
 from cell import Cell
@@ -117,6 +119,29 @@ class Maze:
                     )
 
                     cell.add_pacgum(pacgum)
+    
+    def _get_valid_cell_neighbors(self, cell: Cell) -> Optional[list[Cell]]:
+        north, south, east, west = 0b0001, 0b0100, 0b0010, 0b1000
+
+        def is_open(n_x: int, n_y: int) -> bool:
+            if not (
+                    0 <= n_x < self.width and 0 <= n_y < self.height
+                    ):
+                return False
+            n_cell = self.get_cell(n_x, n_y)
+            if cell.grid_y + 1 == n_y and not n_cell.walls & north:
+                return True
+            if cell.grid_y - 1 == n_y and not n_cell.walls & south:
+                return True
+            if cell.grid_x + 1 == n_x and not n_cell.walls & west:
+                return True
+            if cell.grid_x - 1 == n_x and not n_cell.walls & east:
+                return True
+            return False
+
+        valid_coords = filter(lambda c: is_open(int(c[0]), int(c[1])), cell.neighbors)
+        neighbors = [self.get_cell(int(c[0]), int(c[1])) for c in valid_coords]
+        return neighbors if neighbors else None
 
     def has_pacgums(self) -> bool:
         return self._nb_of_pacgums_visible > 0

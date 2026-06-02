@@ -5,6 +5,7 @@ from maze import Maze
 from typing import TYPE_CHECKING
 from views import MenuView
 from button import ButtonGroup
+from entity.ghost import Ghost
 from game_configuration import GameConfig
 
 
@@ -24,8 +25,8 @@ class Game:
     def start(self) -> None:
         # 1 - create levels
         # 2 - start the first level
-        maze_width = 3
-        maze_height = 3
+        maze_width = 7
+        maze_height = 7
         cell_size = 72
 
         offset_x: int = (
@@ -66,7 +67,11 @@ class Game:
             score_ui_pos,
             hp_bar_pos,
             self._game_config.lives)
-        level = Level(player, maze, self._game_config.level_max_time, self._menu_view)
+
+        blinky = Ghost("assets/blinky.png", 12, 4.5, maze, player)
+        b_position = maze.get_cell(0, 0)
+        blinky.setup(b_position)
+        level = Level(player, maze, [blinky], self._game_config.level_max_time, self._menu_view)
 
         self._window.show_view(level)
 

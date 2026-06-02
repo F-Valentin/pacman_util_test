@@ -1,3 +1,5 @@
+from sys import flags
+
 import arcade
 from typing import Optional
 from pacgum import Pacgum
@@ -11,6 +13,12 @@ class Cell:
         self._walls = walls
         self.pacgum: Optional[Pacgum] = None
         self.center: Optional[arcade.Vec2] = None
+
+        x = grid_pos.x
+        y = grid_pos.y
+
+        self.neighbors: list[tuple[float, float]] = [
+            (x + 1, y), (x - 1, y), (x, y - 1), (x, y + 1)]
 
     @property
     def grid_x(self) -> float:
