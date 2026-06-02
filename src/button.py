@@ -39,6 +39,9 @@ class Button:
 
     def set_alpha(self, value: int) -> None:
         self._sprite.alpha = value
+    
+    def set_scale(self, value: int) -> None:
+        self._sprite.scale = value
 
     def draw(self) -> None:
         self._sprite_list.draw()

@@ -2,7 +2,6 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 import arcade
 import sys
-import button
 from button import Button, ButtonIndex, ButtonGroup
 
 if TYPE_CHECKING:
@@ -25,23 +24,26 @@ class MenuView(arcade.View):
             "start",
             self.window.width // 2,
             self.window.height // 2 + 100,
-            "assets/button/game01.png",
+            "assets/button/start/start.png",
             self.game.start
         )
         
         start_button.set_alpha(200)
+        start_button.set_scale(2)
 
         def quit():
             print("quit")
-            sys.exit(1)
+            sys.exit(0)
 
         exit = Button(
             "quit",
             self.window.width // 2,
-            self.window.height // 2 + 200,
-            "assets/button/b1.png",
+            self.window.height // 2,
+            "assets/button/quit/quit.png",
             quit
         )
+
+        exit.set_scale(2)
 
         self._button_group.add_button(start_button)
         self._button_group.add_button(exit)
@@ -106,17 +108,19 @@ class EndGameView(arcade.View):
         menu_buttton = Button(
             "menu_button",
             self.window.width // 2,
-            self.window.height // 2 + 200,
-            "assets/button/back01.png",
-            lambda _: self.window.show_view(
+            self.window.height // 2 + 100,
+            "assets/button/menu/menu.png",
+            lambda: self.window.show_view(
                 self._menu_view))
         
         menu_buttton.set_alpha(200)
+        menu_buttton.set_scale(2)
         
         quit_button = Button("quit", 
             self.window.width // 2,
-            self.window.height // 2, "assets/button/game01.png", lambda _: sys.exit(1))
+            self.window.height // 2, "assets/button/quit/quit.png", lambda: sys.exit(0))
         
+        quit_button.set_scale(2)
         self._button_group.add_button(menu_buttton)
         self._button_group.add_button(quit_button)
         
