@@ -3,6 +3,8 @@ import os
 
 
 class GameConfig:
+    """Load and validate runtime settings from the configuration file."""
+
     def __init__(self, file_path: str):
         self.file_path = file_path
 
@@ -24,6 +26,7 @@ class GameConfig:
 
     @staticmethod
     def _parse_bool(value: object, key: str) -> bool:
+        """Validate and return a boolean configuration value."""
         if not isinstance(value, bool):
             raise ValueError(
                 f"'{key}' must be a boolean (true/false), "
@@ -32,6 +35,7 @@ class GameConfig:
 
     @staticmethod
     def _parse_int(value: object, key: str) -> int:
+        """Validate and return an integer configuration value."""
         if not isinstance(value, int) or isinstance(value, bool):
             raise ValueError(
                 f"'{key}' must be an integer, "
@@ -39,6 +43,7 @@ class GameConfig:
         return value
 
     def _load_config(self) -> None:
+        """Read the JSON file and apply any custom gameplay values."""
         if not os.path.exists(self.file_path):
             raise FileNotFoundError(
                 f"Configuration file '{self.file_path}' not found.")

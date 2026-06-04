@@ -8,6 +8,8 @@ from mazegenerator import MazeGenerator
 
 
 class Maze:
+    """Build and draw a maze grid with pacgums and wall geometry."""
+
     def __init__(self, width: int, height: int,
                  bottom_left_pos: Vec2, cell_size: int) -> None:
         self._grid: list[list[Cell]] = []
@@ -40,10 +42,12 @@ class Maze:
         return self._cell_size
 
     def pacgum_eaten(self) -> None:
+        """Decrease the visible pacgum counter after the player consumes one."""
         if self._nb_of_pacgums_visible > 0:
             self._nb_of_pacgums_visible -= 1
 
     def setup(self, point_par_pacgum: int) -> None:
+        """Generate the maze layout, place pacgums, and cache wall points."""
         maze_generator = MazeGenerator((self.width, self.height))
         grid: list[list[Cell]] = []
 

@@ -1,3 +1,5 @@
+"""Gameplay view implementation for the active maze level."""
+
 import arcade
 
 from entity.ghost import Ghost
@@ -7,6 +9,8 @@ from views import MenuView, PauseView, EndGameView
 
 
 class Level(arcade.View):
+    """Represent the main level view where the player interacts with the maze."""
+
     def __init__(self, player: Player, maze: Maze, ghosts: list[Ghost], time_to_finish: int, menu_view: MenuView) -> None:
         super().__init__()
 
@@ -18,6 +22,7 @@ class Level(arcade.View):
         self.menu_view = menu_view
 
     def on_update(self, delta_time: float) -> None:
+        """Update the level state each frame."""
         self._fixed_update(delta_time)
 
     def _fixed_update(self, delta_time: float) -> None:
@@ -51,6 +56,7 @@ class Level(arcade.View):
             self._time_to_finish -= time_step
 
     def restart_entity_position(self) -> None:
+        """Reset the player to the starting position after a collision."""
         self._player.restart_position()
 
     def on_key_press(self, symbol: int, modifiers: int) -> None:

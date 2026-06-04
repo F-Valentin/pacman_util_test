@@ -6,7 +6,7 @@ from views import MenuView
 
 
 def main() -> None:
-    """ Main function """
+    """Launch the Pac-Man game using the provided configuration file."""
     if len(sys.argv) != 2:
         print("Usage: python3 pac-man.py <config_file.json>")
         return

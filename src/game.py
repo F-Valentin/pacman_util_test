@@ -1,3 +1,5 @@
+"""Core game orchestration for the Pac-Man prototype."""
+
 import arcade
 from level import Level
 from entity.player import Player
@@ -10,6 +12,8 @@ from game_configuration import GameConfig
 
 
 class Game:
+    """Coordinate the main menu flow and level launch for the game."""
+
     def __init__(self, window: arcade.Window, game_config: GameConfig) -> None:
         self._window = window
         self._game_config = game_config
@@ -17,12 +21,14 @@ class Game:
         self._button_group: ButtonGroup
 
     def run(self) -> None:
+        """Display the menu view and start the Arcade event loop."""
         self._menu_view = MenuView(self)
         self._window.show_view(self._menu_view)
 
         arcade.run()
 
     def start(self) -> None:
+        """Build a maze, create the player and ghost entities, and open the level view."""
         # 1 - create levels
         # 2 - start the first level
         maze_width = 7

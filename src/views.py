@@ -4,10 +4,14 @@ import arcade
 import sys
 from button import Button, ButtonIndex, ButtonGroup
 
+"""Menu, pause, and end-of-game views used by the Arcade window."""
+
 if TYPE_CHECKING:
     from game import Game
 
 class MenuView(arcade.View):
+    """Show the main menu with start and quit actions."""
+
     def __init__(self, game: Game) -> None:
         super().__init__()
 
@@ -20,6 +24,7 @@ class MenuView(arcade.View):
         return self._game
 
     def setup(self) -> None:
+        """Create the menu buttons and wire them to their handlers."""
         start_button = Button(
             "start",
             self.window.width // 2,
@@ -64,6 +69,8 @@ class MenuView(arcade.View):
         self._button_group.draw()
 
 class PauseView(arcade.View):
+    """Display the pause overlay and allow the player to resume."""
+
     def __init__(self, previous_view: arcade.View) -> None:
         super().__init__()
         self._previous_view = previous_view
@@ -93,6 +100,8 @@ class PauseView(arcade.View):
 
 
 class EndGameView(arcade.View):
+    """Show the outcome of the session and return to the menu."""
+
     def __init__(self, win: bool, score: int, menu_view: MenuView) -> None:
         super().__init__()
         self.text = "Win" if win else "Game Over"

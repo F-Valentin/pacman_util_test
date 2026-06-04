@@ -1,3 +1,5 @@
+"""Player entity and movement logic for the Pac-Man prototype."""
+
 import arcade
 import math
 from enum import Enum
@@ -22,6 +24,8 @@ class PlayerDirection(Enum):
 
 
 class Player(arcade.Sprite):
+    """Represent the controlled player character on the maze grid."""
+
     def __init__(self, maze: Maze) -> None:
         super().__init__()
 
@@ -43,6 +47,7 @@ class Player(arcade.Sprite):
         return self._current_lives
 
     def setup(self, position: arcade.Vec2, score_ui_pos: arcade.Vec2, hp_bar_pos: arcade.Vec2, lives: int) -> None:
+        """Initialize the player sprite, score UI, and life indicators."""
         self.center_x = position.x
         self.center_y = position.y
         self.score_ui = ScoreUi(score_ui_pos, arcade.Text(f"score: {self.score}", score_ui_pos.x, score_ui_pos.y))
@@ -69,6 +74,7 @@ class Player(arcade.Sprite):
         self.animations["move"] = move_sprite_list
     
     def restart_position(self) -> None:
+        """Reset the player to its starting cell after a collision."""
         self.center_x = self._default_position.x
         self.center_y = self._default_position.y
         self.velocity = 0.0, 0.0
@@ -77,6 +83,7 @@ class Player(arcade.Sprite):
      
 
     def set_next_direction(self, key: int) -> None:
+        """Store the next direction chosen by the player from keyboard input."""
         match key:
             case arcade.key.UP | arcade.key.W:
                 self.next_direction = PlayerDirection.UP
@@ -153,6 +160,7 @@ class Player(arcade.Sprite):
         self.score += value
 
     def move_to_next_cell(self, p_cell: Cell) -> None:
+        """Move the player toward the next open adjacent maze cell."""
         north, east, south, west = 0b0001, 0b0010, 0b0100, 0b1000
         sprite: arcade.TextureAnimationSprite = self.animations[self.state][0]
         speed = self.speed
@@ -186,6 +194,7 @@ class Player(arcade.Sprite):
             self.next_direction = self.direction
 
     def collide_with_ghosts(self, ghosts: list[Ghost]) -> bool:
+        """Return whether the player overlaps any ghost sprite."""
         for ghost in ghosts:
             dx: float = self.center_x - ghost.center_x
             dy: float = self.center_y - ghost.center_y

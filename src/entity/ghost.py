@@ -8,6 +8,8 @@ from typing import Deque, TYPE_CHECKING
 from cell import Cell
 from maze import Maze
 
+"""Ghost AI and movement helpers for the level."""
+
 if TYPE_CHECKING:
     from entity.player import Player
 
@@ -18,6 +20,8 @@ class GhostState(str, Enum):
 
 
 class Ghost(arcade.Sprite):
+    """Represent an enemy ghost that pursues the player through the maze."""
+
     def __init__(self, path_to_sprite: str, difficulty_id: int, speed: float, maze: Maze, player: Player) -> None:
         super().__init__()
         self.state: GhostState = GhostState.MOVE
@@ -32,6 +36,7 @@ class Ghost(arcade.Sprite):
         self._sprite_image = path_to_sprite
     
     def setup(self, cell_pos: Cell) -> None:
+        """Place the ghost at the given maze cell and prepare its sprite."""
         if not cell_pos.center:
             return 
 
@@ -79,6 +84,7 @@ class Ghost(arcade.Sprite):
         )
     
     def _path_to_player(self, p_cell) -> list[Cell]:
+        """Compute a simple shortest path from the ghost to the player's cell."""
         start = self.get_current_cell()
 
         start_coord = (start.grid_x, start.grid_y)
@@ -122,6 +128,7 @@ class Ghost(arcade.Sprite):
         return path
     
     def _move_to_the_player(self) -> None:
+        """Advance the ghost toward the next step along its path."""
         p_cell = self._player.get_current_cell()
 
         if not self.path:
@@ -153,6 +160,7 @@ class Ghost(arcade.Sprite):
 
     
     def update(self, delta_time: float) -> None:
+        """Move the ghost and recompute its path when it reaches a cell."""
         self.center_x += self.change_x
         self.center_y += self.change_y
         self._update_grid_coordinate()
