@@ -82,9 +82,7 @@ class Ghost(arcade.Sprite):
         start = self.get_current_cell()
 
         start_coord = (start.grid_x, start.grid_y)
-        print(start_coord)
         dest_coord = (p_cell.grid_x, p_cell.grid_y)
-        print(dest_coord)
 
         queue: Deque[Cell] = deque([start])
 
@@ -130,14 +128,12 @@ class Ghost(arcade.Sprite):
             path_to_player = self._path_to_player(p_cell)
             if path_to_player and len(path_to_player) > 1:
                 limite = self.difficulty_id
-                print(path_to_player)
 
                 self.path = path_to_player[1: 1 + limite]
             else:
                 return
         
         g_cell = self.get_current_cell()
-        print(g_cell.grid_x)
         target_cell = self.path.pop(0)
 
         if target_cell.grid_x > g_cell.grid_x:
@@ -153,8 +149,6 @@ class Ghost(arcade.Sprite):
             self.change_x = 0.0
             self.change_y = self.speed
 
-        print(self.path)
-
         
 
     
@@ -169,13 +163,11 @@ class Ghost(arcade.Sprite):
         current_animation.update_animation(delta_time)
 
         cell = self.get_current_cell()
-        print((cell.grid_x, cell.grid_y))
         
         if cell.center:
             gx, gy = int(self.center_x), int(self.center_y)
             cx, cy = int(cell.center.x), int(cell.center.y)
             if (gx, gy) == (cx, cy):
-                print("center")
                 self._move_to_the_player()
 
 
