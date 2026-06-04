@@ -67,7 +67,7 @@ class Player(arcade.Sprite):
 
         move_sprite_list = arcade.SpriteList()
         move_sprite_list.append(move_animation)
-        self.speed = 4.5 
+        self.speed = 4
         self._default_position = position
         self._update_grid_coordinate()
 

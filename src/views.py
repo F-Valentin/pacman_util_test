@@ -138,7 +138,14 @@ class EndGameView(arcade.View):
     def on_mouse_press(self, x: int, y: int, button: int, modifiers: int) -> bool | None:
         self._button_group.on_mouse_press(x, y)
 
-    def on_draw(self) -> bool | None:
+    def on_draw(self):
         self.clear()
 
+        result_text = arcade.Text(
+            f"{self.text}  —  Score : {self.score}",
+            self.window.width // 2,
+            self.window.height // 2 + 220,
+            anchor_x="center",
+            )
+        result_text.draw()
         self._button_group.draw()
