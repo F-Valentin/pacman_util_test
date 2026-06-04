@@ -59,6 +59,9 @@ class Level(arcade.View):
         """Reset the player to the starting position after a collision."""
         self._player.restart_position()
 
+        for ghost in self._ghosts:
+            ghost.restart_position()
+
     def on_key_press(self, symbol: int, modifiers: int) -> None:
         self._player.set_next_direction(key=symbol)
 

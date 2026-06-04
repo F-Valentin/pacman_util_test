@@ -83,6 +83,13 @@ class Ghost(arcade.Sprite):
             math.floor(y)
         )
     
+    def restart_position(self) -> None:
+        """Reset the ghost to its starting cell after a collision."""
+        self.center_x = self._default_position.x
+        self.center_y = self._default_position.y
+        self.velocity = 0.0, 0.0
+        self.path = []
+    
     def _path_to_player(self, p_cell) -> list[Cell]:
         """Compute a simple shortest path from the ghost to the player's cell."""
         start = self.get_current_cell()
