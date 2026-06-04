@@ -56,7 +56,7 @@ class Level(arcade.View):
             self._time_to_finish -= time_step
 
     def restart_entity_position(self) -> None:
-        """Reset the player to the starting position after a collision."""
+        """Reset the entities to their starting position after a collision."""
         self._player.restart_position()
 
         for ghost in self._ghosts:
