@@ -66,7 +66,6 @@ class Level(arcade.View):
         self._player.set_next_direction(key=symbol)
 
         if symbol == arcade.key.SPACE:
-            # self.restart_entity_position()
             self.window.show_view(PauseView(self))
         elif symbol == arcade.key.ENTER:
             self._player.take_damage()
