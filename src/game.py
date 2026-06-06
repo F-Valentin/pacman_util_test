@@ -114,6 +114,7 @@ class Game:
             ghosts.append(ghost)
 
         level = Level(player, maze, ghosts, time_limit, self)
+        level.setup()
         self._window.show_view(level)
 
     def next_level(self, score: int) -> None:

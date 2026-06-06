@@ -5,7 +5,6 @@ import math
 from enum import Enum
 from typing import TYPE_CHECKING, Optional
 from maze import Maze
-from score import ScoreUi
 from cell import Cell
 from entity.ghost import Ghost
 
@@ -40,7 +39,6 @@ class Player(arcade.Sprite):
         self.direction: Optional[PlayerDirection] = None
         self.score: int = 0
         self._maze = maze
-        self.score_ui: ScoreUi
     
     @property
     def current_lives(self) -> int:
@@ -50,7 +48,6 @@ class Player(arcade.Sprite):
         """Initialize the player sprite, score UI, and life indicators."""
         self.center_x = position.x
         self.center_y = position.y
-        self.score_ui = ScoreUi(score_ui_pos, arcade.Text(f"score: {self.score}", score_ui_pos.x, score_ui_pos.y))
         self._current_lives = lives
 
         h_offset = 0
@@ -133,18 +130,10 @@ class Player(arcade.Sprite):
             cell.hide_pacgum()
             self._update_score(cell.pacgum.point)
             self._maze.pacgum_eaten()
-            self.update_score_ui()
     
     def take_damage(self) -> None:
-        if self._current_lives:
-            self._current_lives -= 1
+        self._current_lives -= 1
     
-    def update_score_ui(self) -> None:
-        x = self.score_ui.position.x
-        y = self.score_ui.position.y
-
-        self.score_ui.score_text =  arcade.Text(f"score: {self.score}", x, y)
-
     def update(self, delta_time: float = 1/60, *args, **kwargs) -> None:
         self._move(delta_time)
 
@@ -213,7 +202,6 @@ class Player(arcade.Sprite):
 
     def draw(self) -> None:
         self.animations[self.state].draw()
-        self.score_ui.score_text.draw()
 
         for (i, live) in enumerate(self.lives):
             if i >= self._current_lives:

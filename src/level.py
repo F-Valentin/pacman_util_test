@@ -9,6 +9,7 @@ from entity.ghost import Ghost
 from entity.player import Player
 from maze import Maze
 from views import PauseView
+from score import ScoreUi
 
 if TYPE_CHECKING:
     from game import Game
@@ -17,7 +18,7 @@ if TYPE_CHECKING:
 class Level(arcade.View):
     """Represent the main level view where the player interacts with the maze."""
 
-    def __init__(self, player: Player, maze: Maze, ghosts: list[Ghost], time_to_finish: int, game: "Game") -> None:
+    def __init__(self, player: Player, maze: Maze, ghosts: list[Ghost], time_to_finish: int, game: Game) -> None:
         super().__init__()
 
         self._player = player
@@ -26,6 +27,23 @@ class Level(arcade.View):
         self._time_to_finish = time_to_finish
         self._ghosts = ghosts
         self._game = game
+        self.score_ui: ScoreUi
+
+    def setup(self) -> None:
+        first_cell_pos = self._maze.get_cell(0, 0)
+
+        if first_cell_pos.center:
+            x = self._player._default_position.x
+            y = first_cell_pos.center.y + 100
+            score_ui_pos = arcade.Vec2(x, y)
+            text = arcade.Text("score: {0}", x, y)
+            self.score_ui = ScoreUi(score_ui_pos, text)
+
+    def update_score_ui(self) -> None:
+        x = self.score_ui.position.x
+        y = self.score_ui.position.y
+
+        self.score_ui.score_text =  arcade.Text(f"score: {self._player.score}", x, y)
 
     def on_update(self, delta_time: float) -> None:
         """Update the level state each frame."""
@@ -47,7 +65,7 @@ class Level(arcade.View):
             if self._player.collide_with_ghosts(self._ghosts):
                 self._player.take_damage()
 
-                if not self._player.current_lives:
+                if not self._player.current_lives + 1:
                     self._game.game_over(self._player.score)
                     return
 
@@ -60,6 +78,7 @@ class Level(arcade.View):
 
             self._time_accumulator -= time_step
             self._time_to_finish -= time_step
+            self.update_score_ui()
 
     def restart_entity_position(self) -> None:
         """Reset the entities to their starting position after a collision."""
@@ -74,6 +93,7 @@ class Level(arcade.View):
         if symbol == arcade.key.SPACE:
             self.window.show_view(PauseView(self))
         elif symbol == arcade.key.ENTER:
+            # self._game.next_level(self._player.score)
             self._player.take_damage()
 
     def on_draw(self) -> None:
@@ -83,6 +103,12 @@ class Level(arcade.View):
         self._player.draw()
         for ghost in self._ghosts:
             ghost.draw()
+        
+        first_cell_pos = self._maze.get_cell(0, 0)
 
-        time = arcade.Text(f"time: {int(self._time_to_finish)}", self.window.width // 2, self.window.height // 2 + 300)
-        time.draw()
+        if first_cell_pos.center:
+            c_y = first_cell_pos.center.y
+            time = arcade.Text(f"time: {int(self._time_to_finish)}", self._player._default_position.x - 100, c_y + 100)
+            time.draw()
+        
+        self.score_ui.score_text.draw()
