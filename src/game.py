@@ -14,24 +14,93 @@ class Game:
     """Coordinate the main menu flow and level launch for the game."""
 
     LEVEL_CATALOG = [
+        # Niveau 1 — 7×7, 1 fantôme très lent mais pas idiot
         {
-            "maze_width": 9,
-            "maze_height": 9,
-            "time_limit": 60,
+            "maze_width": 7, "maze_height": 7, "time_limit": 60,
             "ghosts": [
-                {"sprite": "assets/blinky.png", "difficulty_id": 5, "col": 0, "row": 0, "speed": 3},
-                {"sprite": "assets/clyde.png", "difficulty_id": 12, "col": 0, "row": 8, "speed": 2.25},
+                {"sprite": "assets/blinky.png", "difficulty_id": 40, "col": 0, "row": 0, "speed": 1.5},
             ],
         },
+        # Niveau 2 — 7×7, 2 fantômes lents, un peu plus malins
         {
-            "maze_width": 13,
-            "maze_height": 13,
-            "time_limit": 100,
+            "maze_width": 7, "maze_height": 7, "time_limit": 60,
             "ghosts": [
-                {"sprite": "assets/blinky.png", "difficulty_id": 2, "col": 0, "row": 0,  "speed": 4},
-                {"sprite": "assets/clyde.png", "difficulty_id": 8, "col": 0, "row": 12, "speed": 3},
-                {"sprite": "assets/blinky.png", "difficulty_id": 15, "col": 12, "row": 0,  "speed": 2.25},
-                {"sprite": "assets/clyde.png", "difficulty_id": 20, "col": 12, "row": 12, "speed": 2.25},
+                {"sprite": "assets/blinky.png", "difficulty_id": 35, "col": 0, "row": 0, "speed": 1.5},
+                {"sprite": "assets/clyde.png",  "difficulty_id": 38, "col": 6, "row": 6, "speed": 1.5},
+            ],
+        },
+        # Niveau 3 — 9×9, vitesse monte, difficulty_id compense
+        {
+            "maze_width": 9, "maze_height": 9, "time_limit": 75,
+            "ghosts": [
+                {"sprite": "assets/blinky.png", "difficulty_id": 28, "col": 0, "row": 0, "speed": 2.0},
+                {"sprite": "assets/pinky.png",  "difficulty_id": 32, "col": 8, "row": 8, "speed": 2.0},
+            ],
+        },
+        # Niveau 4 — 9×9, même vitesse, fantômes plus malins
+        {
+            "maze_width": 9, "maze_height": 9, "time_limit": 75,
+            "ghosts": [
+                {"sprite": "assets/blinky.png", "difficulty_id": 22, "col": 0, "row": 0, "speed": 2.0},
+                {"sprite": "assets/clyde.png",  "difficulty_id": 26, "col": 8, "row": 8, "speed": 2.0},
+            ],
+        },
+        # Niveau 5 — 9×9, 3 fantômes, vitesse monte légèrement
+        {
+            "maze_width": 9, "maze_height": 9, "time_limit": 80,
+            "ghosts": [
+                {"sprite": "assets/blinky.png", "difficulty_id": 18, "col": 0, "row": 0, "speed": 2.25},
+                {"sprite": "assets/pinky.png",  "difficulty_id": 22, "col": 8, "row": 8, "speed": 2.0},
+                {"sprite": "assets/clyde.png",  "difficulty_id": 25, "col": 0, "row": 8, "speed": 2.0},
+            ],
+        },
+        # Niveau 6 — 11×11, vitesse stable, malin monte
+        {
+            "maze_width": 11, "maze_height": 11, "time_limit": 100,
+            "ghosts": [
+                {"sprite": "assets/blinky.png", "difficulty_id": 14, "col": 0,  "row": 0,  "speed": 2.25},
+                {"sprite": "assets/inky.png",   "difficulty_id": 17, "col": 10, "row": 0,  "speed": 2.25},
+                {"sprite": "assets/clyde.png",  "difficulty_id": 20, "col": 0,  "row": 10, "speed": 2.0},
+            ],
+        },
+        # Niveau 7 — 11×11, 4 fantômes, vitesse monte à 3.0
+        {
+            "maze_width": 11, "maze_height": 11, "time_limit": 100,
+            "ghosts": [
+                {"sprite": "assets/blinky.png", "difficulty_id": 10, "col": 0,  "row": 0,  "speed": 3.0},
+                {"sprite": "assets/pinky.png",  "difficulty_id": 13, "col": 10, "row": 0,  "speed": 2.25},
+                {"sprite": "assets/inky.png",   "difficulty_id": 16, "col": 0,  "row": 10, "speed": 2.25},
+                {"sprite": "assets/clyde.png",  "difficulty_id": 19, "col": 10, "row": 10, "speed": 2.0},
+            ],
+        },
+        # Niveau 8 — 11×11, tous à 3.0 minimum, très malins
+        {
+            "maze_width": 11, "maze_height": 11, "time_limit": 90,
+            "ghosts": [
+                {"sprite": "assets/blinky.png", "difficulty_id": 7,  "col": 0,  "row": 0,  "speed": 3.0},
+                {"sprite": "assets/pinky.png",  "difficulty_id": 9,  "col": 10, "row": 0,  "speed": 3.0},
+                {"sprite": "assets/inky.png",   "difficulty_id": 12, "col": 0,  "row": 10, "speed": 3.0},
+                {"sprite": "assets/clyde.png",  "difficulty_id": 15, "col": 10, "row": 10, "speed": 2.25},
+            ],
+        },
+        # Niveau 9 — 11×11, très rapides et très malins
+        {
+            "maze_width": 11, "maze_height": 11, "time_limit": 80,
+            "ghosts": [
+                {"sprite": "assets/blinky.png", "difficulty_id": 4,  "col": 0,  "row": 0,  "speed": 3.0},
+                {"sprite": "assets/pinky.png",  "difficulty_id": 6,  "col": 10, "row": 0,  "speed": 3.0},
+                {"sprite": "assets/inky.png",   "difficulty_id": 8,  "col": 0,  "row": 10, "speed": 3.0},
+                {"sprite": "assets/clyde.png",  "difficulty_id": 10, "col": 10, "row": 10, "speed": 3.0},
+            ],
+        },
+        # Niveau 10 — enfer : Blinky à 4.0, les autres ultra-malins et rapides
+        {
+            "maze_width": 11, "maze_height": 11, "time_limit": 70,
+            "ghosts": [
+                {"sprite": "assets/blinky.png", "difficulty_id": 1,  "col": 0,  "row": 0,  "speed": 4.0},
+                {"sprite": "assets/pinky.png",  "difficulty_id": 3,  "col": 10, "row": 0,  "speed": 3.0},
+                {"sprite": "assets/inky.png",   "difficulty_id": 5,  "col": 0,  "row": 10, "speed": 3.0},
+                {"sprite": "assets/clyde.png",  "difficulty_id": 7,  "col": 10, "row": 10, "speed": 3.0},
             ],
         },
     ]
