@@ -119,7 +119,8 @@ class ButtonGroup:
     def on_mouse_press(self, x: int, y: int) -> None:
         """Activate the first button that contains the clicked point."""
         if self.current_button_focus:
-            if self.current_button_focus.collide_with_point(x, y):
+            point = arcade.Vec2(x, y)
+            if self.current_button_focus.collide_with_point(point):
                 self.current_button_focus.trigger() 
 
     def on_mouse_motion(self, x: int, y: int) -> None:
