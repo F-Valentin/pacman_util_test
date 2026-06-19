@@ -94,7 +94,7 @@ class Level(arcade.View):
             self.window.show_view(PauseView(self))
         elif symbol == arcade.key.ENTER:
             # self._game.next_level(self._player.score)
-            self._player.take_damage()
+            self._game.next_level(self._player.score)
 
     def on_draw(self) -> None:
         self.clear()

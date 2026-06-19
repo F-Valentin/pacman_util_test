@@ -123,9 +123,9 @@ class Game:
     def start(self) -> None:
         """Reset progression and load the first level."""
         self._current_level_index = 0
-        self.load_level()
+        self.load_level(current_score=0)
 
-    def load_level(self) -> None:
+    def load_level(self, current_score: int) -> None:
         """Read the catalog at the current index and build + show the level."""
 
         config = self.LEVEL_CATALOG[self._current_level_index]
@@ -157,6 +157,7 @@ class Game:
         maze.setup(self._game_config.points_per_pacgum)
 
         player = Player(maze)
+        player.score = current_score
 
         half = maze_width * cell_size // 2
         offset = 0 if maze_width % 2 != 0 else -cell_size // 2
@@ -190,7 +191,7 @@ class Game:
         """Advance to the next level, or show the final victory screen."""
         self._current_level_index += 1
         if self._current_level_index < len(self.LEVEL_CATALOG):
-            self.load_level()
+            self.load_level(score)
         else:
             self._window.show_view(EndGameView(True, score, self._menu_view))
 

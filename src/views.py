@@ -2,6 +2,8 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 import arcade
 import sys
+import hjson
+from highscore import update_highscore_file
 from button import Button, ButtonIndex, ButtonGroup
 
 """Menu, pause, and end-of-game views used by the Arcade window."""
@@ -106,6 +108,7 @@ class EndGameView(arcade.View):
         super().__init__()
         self.text = "Win" if win else "Game Over"
         self.score = score
+        self.highscore = 0
         self._menu_view = menu_view
         self._button_group: ButtonGroup = ButtonGroup(2)
 
@@ -128,9 +131,21 @@ class EndGameView(arcade.View):
         quit_button.set_scale(2)
         self._button_group.add_button(menu_buttton)
         self._button_group.add_button(quit_button)
+
+        highscore = 0
+        try:
+            with open("highscore.json", 'r', encoding='utf-8') as f:
+                print("open")
+                data = hjson.load(f)
+                highscore = data.get("highscore", 0)
+                self.highscore = highscore
+        except (FileNotFoundError, hjson.HjsonDecodeError) as e: 
+            print(e)
         
-        # open save score to get the highscore
-        # check if score > highscore change highscore else do nothing
+        if self.score > highscore:
+            print("update")
+            update_highscore_file("highscore.json", self.score)
+            self.highscore = self.score
     
     def on_key_press(self, symbol: int, modifiers: int) -> bool | None:
         self._button_group.on_key_press(key=symbol)
@@ -148,4 +163,12 @@ class EndGameView(arcade.View):
             anchor_x="center",
             )
         result_text.draw()
+
+        highscore_text = arcade.Text(f"HighScore : {self.highscore}",
+            self.window.width // 2,
+            self.window.height // 2 + 120,
+            anchor_x="center",
+        )
+
+        highscore_text.draw()
         self._button_group.draw()
