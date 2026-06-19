@@ -60,8 +60,8 @@ class MenuView(arcade.View):
         self._button_group.on_mouse_press(x, y)
        
     
-    # def on_mouse_motion(self, x: int, y: int, dx: int, dy: int) -> bool | None:
-    #     pass
+    def on_mouse_motion(self, x: int, y: int, dx: int, dy: int) -> bool | None:
+        self._button_group.on_mouse_motion(x, y)
 
     def on_draw(self) -> None:
         """ Draw everything """
