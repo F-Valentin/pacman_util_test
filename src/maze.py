@@ -46,7 +46,8 @@ class Maze:
         if self._nb_of_pacgums_visible > 0:
             self._nb_of_pacgums_visible -= 1
 
-    def setup(self, point_par_pacgum: int) -> None:
+    def setup(self, point_par_pacgum: int,
+              point_par_super_pacgum: int) -> None:
         """Generate the maze layout, place pacgums, and cache wall points."""
         maze_generator = MazeGenerator((self.width, self.height))
         grid: list[list[Cell]] = []
@@ -59,7 +60,7 @@ class Maze:
         self._grid = grid
 
         if self._grid:
-            self._setup_cells(point_par_pacgum)
+            self._setup_cells(point_par_pacgum, point_par_super_pacgum)
             self._wall_points = self._build_wall_points()
             self._pacgums = self._get_cells_pacgums()
             self._nb_of_pacgums_visible = len(self._pacgums)
@@ -94,14 +95,23 @@ class Maze:
 
         return wall_points
 
-    def _setup_cells(self, point_par_pacgum: int) -> None:
+    def _setup_cells(self, point_par_pacgum: int,
+                     point_par_super_pacgum: int) -> None:
         cell_size: int = self._cell_size
 
         blocked: int = 0x0F
 
+        corner = [(0, 0),
+                  (0, (len(self._grid) - 1)),
+                  ((len(self._grid) - 1), 0),
+                  ((len(self._grid) - 1), (len(self._grid) - 1))]
+
         pacgum_radius: float = 3.0
+        super_pacgum_radius: float = 6.0
         pacgum_color: tuple[int, int, int, int] = arcade.color.WHITE
+        super_pacgum_color: tuple[int, int, int, int] = arcade.color.BLUE
         pacgum_point: int = point_par_pacgum
+        super_pacgum_point: int = point_par_super_pacgum
 
         for cells in self.grid:
             for cell in cells:
@@ -116,14 +126,24 @@ class Maze:
 
                 cell.center = Vec2(center_x, center_y)
 
-                if cell.walls != blocked:
+
+                if (cell._grid_x, cell._grid_y) in corner:
+                    super_pacgum = Pacgum(
+                        center_x, center_y,
+                        True, super_pacgum_radius, super_pacgum_point,
+                        super_pacgum_color
+                    )
+
+                    cell.add_pacgum(super_pacgum)
+
+                elif cell.walls != blocked:
                     pacgum = Pacgum(
                         center_x, center_y,
                         True, pacgum_radius, pacgum_point, pacgum_color
                     )
 
                     cell.add_pacgum(pacgum)
-    
+
     def _get_valid_cell_neighbors(self, cell: Cell) -> Optional[list[Cell]]:
         north, south, east, west = 0b0001, 0b0100, 0b0010, 0b1000
 
@@ -143,7 +163,8 @@ class Maze:
                 return True
             return False
 
-        valid_coords = filter(lambda c: is_open(int(c[0]), int(c[1])), cell.neighbors)
+        valid_coords = filter(lambda c: is_open(int(c[0]), int(c[1])),
+                              cell.neighbors)
         neighbors = [self.get_cell(int(c[0]), int(c[1])) for c in valid_coords]
         return neighbors if neighbors else None
 

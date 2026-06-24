@@ -13,6 +13,7 @@ from maze import Maze
 if TYPE_CHECKING:
     from entity.player import Player
 
+
 class GhostState(str, Enum):
     IDLE = "idle"
     MOVE = "move"
@@ -22,7 +23,8 @@ class GhostState(str, Enum):
 class Ghost(arcade.Sprite):
     """Represent an enemy ghost that pursues the player through the maze."""
 
-    def __init__(self, path_to_sprite: str, difficulty_id: int, speed: float, maze: Maze, player: Player) -> None:
+    def __init__(self, path_to_sprite: str, difficulty_id: int, speed: float,
+                 maze: Maze, player: Player) -> None:
         super().__init__()
         self.state: GhostState = GhostState.MOVE
         self.animations: dict[str, arcade.SpriteList] = {}
@@ -34,11 +36,11 @@ class Ghost(arcade.Sprite):
         self._default_position: arcade.Vec2
         self._player = player
         self._sprite_image = path_to_sprite
-    
+
     def setup(self, cell_pos: Cell) -> None:
         """Place the ghost at the given maze cell and prepare its sprite."""
         if not cell_pos.center:
-            return 
+            return
 
         position = arcade.Vec2(cell_pos.center.x, cell_pos.center.y)
         move_animation = arcade.Sprite(self._sprite_image)
@@ -59,10 +61,10 @@ class Ghost(arcade.Sprite):
         self._default_position = position
 
         self._update_grid_coordinate()
-    
+
     def get_grid_coordinate(self) -> arcade.Vec2:
         return self._grid_coordinate
-    
+
     def get_current_cell(self) -> Cell:
         c_x = int(self._grid_coordinate.x)
         c_y = int(self._grid_coordinate.y)
@@ -70,7 +72,6 @@ class Ghost(arcade.Sprite):
 
         return g_cell
 
- 
     def _update_grid_coordinate(self) -> None:
         cell_size: int = self._maze.cell_size
         bottom_left_pos = self._maze.bottom_left_pos
@@ -82,14 +83,14 @@ class Ghost(arcade.Sprite):
             math.floor(x),
             math.floor(y)
         )
-    
+
     def restart_position(self) -> None:
         """Reset the ghost to its starting cell after a collision."""
         self.center_x = self._default_position.x
         self.center_y = self._default_position.y
         self.velocity = 0.0, 0.0
         self.path = []
-    
+
     def _path_to_player(self, p_cell) -> list[Cell]:
         """Compute a simple shortest path from the ghost to the player's cell."""
         start = self.get_current_cell()
@@ -114,7 +115,7 @@ class Ghost(arcade.Sprite):
 
             if not neighbors:
                 continue
-                
+
             for neighbor in neighbors:
                 neighbor_coord = (neighbor.grid_x, neighbor.grid_y)
 
@@ -122,18 +123,18 @@ class Ghost(arcade.Sprite):
                     came_from[neighbor_coord] = curr_coord
                     cell_registry[neighbor_coord] = neighbor
                     queue.append(neighbor)
-        
+
         path = []
         curr = dest_coord
 
         while curr:
             path.append(cell_registry[curr])
             curr = came_from[curr]
-        
+
         path.reverse()
 
         return path
-    
+
     def _move_to_the_player(self) -> None:
         """Advance the ghost toward the next step along its path."""
         p_cell = self._player.get_current_cell()
@@ -146,7 +147,7 @@ class Ghost(arcade.Sprite):
                 self.path = path_to_player[1: 1 + limite]
             else:
                 return
-        
+
         g_cell = self.get_current_cell()
         target_cell = self.path.pop(0)
 
@@ -163,9 +164,6 @@ class Ghost(arcade.Sprite):
             self.change_x = 0.0
             self.change_y = self.speed
 
-        
-
-    
     def update(self, delta_time: float) -> None:
         """Move the ghost and recompute its path when it reaches a cell."""
         self.center_x += self.change_x
@@ -178,15 +176,12 @@ class Ghost(arcade.Sprite):
         current_animation.update_animation(delta_time)
 
         cell = self.get_current_cell()
-        
+
         if cell.center:
             gx, gy = int(self.center_x), int(self.center_y)
             cx, cy = int(cell.center.x), int(cell.center.y)
             if (gx, gy) == (cx, cy):
                 self._move_to_the_player()
 
-
-       
-    
     def draw(self) -> None:
         self.animations[self.state].draw()
