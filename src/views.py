@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Callable
 import arcade
 import sys
 import hjson
@@ -41,14 +41,17 @@ class MenuView(arcade.View):
         exit = Button(
             "quit",
             self.window.width // 2,
-            self.window.height // 2,
+            self.window.height // 2 + 300,
             "assets/button/quit/quit.png",
             lambda: sys.exit(0)
         )
 
         exit.set_scale(2)
 
+        instruction = Button("instruction", self.window.width // 2, self.window.height // 2 + 200, "assets/Single PNGs/ENTER.png", lambda: self.window.show_view(InstructionView(self)))
+
         self._button_group.add_button(start_button)
+        self._button_group.add_button(instruction)
         self._button_group.add_button(exit)
 
     def on_show_view(self) -> None:
@@ -172,3 +175,52 @@ class EndGameView(arcade.View):
 
         highscore_text.draw()
         self._button_group.draw()
+
+
+class InstructionView(arcade.View):
+    def __init__(self, menu_view: MenuView) -> None:
+        super().__init__()
+        from arcade import Sprite
+        self._button_group: ButtonGroup = ButtonGroup(1)
+        self._menu_view = menu_view
+
+        pos_d = arcade.Vec2(self.window.width // 2 + 100, self.window.height // 2)
+        pos_r = arcade.Vec2(pos_d.x + 20, pos_d.y)
+        pos_l = arcade.Vec2(pos_d.x - 20, pos_d.y)
+        pos_u = arcade.Vec2(pos_d.x, pos_d.y + 20)
+
+        arrow_d = Sprite("assets/Single PNGs/ARROWDOWN.png", 1, pos_d.x, pos_d.y)
+        arrow_l= Sprite("assets/Single PNGs/ARROWLEFT.png", 1, pos_l.x, pos_l.y)
+        arrow_r = Sprite("assets/Single PNGs/ARROWRIGHT.png", 1, pos_r.x, pos_r.y)
+        arrow_u = Sprite("assets/Single PNGs/ARROWUP.png", 1, pos_u.x, pos_u.y)
+
+        self.move_wasd = arcade.Text("You can move using the key arrows or wasd", pos_l.x - 20, pos_u.y + 20)
+        self.arrows: arcade.SpriteList = arcade.SpriteList()
+        self.arrows.append(arrow_d)
+        self.arrows.append(arrow_l)
+        self.arrows.append(arrow_r)
+        self.arrows.append(arrow_u)
+
+        quit_button = Button("quit", 
+            self.window.width // 2,
+            self.window.height // 2, "assets/button/quit/quit.png", lambda: self.window.show_view(self._menu_view))
+        
+        self._button_group.add_button(quit_button)
+    
+    def on_key_press(self, symbol: int, modifiers: int) -> bool | None:
+        self._button_group.on_key_press(key=symbol)
+    
+    def on_mouse_motion(self, x: int, y: int, dx: int, dy: int) -> bool | None:
+        self._button_group.on_mouse_motion(x, y)
+
+    def on_mouse_press(self, x: int, y: int, button: int, modifiers: int) -> bool | None:
+        self._button_group.on_mouse_press(x, y)
+
+    
+    def on_draw(self) -> bool | None:
+        self.clear()
+        text = arcade.Text("instruction", self.window.width // 2, self.window.height // 2 + 200)
+        self.arrows.draw()
+        self._button_group.draw()
+        self.move_wasd.draw()
+        text.draw()
