@@ -4,7 +4,7 @@ import arcade
 import sys
 import hjson
 from highscore import update_highscore_file
-from button import Button, ButtonIndex, ButtonGroup
+from button import Button, CheckButton, ButtonGroup
 
 """Menu, pause, and end-of-game views used by the Arcade window."""
 
@@ -31,7 +31,7 @@ class MenuView(arcade.View):
             "start",
             self.window.width // 2,
             self.window.height // 2 + 100,
-            "assets/button/start/start.png",
+            ["assets/button/start/start.png"],
             self.game.start
         )
         
@@ -42,13 +42,13 @@ class MenuView(arcade.View):
             "quit",
             self.window.width // 2,
             self.window.height // 2 + 300,
-            "assets/button/quit/quit.png",
+            ["assets/button/quit/quit.png"],
             lambda: sys.exit(0)
         )
 
         exit.set_scale(2)
 
-        instruction = Button("instruction", self.window.width // 2, self.window.height // 2 + 200, "assets/Single PNGs/ENTER.png", lambda: self.window.show_view(InstructionView(self)))
+        instruction = Button("instruction", self.window.width // 2, self.window.height // 2 + 200, ["assets/Single PNGs/ENTER.png"], lambda: self.window.show_view(InstructionView(self)))
 
         self._button_group.add_button(start_button)
         self._button_group.add_button(instruction)
@@ -90,7 +90,7 @@ class PauseView(arcade.View):
             "resume",
             self.window.width // 2,
             self.window.height // 2 + 100,
-            "assets/button/back01.png",
+            ["assets/button/back01.png"],
             self.resume)
 
     def on_key_press(self, symbol: int, modifiers: int) -> bool | None:
@@ -120,7 +120,7 @@ class EndGameView(arcade.View):
             "menu_button",
             self.window.width // 2,
             self.window.height // 2 + 100,
-            "assets/button/menu/menu.png",
+            ["assets/button/menu/menu.png"],
             lambda: self.window.show_view(
                 self._menu_view))
         
@@ -129,7 +129,7 @@ class EndGameView(arcade.View):
         
         quit_button = Button("quit", 
             self.window.width // 2,
-            self.window.height // 2, "assets/button/quit/quit.png", lambda: sys.exit(0))
+            self.window.height // 2, ["assets/button/quit/quit.png"], lambda: sys.exit(0))
         
         quit_button.set_scale(2)
         self._button_group.add_button(menu_buttton)
@@ -181,7 +181,7 @@ class InstructionView(arcade.View):
     def __init__(self, menu_view: MenuView) -> None:
         super().__init__()
         from arcade import Sprite
-        self._button_group: ButtonGroup = ButtonGroup(1)
+        self._button_group: ButtonGroup = ButtonGroup(2)
         self._menu_view = menu_view
 
         pos_d = arcade.Vec2(self.window.width // 2 + 100, self.window.height // 2)
@@ -201,11 +201,15 @@ class InstructionView(arcade.View):
         self.arrows.append(arrow_r)
         self.arrows.append(arrow_u)
 
+        skip_level = CheckButton("skip level", pos_r.x + 50, pos_u.y, ["assets/button/checkbutton.png", "assets/button/uncheckbutton.png"])
+        skip_level.set_scale(0.1)
+
         quit_button = Button("quit", 
             self.window.width // 2,
-            self.window.height // 2, "assets/button/quit/quit.png", lambda: self.window.show_view(self._menu_view))
+            self.window.height // 2, ["assets/button/quit/quit.png"], lambda: self.window.show_view(self._menu_view))
         
         self._button_group.add_button(quit_button)
+        self._button_group.add_button(skip_level)
     
     def on_key_press(self, symbol: int, modifiers: int) -> bool | None:
         self._button_group.on_key_press(key=symbol)
