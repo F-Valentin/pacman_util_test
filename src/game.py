@@ -154,7 +154,8 @@ class Game:
             cell_size
         )
 
-        maze.setup(self._game_config.points_per_pacgum)
+        maze.setup(self._game_config.points_per_pacgum,
+                   self._game_config.points_per_super_pacgum)
 
         player = Player(maze)
         player.score = current_score
@@ -178,10 +179,13 @@ class Game:
 
         ghosts: list[Ghost] = []
         for g in config["ghosts"]:
-            ghost = Ghost(g["sprite"], g["difficulty_id"], g["speed"], maze, player)
+            ghost = Ghost(g["sprite"], g["difficulty_id"], g["speed"],
+                          maze, player)
             position = maze.get_cell(g["col"], g["row"])
             ghost.setup(position)
             ghosts.append(ghost)
+
+        player.ghosts = ghosts
 
         level = Level(player, maze, ghosts, time_limit, self)
         level.setup()
