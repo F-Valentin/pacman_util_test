@@ -126,12 +126,11 @@ class Maze:
 
                 cell.center = Vec2(center_x, center_y)
 
-
                 if (cell._grid_x, cell._grid_y) in corner:
                     super_pacgum = Pacgum(
                         center_x, center_y,
                         True, super_pacgum_radius, super_pacgum_point,
-                        super_pacgum_color
+                        super_pacgum_color, True
                     )
 
                     cell.add_pacgum(super_pacgum)
@@ -139,7 +138,7 @@ class Maze:
                 elif cell.walls != blocked:
                     pacgum = Pacgum(
                         center_x, center_y,
-                        True, pacgum_radius, pacgum_point, pacgum_color
+                        True, pacgum_radius, pacgum_point, pacgum_color, False
                     )
 
                     cell.add_pacgum(pacgum)

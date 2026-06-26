@@ -11,6 +11,7 @@ class Pacgum:
     radius: float
     point: int
     color: tuple[int, int, int, int]
+    is_super: bool
 
 
 def draw_pacgum(pacgum: Pacgum) -> None:

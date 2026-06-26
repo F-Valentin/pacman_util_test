@@ -77,6 +77,7 @@ class Cell:
             raise ValueError("Trying to hide a pacgum, but the pacgum is None")
 
         self.pacgum.visible = False
+        
 
     def has_pacgum(self) -> bool:
         """Return whether this cell still has a visible pacgum."""

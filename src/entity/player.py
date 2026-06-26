@@ -6,7 +6,7 @@ from enum import Enum
 from typing import TYPE_CHECKING, Optional
 from maze import Maze
 from cell import Cell
-from entity.ghost import Ghost
+from entity.ghost import Ghost, GhostState
 
 
 class PlayerState(str, Enum):
@@ -39,7 +39,8 @@ class Player(arcade.Sprite):
         self.direction: Optional[PlayerDirection] = None
         self.score: int = 0
         self._maze = maze
-    
+        self.ghosts: list[Ghost]
+
     @property
     def current_lives(self) -> int:
         return self._current_lives
@@ -57,7 +58,6 @@ class Player(arcade.Sprite):
             )
             h_offset += 40
 
-
         move_animation = arcade.load_animated_gif("assets/pacman.gif")
         move_animation.position = self.position
         move_animation.scale = 0.12
@@ -69,7 +69,7 @@ class Player(arcade.Sprite):
         self._update_grid_coordinate()
 
         self.animations["move"] = move_sprite_list
-    
+
     def restart_position(self) -> None:
         """Reset the player to its starting cell after a collision."""
         self.center_x = self._default_position.x
@@ -77,7 +77,6 @@ class Player(arcade.Sprite):
         self.velocity = 0.0, 0.0
         self.direction = None
         self.next_direction = None
-     
 
     def set_next_direction(self, key: int) -> None:
         """Store the next direction chosen by the player from keyboard input."""
@@ -91,10 +90,9 @@ class Player(arcade.Sprite):
             case arcade.key.RIGHT | arcade.key.D:
                 self.next_direction = PlayerDirection.RIGHT
 
-
     def get_grid_coordinate(self) -> arcade.Vec2:
         return self._grid_coordinate
-    
+
     def get_current_cell(self) -> Cell:
         c_x = int(self._grid_coordinate.x)
         c_y = int(self._grid_coordinate.y)
@@ -102,7 +100,6 @@ class Player(arcade.Sprite):
 
         return p_cell
 
- 
     def _update_grid_coordinate(self) -> None:
         cell_size: int = self._maze.cell_size
         bottom_left_pos = self._maze.bottom_left_pos
@@ -114,7 +111,7 @@ class Player(arcade.Sprite):
             math.floor(x),
             math.floor(y)
         )
-    
+
     def _move(self, delta_time: float) -> None:
         self.center_x += self.change_x
         self.center_y += self.change_y
@@ -124,16 +121,19 @@ class Player(arcade.Sprite):
         current_animation.update_animation(delta_time)
         current_animation[0].center_x = self.center_x
         current_animation[0].center_y = self.center_y
-    
+
     def _eat_pacgum(self, cell: Cell) -> None:
         if cell.pacgum and cell.has_pacgum():
             cell.hide_pacgum()
             self._update_score(cell.pacgum.point)
             self._maze.pacgum_eaten()
-    
+            if cell.pacgum.is_super:
+                for ghost in self.ghosts:
+                    ghost.state = GhostState.FLEE
+
     def take_damage(self) -> None:
         self._current_lives -= 1
-    
+
     def update(self, delta_time: float = 1/60, *args, **kwargs) -> None:
         self._move(delta_time)
 
@@ -144,7 +144,7 @@ class Player(arcade.Sprite):
             if (px, py) == (cx, cy):
                 self._eat_pacgum(cell)
                 self.move_to_next_cell(cell)
-    
+
     def _update_score(self, value: int) -> None:
         self.score += value
 
@@ -182,9 +182,9 @@ class Player(arcade.Sprite):
         else:
             self.next_direction = self.direction
 
-    def collide_with_ghosts(self, ghosts: list[Ghost]) -> bool:
+    def collide_with_ghosts(self) -> bool:
         """Return whether the player overlaps any ghost sprite."""
-        for ghost in ghosts:
+        for ghost in self.ghosts:
             dx: float = self.center_x - ghost.center_x
             dy: float = self.center_y - ghost.center_y
             distance = math.sqrt(dx ** 2 + dy ** 2)
@@ -195,7 +195,11 @@ class Player(arcade.Sprite):
             p_radius = (p_current_sprite.width / 2) * 0.5
             g_radius = (g_current_sprite.width / 2) * 0.5
 
-            if distance <= (p_radius + g_radius):
+            if distance <= (p_radius + g_radius) and ghost.state == GhostState.FLEE:
+                ghost.restart_position()
+                ghost.state = GhostState.MOVE
+                return False
+            elif distance <= (p_radius + g_radius):
                 return True
 
         return False
@@ -206,5 +210,5 @@ class Player(arcade.Sprite):
         for (i, live) in enumerate(self.lives):
             if i >= self._current_lives:
                 live.alpha = 0
-        
+
         self.lives.draw()

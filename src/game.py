@@ -184,6 +184,8 @@ class Game:
             ghost.setup(position)
             ghosts.append(ghost)
 
+        player.ghosts = ghosts
+
         level = Level(player, maze, ghosts, time_limit, self)
         level.setup()
         self._window.show_view(level)

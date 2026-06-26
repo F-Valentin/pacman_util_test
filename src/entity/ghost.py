@@ -18,6 +18,7 @@ class GhostState(str, Enum):
     IDLE = "idle"
     MOVE = "move"
     DEAD = "dead"
+    FLEE = "flee"
 
 
 class Ghost(arcade.Sprite):
@@ -36,6 +37,7 @@ class Ghost(arcade.Sprite):
         self._default_position: arcade.Vec2
         self._player = player
         self._sprite_image = path_to_sprite
+        self._flee_image = "assets/ghost_flee.png"
 
     def setup(self, cell_pos: Cell) -> None:
         """Place the ghost at the given maze cell and prepare its sprite."""
@@ -47,6 +49,10 @@ class Ghost(arcade.Sprite):
         move_animation.position = position
         move_animation.scale = 0.08
 
+        flee_animation = arcade.Sprite(self._flee_image)
+        flee_animation.position = position
+        flee_animation.scale = 0.08
+
         self.center_x = position.x
         self.center_y = position.y
         self.velocity = 0.0, 0.0
@@ -54,11 +60,16 @@ class Ghost(arcade.Sprite):
         move_sprite_list = arcade.SpriteList()
         move_sprite_list.append(move_animation)
 
+        flee_sprite_list = arcade.SpriteList()
+        flee_sprite_list.append(flee_animation)
+
         self.animations["move"] = move_sprite_list
+        self.animations["flee"] = flee_sprite_list
 
         self.center_x = position.x
         self.center_y = position.y
         self._default_position = position
+        self._spawn_cell = cell_pos
 
         self._update_grid_coordinate()
 
@@ -68,8 +79,8 @@ class Ghost(arcade.Sprite):
     def get_current_cell(self) -> Cell:
         c_x = int(self._grid_coordinate.x)
         c_y = int(self._grid_coordinate.y)
-        g_cell: Cell = self._maze.get_cell(c_x, c_y)
 
+        g_cell: Cell = self._maze.get_cell(c_x, c_y)
         return g_cell
 
     def _update_grid_coordinate(self) -> None:
@@ -91,12 +102,12 @@ class Ghost(arcade.Sprite):
         self.velocity = 0.0, 0.0
         self.path = []
 
-    def _path_to_player(self, p_cell) -> list[Cell]:
+    def _path_to_cell(self, target_cell: Cell) -> list[Cell]:
         """Compute a simple shortest path from the ghost to the player's cell."""
         start = self.get_current_cell()
 
         start_coord = (start.grid_x, start.grid_y)
-        dest_coord = (p_cell.grid_x, p_cell.grid_y)
+        dest_coord = (target_cell.grid_x, target_cell.grid_y)
 
         queue: Deque[Cell] = deque([start])
 
@@ -135,21 +146,9 @@ class Ghost(arcade.Sprite):
 
         return path
 
-    def _move_to_the_player(self) -> None:
-        """Advance the ghost toward the next step along its path."""
-        p_cell = self._player.get_current_cell()
-
-        if not self.path:
-            path_to_player = self._path_to_player(p_cell)
-            if path_to_player and len(path_to_player) > 1:
-                limite = self.difficulty_id
-
-                self.path = path_to_player[1: 1 + limite]
-            else:
-                return
-
+    def _set_velocity_towards(self, target_cell: Cell) -> None:
+        """Helper to set velocity vectors toward an adjacent cell."""
         g_cell = self.get_current_cell()
-        target_cell = self.path.pop(0)
 
         if target_cell.grid_x > g_cell.grid_x:
             self.change_x = self.speed
@@ -163,6 +162,34 @@ class Ghost(arcade.Sprite):
         elif target_cell.grid_y < g_cell.grid_y:
             self.change_x = 0.0
             self.change_y = self.speed
+
+    def _move_to_the_player(self) -> None:
+        """Advance the ghost toward the next step along its path to the player."""
+        p_cell = self._player.get_current_cell()
+
+        if not self.path:
+            path_to_player = self._path_to_cell(p_cell)
+            if path_to_player and len(path_to_player) > 1:
+                limite = self.difficulty_id
+                self.path = path_to_player[1: 1 + limite]
+            else:
+                return
+
+        target_cell = self.path.pop(0)
+        self._set_velocity_towards(target_cell)
+
+    def flee(self) -> None:
+        """Advance the ghost toward its original spawn point."""
+        if not self.path:
+            path_to_spawn = self._path_to_cell(self._spawn_cell)
+            if path_to_spawn and len(path_to_spawn) > 1:
+
+                self.path = path_to_spawn[1:]
+            else:
+                return
+
+        target_cell = self.path.pop(0)
+        self._set_velocity_towards(target_cell)
 
     def update(self, delta_time: float) -> None:
         """Move the ghost and recompute its path when it reaches a cell."""
@@ -180,8 +207,15 @@ class Ghost(arcade.Sprite):
         if cell.center:
             gx, gy = int(self.center_x), int(self.center_y)
             cx, cy = int(cell.center.x), int(cell.center.y)
-            if (gx, gy) == (cx, cy):
+            if (gx, gy) == (cx, cy) and self.state != GhostState.FLEE:
                 self._move_to_the_player()
+            elif (gx, gy) == (cx, cy) and self.state == GhostState.FLEE and cell.grid_x == self._spawn_cell.grid_x and cell.grid_y == self._spawn_cell.grid_y:
+                self.state = GhostState.MOVE
+                self.change_x = 0.0
+                self.change_y = 0.0
+                self.path = []
+            elif (gx, gy) == (cx, cy) and self.state == GhostState.FLEE:
+                self.flee()
 
     def draw(self) -> None:
         self.animations[self.state].draw()

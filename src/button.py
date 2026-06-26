@@ -128,7 +128,6 @@ class ButtonGroup:
 
         for (idx, button) in enumerate(self._buttons):
             if button.collide_with_point(point):
-                print("collide")
                 self.current_button_focus.set_alpha(255)
                 self.current_button_focus = button
                 button.set_alpha(200)
