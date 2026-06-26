@@ -208,7 +208,6 @@ class Ghost(arcade.Sprite):
                *args: Any, **kwargs: Any) -> None:
         """Move the ghost and recompute its path when it reaches a cell."""
         if self._freeze:
-            # Keep animations synced even when frozen
             self._sync_animations(delta_time)
             return
 

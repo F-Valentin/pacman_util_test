@@ -14,7 +14,6 @@ class CheatMode:
         self._buttons_initialized: bool = False
 
     def _init_buttons(self) -> None:
-        """Crée les boutons de cheat une seule fois."""
         if self._buttons_initialized:
             return
 
@@ -55,7 +54,6 @@ class CheatMode:
         self._buttons_initialized = True
 
     def _freeze_all(self) -> None:
-        """Appelle tous les freeze de fantômes."""
         for freeze in self.ghosts_freeze:
             freeze()
 
@@ -66,24 +64,6 @@ class CheatMode:
         return self._button_group
 
     def draw(self) -> None:
-        """Dessine tous les boutons de cheat."""
         if not self._buttons_initialized:
             self._init_buttons()
         self._button_group.draw()
-
-    def reset_positions(self) -> None:
-        """Recalcule les positions si la fenêtre a changé."""
-        if not self._buttons_initialized:
-            return
-        
-        center_x = self._window.width // 2
-        base_y = self._window.height // 2
-        
-        buttons = self._button_group._buttons
-        offsets = [0, -60, -120]
-        
-        for btn, offset in zip(buttons, offsets):
-            btn.center = arcade.Vec2(center_x, base_y + offset)
-            for sprite in btn._sprite_list:
-                sprite.position = btn.center
-            btn._update_collision_rect()
