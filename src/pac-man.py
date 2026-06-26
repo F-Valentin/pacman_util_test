@@ -2,7 +2,6 @@ import arcade
 import sys
 from game import Game
 from game_configuration import GameConfig
-from views import MenuView
 
 
 def main() -> None:
@@ -15,7 +14,8 @@ def main() -> None:
 
     game_config = GameConfig(file_path)
 
-    window = arcade.Window(game_config.screen_width, game_config.screen_height)
+    window = arcade.Window(game_config.screen_width,
+                           game_config.screen_height)
     game = Game(window, game_config)
     game.run()
 

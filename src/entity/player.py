@@ -3,7 +3,7 @@
 import arcade
 import math
 from enum import Enum
-from typing import TYPE_CHECKING, Optional
+from typing import Optional
 from maze import Maze
 from cell import Cell
 from entity.ghost import Ghost, GhostState
@@ -40,12 +40,14 @@ class Player(arcade.Sprite):
         self.score: int = 0
         self._maze = maze
         self.ghosts: list[Ghost]
+        self._invicibility = False
 
     @property
     def current_lives(self) -> int:
         return self._current_lives
 
-    def setup(self, position: arcade.Vec2, score_ui_pos: arcade.Vec2, hp_bar_pos: arcade.Vec2, lives: int) -> None:
+    def setup(self, position: arcade.Vec2, score_ui_pos: arcade.Vec2,
+             hp_bar_pos: arcade.Vec2, lives: int) -> None:
         """Initialize the player sprite, score UI, and life indicators."""
         self.center_x = position.x
         self.center_y = position.y
@@ -54,7 +56,8 @@ class Player(arcade.Sprite):
         h_offset = 0
         for _ in range(lives):
             self.lives.append(
-                arcade.Sprite("assets/hp.png", 1, hp_bar_pos.x + h_offset, hp_bar_pos.y)
+                arcade.Sprite("assets/hp.png", 1,
+                              hp_bar_pos.x + h_offset, hp_bar_pos.y)
             )
             h_offset += 40
 
@@ -62,7 +65,7 @@ class Player(arcade.Sprite):
         move_animation.position = self.position
         move_animation.scale = 0.12
 
-        move_sprite_list = arcade.SpriteList()
+        move_sprite_list: arcade.SpriteList = arcade.SpriteList()
         move_sprite_list.append(move_animation)
         self.speed = 4
         self._default_position = position
@@ -105,7 +108,8 @@ class Player(arcade.Sprite):
         bottom_left_pos = self._maze.bottom_left_pos
 
         x: float = (self.center_x - bottom_left_pos.x) / float(cell_size)
-        y: float = ((self._maze.height - 1) - (self.center_y - bottom_left_pos.y)) / float(cell_size)
+        y: float = ((self._maze.height - 1)
+                    - (self.center_y - bottom_left_pos.y)) / float(cell_size)
 
         self._grid_coordinate = arcade.Vec2(
             math.floor(x),
@@ -132,9 +136,11 @@ class Player(arcade.Sprite):
                     ghost.state = GhostState.FLEE
 
     def take_damage(self) -> None:
-        self._current_lives -= 1
+        if not self._invicibility:
+            self._current_lives -= 1
 
-    def update(self, delta_time: float = 1/60, *args, **kwargs) -> None:
+    def update(self, delta_time: float = 1 / 60,
+               *args: object, **kwargs: object) -> None:
         self._move(delta_time)
 
         cell = self.get_current_cell()
@@ -154,7 +160,8 @@ class Player(arcade.Sprite):
         sprite: arcade.TextureAnimationSprite = self.animations[self.state][0]
         speed = self.speed
 
-        next_direction: Optional[PlayerDirection] = self.next_direction or self.direction
+        next_direction: Optional[PlayerDirection] = (
+            self.next_direction or self.direction)
 
         self.change_x = 0.0
         self.change_y = 0.0
@@ -164,17 +171,20 @@ class Player(arcade.Sprite):
             self.change_y = speed
             self.direction = next_direction
             self.next_direction = None
-        elif next_direction == PlayerDirection.DOWN and not p_cell.walls & south:
+        elif (next_direction == PlayerDirection.DOWN
+              and not p_cell.walls & south):
             sprite.angle = 90
             self.change_y = -speed
             self.direction = next_direction
             self.next_direction = None
-        elif next_direction == PlayerDirection.RIGHT and not p_cell.walls & east:
+        elif (next_direction == PlayerDirection.RIGHT
+              and not p_cell.walls & east):
             sprite.angle = 0
             self.change_x = speed
             self.direction = next_direction
             self.next_direction = None
-        elif next_direction == PlayerDirection.LEFT and not p_cell.walls & west:
+        elif (next_direction == PlayerDirection.LEFT
+              and not p_cell.walls & west):
             sprite.angle = 180
             self.change_x = -speed
             self.direction = next_direction
@@ -195,7 +205,8 @@ class Player(arcade.Sprite):
             p_radius = (p_current_sprite.width / 2) * 0.5
             g_radius = (g_current_sprite.width / 2) * 0.5
 
-            if distance <= (p_radius + g_radius) and ghost.state == GhostState.FLEE:
+            if (distance <= (p_radius + g_radius)
+                    and ghost.state == GhostState.FLEE):
                 ghost.restart_position()
                 ghost.state = GhostState.MOVE
                 return False
@@ -203,6 +214,9 @@ class Player(arcade.Sprite):
                 return True
 
         return False
+
+    def invicibility(self) -> None:
+        self._invicibility = not self._invicibility
 
     def draw(self) -> None:
         self.animations[self.state].draw()

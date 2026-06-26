@@ -18,13 +18,15 @@ if TYPE_CHECKING:
 class Level(arcade.View):
     """Represent the main level view where the player interacts with the maze."""
 
-    def __init__(self, player: Player, maze: Maze, ghosts: list[Ghost], time_to_finish: int, game: Game) -> None:
+    def __init__(self, player: Player, maze: Maze,
+                 ghosts: list[Ghost], time_to_finish: int,
+                 game: Game) -> None:
         super().__init__()
 
         self._player = player
         self._maze = maze
         self._time_accumulator: float = 0
-        self._time_to_finish = time_to_finish
+        self._time_to_finish = float(time_to_finish)
         self._ghosts = ghosts
         self._game = game
         self.score_ui: ScoreUi
@@ -43,7 +45,8 @@ class Level(arcade.View):
         x = self.score_ui.position.x
         y = self.score_ui.position.y
 
-        self.score_ui.score_text = arcade.Text(f"score: {self._player.score}", x, y)
+        self.score_ui.score_text = arcade.Text(
+            f"score: {self._player.score}", x, y)
 
     def on_update(self, delta_time: float) -> None:
         """Update the level state each frame."""
@@ -63,7 +66,6 @@ class Level(arcade.View):
                 return
 
             if self._player.collide_with_ghosts():
-                
                 self._player.take_damage()
 
                 if not self._player.current_lives + 1:
@@ -92,10 +94,10 @@ class Level(arcade.View):
         self._player.set_next_direction(key=symbol)
 
         if symbol == arcade.key.SPACE:
-            self.window.show_view(PauseView(self))
-        elif symbol == arcade.key.ENTER:
-            # self._game.next_level(self._player.score)
-            self._game.next_level(self._player.score)
+            self.window.show_view(PauseView(self, self._game.cheat_mode))
+        elif symbol == arcade.key.N:
+            if self._game.can_skip_levels:
+                self._game.next_level(self._player.score)
 
     def on_draw(self) -> None:
         self.clear()
@@ -104,12 +106,14 @@ class Level(arcade.View):
         self._player.draw()
         for ghost in self._ghosts:
             ghost.draw()
-        
+
         first_cell_pos = self._maze.get_cell(0, 0)
 
         if first_cell_pos.center:
             c_y = first_cell_pos.center.y
-            time = arcade.Text(f"time: {int(self._time_to_finish)}", self._player._default_position.x - 100, c_y + 100)
+            time = arcade.Text(
+                f"time: {int(self._time_to_finish)}",
+                self._player._default_position.x - 100, c_y + 100)
             time.draw()
-        
+
         self.score_ui.score_text.draw()

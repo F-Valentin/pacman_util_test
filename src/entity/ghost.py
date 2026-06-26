@@ -3,7 +3,7 @@ import arcade
 import math
 from enum import Enum
 from collections import deque
-from typing import Deque, TYPE_CHECKING
+from typing import Deque, TYPE_CHECKING, Any, Optional
 
 from cell import Cell
 from maze import Maze
@@ -24,8 +24,8 @@ class GhostState(str, Enum):
 class Ghost(arcade.Sprite):
     """Represent an enemy ghost that pursues the player through the maze."""
 
-    def __init__(self, path_to_sprite: str, difficulty_id: int, speed: float,
-                 maze: Maze, player: Player) -> None:
+    def __init__(self, path_to_sprite: str, difficulty_id: int,
+                 speed: float, maze: Maze, player: Player) -> None:
         super().__init__()
         self.state: GhostState = GhostState.MOVE
         self.animations: dict[str, arcade.SpriteList] = {}
@@ -38,6 +38,7 @@ class Ghost(arcade.Sprite):
         self._player = player
         self._sprite_image = path_to_sprite
         self._flee_image = "assets/ghost_flee.png"
+        self._freeze = False
 
     def setup(self, cell_pos: Cell) -> None:
         """Place the ghost at the given maze cell and prepare its sprite."""
@@ -57,10 +58,10 @@ class Ghost(arcade.Sprite):
         self.center_y = position.y
         self.velocity = 0.0, 0.0
 
-        move_sprite_list = arcade.SpriteList()
+        move_sprite_list: arcade.SpriteList = arcade.SpriteList()
         move_sprite_list.append(move_animation)
 
-        flee_sprite_list = arcade.SpriteList()
+        flee_sprite_list: arcade.SpriteList = arcade.SpriteList()
         flee_sprite_list.append(flee_animation)
 
         self.animations["move"] = move_sprite_list
@@ -88,7 +89,8 @@ class Ghost(arcade.Sprite):
         bottom_left_pos = self._maze.bottom_left_pos
 
         x: float = (self.center_x - bottom_left_pos.x) / float(cell_size)
-        y: float = ((self._maze.height - 1) - (self.center_y - bottom_left_pos.y)) / float(cell_size)
+        y: float = ((self._maze.height - 1)
+                    - (self.center_y - bottom_left_pos.y)) / float(cell_size)
 
         self._grid_coordinate = arcade.Vec2(
             math.floor(x),
@@ -101,6 +103,9 @@ class Ghost(arcade.Sprite):
         self.center_y = self._default_position.y
         self.velocity = 0.0, 0.0
         self.path = []
+        self.state = GhostState.MOVE
+        self.change_x = 0.0
+        self.change_y = 0.0
 
     def _path_to_cell(self, target_cell: Cell) -> list[Cell]:
         """Compute a simple shortest path from the ghost to the player's cell."""
@@ -111,7 +116,8 @@ class Ghost(arcade.Sprite):
 
         queue: Deque[Cell] = deque([start])
 
-        came_from: dict[tuple[float, float], tuple[float, float] | None] = {start_coord: None}
+        came_from: dict[tuple[float, float],
+                        Optional[tuple[float, float]]] = {start_coord: None}
 
         cell_registry: dict[tuple[float, float], Cell] = {start_coord: start}
 
@@ -136,7 +142,7 @@ class Ghost(arcade.Sprite):
                     queue.append(neighbor)
 
         path = []
-        curr = dest_coord
+        curr: Optional[tuple[float, float]] = dest_coord
 
         while curr:
             path.append(cell_registry[curr])
@@ -164,7 +170,7 @@ class Ghost(arcade.Sprite):
             self.change_y = self.speed
 
     def _move_to_the_player(self) -> None:
-        """Advance the ghost toward the next step along its path to the player."""
+        """Advance the ghost toward the next step along its path."""
         p_cell = self._player.get_current_cell()
 
         if not self.path:
@@ -183,7 +189,6 @@ class Ghost(arcade.Sprite):
         if not self.path:
             path_to_spawn = self._path_to_cell(self._spawn_cell)
             if path_to_spawn and len(path_to_spawn) > 1:
-
                 self.path = path_to_spawn[1:]
             else:
                 return
@@ -191,16 +196,27 @@ class Ghost(arcade.Sprite):
         target_cell = self.path.pop(0)
         self._set_velocity_towards(target_cell)
 
-    def update(self, delta_time: float) -> None:
+    def _sync_animations(self, delta_time: float) -> None:
+        """Sync all animations to the ghost's current position."""
+        for anim in self.animations.values():
+            if len(anim) > 0:
+                anim[0].center_x = self.center_x
+                anim[0].center_y = self.center_y
+                anim.update_animation(delta_time)
+
+    def update(self, delta_time: float = 1 / 60,
+               *args: Any, **kwargs: Any) -> None:
         """Move the ghost and recompute its path when it reaches a cell."""
+        if self._freeze:
+            # Keep animations synced even when frozen
+            self._sync_animations(delta_time)
+            return
+
         self.center_x += self.change_x
         self.center_y += self.change_y
         self._update_grid_coordinate()
 
-        current_animation = self.animations[self.state]
-        current_animation[0].center_x = self.center_x
-        current_animation[0].center_y = self.center_y
-        current_animation.update_animation(delta_time)
+        self._sync_animations(delta_time)
 
         cell = self.get_current_cell()
 
@@ -209,13 +225,19 @@ class Ghost(arcade.Sprite):
             cx, cy = int(cell.center.x), int(cell.center.y)
             if (gx, gy) == (cx, cy) and self.state != GhostState.FLEE:
                 self._move_to_the_player()
-            elif (gx, gy) == (cx, cy) and self.state == GhostState.FLEE and cell.grid_x == self._spawn_cell.grid_x and cell.grid_y == self._spawn_cell.grid_y:
+            elif ((gx, gy) == (cx, cy)
+                  and self.state == GhostState.FLEE
+                  and cell.grid_x == self._spawn_cell.grid_x
+                  and cell.grid_y == self._spawn_cell.grid_y):
                 self.state = GhostState.MOVE
                 self.change_x = 0.0
                 self.change_y = 0.0
                 self.path = []
             elif (gx, gy) == (cx, cy) and self.state == GhostState.FLEE:
                 self.flee()
+
+    def toggle_freeze(self) -> None:
+        self._freeze = not self._freeze
 
     def draw(self) -> None:
         self.animations[self.state].draw()
