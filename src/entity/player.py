@@ -25,12 +25,13 @@ class PlayerDirection(Enum):
 class Player(arcade.Sprite):
     """Represent the controlled player character on the maze grid."""
 
-    def __init__(self, position: arcade.Vec2, score: int) -> None:
+    def __init__(self, position: arcade.Vec2, score: int,
+                 maze: Maze, ghosts: list[Ghost]) -> None:
         super().__init__()
 
         self.center_x = position.x
         self.center_y = position.y
-        
+
         self._current_lives: int = 3
         self._default_position: arcade.Vec2 = position
         self.next_direction: Optional[PlayerDirection] = None
@@ -40,9 +41,10 @@ class Player(arcade.Sprite):
         self._grid_coordinate: arcade.Vec2 = arcade.Vec2(0.0, 0.0)
         self.direction: Optional[PlayerDirection] = None
         self.score: int = score
-        self.ghosts: list[Ghost]
+        self.ghosts: list[Ghost] = ghosts
         self._invicibility = False
-        
+        self._maze = maze
+
         # self._update_grid_coordinate()
         self._init_animation()
 
@@ -83,13 +85,12 @@ class Player(arcade.Sprite):
     def get_grid_coordinate(self) -> arcade.Vec2:
         return self._grid_coordinate
 
-    def get_current_cell(self, maze: Maze) -> Cell:
+    def get_current_cell(self) -> Cell:
         c_x = int(self._grid_coordinate.x)
         c_y = int(self._grid_coordinate.y)
-        p_cell: Cell = maze.get_cell(c_x, c_y)
+        p_cell: Cell = self._maze.get_cell(c_x, c_y)
 
         return p_cell
-
 
     def _move(self, delta_time: float) -> None:
         self.center_x += self.change_x
@@ -100,12 +101,12 @@ class Player(arcade.Sprite):
         current_animation[0].center_x = self.center_x
         current_animation[0].center_y = self.center_y
 
-    def _eat_pacgum(self, cell: Cell, maze: Maze) -> None:
+    def _eat_pacgum(self, cell: Cell) -> None:
         if cell.pacgum and cell.has_pacgum():
             cell.hide_pacgum()
             self._update_score(cell.pacgum.point)
-            maze.pacgum_eaten()
-            
+            self._maze.pacgum_eaten()
+
             if cell.pacgum.is_super:
                 for ghost in self.ghosts:
                     ghost.state = GhostState.FLEE
@@ -114,16 +115,17 @@ class Player(arcade.Sprite):
         if not self._invicibility:
             self._current_lives -= 1
 
-    def update(self, maze: Maze, delta_time: float = 1 / 60) -> None:
+    def update(self, delta_time: float = 1 / 60) -> None:
         self._move(delta_time)
-        self._grid_coordinate = maze.convert_pos_to_grid(arcade.Vec2(self.center_x, self.center_y))
+        self._grid_coordinate = self._maze.convert_pos_to_grid(
+            arcade.Vec2(self.center_x, self.center_y))
 
-        cell = self.get_current_cell(maze)
+        cell = self.get_current_cell()
         if cell.center:
             px, py = int(self.center_x), int(self.center_y)
             cx, cy = int(cell.center.x), int(cell.center.y)
             if (px, py) == (cx, cy):
-                self._eat_pacgum(cell, maze)
+                self._eat_pacgum(cell)
                 self.move_to_next_cell(cell)
 
     def _update_score(self, value: int) -> None:

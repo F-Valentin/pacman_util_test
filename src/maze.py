@@ -150,7 +150,7 @@ class Maze:
         def is_open(n_x: int, n_y: int) -> bool:
             if not (
                     0 <= n_x < self.width and 0 <= n_y < self.height
-                    ):
+            ):
                 return False
             n_cell = self.get_cell(n_x, n_y)
             if cell.grid_y + 1 == n_y and not n_cell.walls & north:

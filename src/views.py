@@ -1,8 +1,8 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 import arcade
-import sys
 import hjson
+
 from highscore import update_highscore_file
 from button import Button, CheckButton, ButtonGroup
 from cheatmode import CheatMode
@@ -21,13 +21,12 @@ class MenuView(arcade.View):
 
         self._game = game
         self._button_group: ButtonGroup = ButtonGroup(4)
-        self.setup()
 
     @property
     def game(self) -> Game:
         return self._game
 
-    def setup(self) -> None:
+    def on_show_view(self) -> None:
         """Create the menu buttons and wire them to their handlers."""
         start_button = Button(
             "start",
@@ -61,9 +60,6 @@ class MenuView(arcade.View):
         self._button_group.add_button(start_button)
         self._button_group.add_button(instruction)
         self._button_group.add_button(exit_btn)
-
-    def on_show_view(self) -> None:
-        print("Menu View started")
 
     def on_key_press(self, symbol: int, modifiers: int) -> None:
         self._button_group.on_key_press(key=symbol)

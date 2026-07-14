@@ -190,24 +190,25 @@ class Game:
         maze.setup(self._game_config.points_per_pacgum,
                    self._game_config.points_per_super_pacgum)
 
-
         half = maze_width * cell_size // 2
         offset = 0 if maze_width % 2 != 0 else -cell_size // 2
         x = int(offset_x + half + offset)
         y = int(offset_y + half + offset)
-        
-        player = Player(arcade.Vec2(x, y), current_score)
 
         ghosts: list[Ghost] = []
         for g in config["ghosts"]:
             position = maze.get_cell(g["col"], g["row"])
-            ghost = Ghost.at_cell(position, g["sprite"], g["difficulty_id"], g["speed"])
+            ghost = Ghost.at_cell(
+                position,
+                g["sprite"],
+                g["difficulty_id"],
+                g["speed"],
+                maze)
             ghosts.append(ghost)
 
-        player.ghosts = ghosts
+        player = Player(arcade.Vec2(x, y), current_score, maze, ghosts)
 
         level = Level(player, maze, ghosts, time_limit, self)
-        level.setup()
         self.cheat_mode.player_inviciblity = player.invicibility
         self.cheat_mode.can_skip_levels = self.skip_levels
         self.cheat_mode.ghosts_freeze = [g.toggle_freeze for g in ghosts]

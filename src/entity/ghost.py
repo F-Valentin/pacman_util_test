@@ -10,6 +10,7 @@ from maze import Maze
 
 """Ghost AI and movement helpers for the level."""
 
+
 class GhostState(str, Enum):
     IDLE = "idle"
     MOVE = "move"
@@ -21,10 +22,10 @@ class Ghost(arcade.Sprite):
     """Represent an enemy ghost that pursues the player through the maze."""
 
     def __init__(self, position: arcade.Vec2, path_to_sprite: str, difficulty_id: int,
-                 speed: float, _internal: bool = False) -> None:
+                 speed: float, maze: Maze, _internal: bool = False) -> None:
         """Do not use the default constructor"""
         if not _internal:
-                raise RuntimeError("Use Ghost.at_cell() instead")
+            raise RuntimeError("Use Ghost.at_cell() instead")
         super().__init__()
 
         self.center_x = position.x
@@ -40,21 +41,27 @@ class Ghost(arcade.Sprite):
         self._flee_image = "assets/ghost_flee.png"
         self._freeze = False
         self._spawn_cell: Cell
+        self._maze = maze
 
         self._init_animation()
 
-
     @classmethod
     def at_cell(cls,
-        cell: Cell, path_to_sprite: str, difficulty_id: int,
-            speed: float) -> Ghost:
+                cell: Cell, path_to_sprite: str, difficulty_id: int,
+                speed: float, maze: Maze) -> Ghost:
 
         # if not cell.center:
-            # return
+        # return
 
         position = arcade.Vec2(cell.center.x, cell.center.y)
 
-        g = cls(position, path_to_sprite, difficulty_id, speed, _internal=True)
+        g = cls(
+            position,
+            path_to_sprite,
+            difficulty_id,
+            speed,
+            maze,
+            _internal=True)
         g._spawn_cell = cell
 
         return g
@@ -80,11 +87,11 @@ class Ghost(arcade.Sprite):
     def get_grid_coordinate(self) -> arcade.Vec2:
         return self._grid_coordinate
 
-    def get_current_cell(self, maze: Maze) -> Cell:
+    def get_current_cell(self) -> Cell:
         c_x = int(self._grid_coordinate.x)
         c_y = int(self._grid_coordinate.y)
 
-        g_cell: Cell = maze.get_cell(c_x, c_y)
+        g_cell: Cell = self._maze.get_cell(c_x, c_y)
         return g_cell
 
     def restart_position(self) -> None:
@@ -97,7 +104,7 @@ class Ghost(arcade.Sprite):
         self.change_x = 0.0
         self.change_y = 0.0
 
-    def _path_to_cell(self, start: Cell, target_cell: Cell, maze: Maze) -> list[Cell]:
+    def _path_to_cell(self, start: Cell, target_cell: Cell) -> list[Cell]:
         """Compute a simple shortest path from the ghost to the player's cell."""
 
         start_coord = (start.grid_x, start.grid_y)
@@ -117,7 +124,7 @@ class Ghost(arcade.Sprite):
             if curr_coord == dest_coord:
                 break
 
-            neighbors = maze.get_valid_cell_neighbors(curr_cell)
+            neighbors = self._maze.get_valid_cell_neighbors(curr_cell)
 
             if not neighbors:
                 continue
@@ -157,31 +164,20 @@ class Ghost(arcade.Sprite):
             self.change_x = 0.0
             self.change_y = self.speed
 
-    def _move_to_the_player(self, g_cell: Cell, p_cell: Cell, maze: Maze) -> None:
-        """Advance the ghost toward the next step along its path."""
-
+    def _navigate_to(self, target: Cell, limit: Optional[int] = None) -> None:
         if not self.path:
-            path_to_player = self._path_to_cell(g_cell, p_cell, maze)
-            if path_to_player and len(path_to_player) > 1:
-                limite = self.difficulty_id
-                self.path = path_to_player[1: 1 + limite]
-            else:
+            path = self._path_to_cell(self.get_current_cell(), target)
+            if not path or len(path) <= 1:
                 return
+            self.path = path[1:] if limit is None else path[1: 1 + limit]
 
-        target_cell = self.path.pop(0)
-        self._set_velocity_towards(g_cell, target_cell)
+        self._set_velocity_towards(self.get_current_cell(), self.path.pop(0))
 
-    def flee(self, g_cell: Cell, maze: Maze) -> None:
-        """Advance the ghost toward its original spawn point."""
-        if not self.path:
-            path_to_spawn = self._path_to_cell(g_cell, self._spawn_cell, maze)
-            if path_to_spawn and len(path_to_spawn) > 1:
-                self.path = path_to_spawn[1:]
-            else:
-                return
+    def _move_to_the_player(self, p_cell: Cell) -> None:
+        self._navigate_to(p_cell, limit=self.difficulty_id)
 
-        target_cell = self.path.pop(0)
-        self._set_velocity_towards(g_cell, target_cell)
+    def flee(self) -> None:
+        self._navigate_to(self._spawn_cell)
 
     def _sync_animations(self, delta_time: float) -> None:
         """Sync all animations to the ghost's current position."""
@@ -191,7 +187,7 @@ class Ghost(arcade.Sprite):
                 anim[0].center_y = self.center_y
                 anim.update_animation(delta_time)
 
-    def update(self, p_cell: Cell, maze: Maze, delta_time: float = 1 / 60) -> None:
+    def update(self, p_cell: Cell, delta_time: float = 1 / 60) -> None:
         """Move the ghost and recompute its path when it reaches a cell."""
         if self._freeze:
             self._sync_animations(delta_time)
@@ -202,17 +198,17 @@ class Ghost(arcade.Sprite):
 
         pos = arcade.Vec2(self.center_x, self.center_y)
 
-        self._grid_coordinate = maze.convert_pos_to_grid(pos)
+        self._grid_coordinate = self._maze.convert_pos_to_grid(pos)
 
         self._sync_animations(delta_time)
 
-        cell = maze.convert_pos_to_cell(pos)
+        cell = self._maze.convert_pos_to_cell(pos)
 
         if cell.center:
             gx, gy = int(self.center_x), int(self.center_y)
             cx, cy = int(cell.center.x), int(cell.center.y)
             if (gx, gy) == (cx, cy) and self.state != GhostState.FLEE:
-                self._move_to_the_player(cell, p_cell, maze)
+                self._move_to_the_player(p_cell)
             elif ((gx, gy) == (cx, cy)
                   and self.state == GhostState.FLEE
                   and cell.grid_x == self._spawn_cell.grid_x
@@ -222,7 +218,7 @@ class Ghost(arcade.Sprite):
                 self.change_y = 0.0
                 self.path = []
             elif (gx, gy) == (cx, cy) and self.state == GhostState.FLEE:
-                self.flee(cell, maze)
+                self.flee()
 
     def toggle_freeze(self) -> None:
         self._freeze = not self._freeze
