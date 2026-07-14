@@ -1,6 +1,7 @@
 from typing import Optional
 
 import arcade
+import math
 from arcade import Vec2
 from cell import Cell
 from pacgum import Pacgum, draw_pacgum
@@ -182,6 +183,24 @@ class Maze:
                     pacgums.append(cell.pacgum)
 
         return pacgums
+
+    def convert_pos_to_grid(self, pos: arcade.Vec2):
+        cell_size: int = self.cell_size
+        bottom_left_pos = self.bottom_left_pos
+
+        x: float = (pos.x - bottom_left_pos.x) / float(cell_size)
+        y: float = ((self.height - 1)
+                    - (pos.y - bottom_left_pos.y)) / float(cell_size)
+
+        return arcade.Vec2(
+            math.floor(x),
+            math.floor(y)
+        )
+
+    def convert_pos_to_cell(self, pos: arcade.Vec2):
+        grid_pos = self.convert_pos_to_grid(pos)
+
+        return self.get_cell(int(grid_pos.x), int(grid_pos.y))
 
     def _draw_pacgums(self) -> None:
         for pacgum in self._pacgums:

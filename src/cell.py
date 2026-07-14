@@ -1,5 +1,3 @@
-from sys import flags
-
 import arcade
 from typing import Optional
 from pacgum import Pacgum

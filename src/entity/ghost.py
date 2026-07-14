@@ -3,16 +3,12 @@ import arcade
 import math
 from enum import Enum
 from collections import deque
-from typing import Deque, TYPE_CHECKING, Any, Optional
+from typing import Deque, Optional
 
 from cell import Cell
 from maze import Maze
 
 """Ghost AI and movement helpers for the level."""
-
-if TYPE_CHECKING:
-    from entity.player import Player
-
 
 class GhostState(str, Enum):
     IDLE = "idle"
@@ -25,7 +21,7 @@ class Ghost(arcade.Sprite):
     """Represent an enemy ghost that pursues the player through the maze."""
 
     def __init__(self, path_to_sprite: str, difficulty_id: int,
-                 speed: float, maze: Maze, player: Player) -> None:
+                 speed: float, maze: Maze) -> None:
         super().__init__()
         self.state: GhostState = GhostState.MOVE
         self.animations: dict[str, arcade.SpriteList] = {}
@@ -35,7 +31,6 @@ class Ghost(arcade.Sprite):
         self.speed = speed
         self._maze = maze
         self._default_position: arcade.Vec2
-        self._player = player
         self._sprite_image = path_to_sprite
         self._flee_image = "assets/ghost_flee.png"
         self._freeze = False
@@ -169,9 +164,8 @@ class Ghost(arcade.Sprite):
             self.change_x = 0.0
             self.change_y = self.speed
 
-    def _move_to_the_player(self) -> None:
+    def _move_to_the_player(self, p_cell: Cell) -> None:
         """Advance the ghost toward the next step along its path."""
-        p_cell = self._player.get_current_cell()
 
         if not self.path:
             path_to_player = self._path_to_cell(p_cell)
@@ -204,8 +198,7 @@ class Ghost(arcade.Sprite):
                 anim[0].center_y = self.center_y
                 anim.update_animation(delta_time)
 
-    def update(self, delta_time: float = 1 / 60,
-               *args: Any, **kwargs: Any) -> None:
+    def update(self, p_cell: Cell, delta_time: float = 1 / 60) -> None:
         """Move the ghost and recompute its path when it reaches a cell."""
         if self._freeze:
             self._sync_animations(delta_time)
@@ -223,7 +216,7 @@ class Ghost(arcade.Sprite):
             gx, gy = int(self.center_x), int(self.center_y)
             cx, cy = int(cell.center.x), int(cell.center.y)
             if (gx, gy) == (cx, cy) and self.state != GhostState.FLEE:
-                self._move_to_the_player()
+                self._move_to_the_player(p_cell)
             elif ((gx, gy) == (cx, cy)
                   and self.state == GhostState.FLEE
                   and cell.grid_x == self._spawn_cell.grid_x

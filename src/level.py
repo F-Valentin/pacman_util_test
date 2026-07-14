@@ -8,6 +8,7 @@ from typing import TYPE_CHECKING
 from entity.ghost import Ghost
 from entity.player import Player
 from maze import Maze
+from cell import Cell
 from views import PauseView
 from score import ScoreUi
 
@@ -30,6 +31,15 @@ class Level(arcade.View):
         self._ghosts = ghosts
         self._game = game
         self.score_ui: ScoreUi
+        self.player_lives_ui: arcade.SpriteList[arcade.Sprite] = arcade.SpriteList()
+
+        # h_offset = 0
+        # for _ in range(self._player.current_lives):
+        #     self.player_lives_ui.append(
+        #         arcade.Sprite("assets/hp.png", 1,
+        #                     hp_bar_pos.x + h_offset, hp_bar_pos.y)
+        #     )
+        #     h_offset += 40
 
     def setup(self) -> None:
         first_cell_pos = self._maze.get_cell(0, 0)
@@ -74,10 +84,14 @@ class Level(arcade.View):
 
                 self.restart_entity_position()
 
-            self._player.update(time_step)
+            self._player.update(self._maze, time_step)
 
+            x = self._player.center_x
+            y = self._player.center_y
+            p_cell: Cell = self._maze.convert_pos_to_cell(arcade.Vec2(x, y))
+            
             for ghost in self._ghosts:
-                ghost.update(time_step)
+                ghost.update(p_cell)
 
             self._time_accumulator -= time_step
             self._time_to_finish -= time_step
@@ -103,7 +117,15 @@ class Level(arcade.View):
         self.clear()
 
         self._maze.draw()
+        
         self._player.draw()
+        
+        # for (i, live) in enumerate(self.player_lives_ui):
+        #     if i >= self._player.current_lives:
+        #         live.alpha = 0
+
+        # self.player_lives_ui.draw()
+        
         for ghost in self._ghosts:
             ghost.draw()
 

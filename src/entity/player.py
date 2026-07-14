@@ -25,51 +25,38 @@ class PlayerDirection(Enum):
 class Player(arcade.Sprite):
     """Represent the controlled player character on the maze grid."""
 
-    def __init__(self, maze: Maze) -> None:
+    def __init__(self, position: arcade.Vec2, score: int) -> None:
         super().__init__()
 
-        self._current_lives: int = 0
-        self.lives: arcade.SpriteList[arcade.Sprite] = arcade.SpriteList()
-        self._default_position: arcade.Vec2 = arcade.Vec2(0.0, 0.0)
+        self.center_x = position.x
+        self.center_y = position.y
+        
+        self._current_lives: int = 3
+        self._default_position: arcade.Vec2 = position
         self.next_direction: Optional[PlayerDirection] = None
-        self.speed: float = 0.0
+        self.speed: float = 4.0
         self.state: PlayerState = PlayerState.MOVE
         self.animations: dict[str, arcade.SpriteList] = {}
         self._grid_coordinate: arcade.Vec2 = arcade.Vec2(0.0, 0.0)
         self.direction: Optional[PlayerDirection] = None
-        self.score: int = 0
-        self._maze = maze
+        self.score: int = score
         self.ghosts: list[Ghost]
         self._invicibility = False
+        
+        # self._update_grid_coordinate()
+        self._init_animation()
 
     @property
     def current_lives(self) -> int:
         return self._current_lives
 
-    def setup(self, position: arcade.Vec2, score_ui_pos: arcade.Vec2,
-             hp_bar_pos: arcade.Vec2, lives: int) -> None:
-        """Initialize the player sprite, score UI, and life indicators."""
-        self.center_x = position.x
-        self.center_y = position.y
-        self._current_lives = lives
-
-        h_offset = 0
-        for _ in range(lives):
-            self.lives.append(
-                arcade.Sprite("assets/hp.png", 1,
-                              hp_bar_pos.x + h_offset, hp_bar_pos.y)
-            )
-            h_offset += 40
-
+    def _init_animation(self) -> None:
         move_animation = arcade.load_animated_gif("assets/pacman.gif")
         move_animation.position = self.position
         move_animation.scale = 0.12
 
         move_sprite_list: arcade.SpriteList = arcade.SpriteList()
         move_sprite_list.append(move_animation)
-        self.speed = 4
-        self._default_position = position
-        self._update_grid_coordinate()
 
         self.animations["move"] = move_sprite_list
 
@@ -96,41 +83,29 @@ class Player(arcade.Sprite):
     def get_grid_coordinate(self) -> arcade.Vec2:
         return self._grid_coordinate
 
-    def get_current_cell(self) -> Cell:
+    def get_current_cell(self, maze: Maze) -> Cell:
         c_x = int(self._grid_coordinate.x)
         c_y = int(self._grid_coordinate.y)
-        p_cell: Cell = self._maze.get_cell(c_x, c_y)
+        p_cell: Cell = maze.get_cell(c_x, c_y)
 
         return p_cell
 
-    def _update_grid_coordinate(self) -> None:
-        cell_size: int = self._maze.cell_size
-        bottom_left_pos = self._maze.bottom_left_pos
-
-        x: float = (self.center_x - bottom_left_pos.x) / float(cell_size)
-        y: float = ((self._maze.height - 1)
-                    - (self.center_y - bottom_left_pos.y)) / float(cell_size)
-
-        self._grid_coordinate = arcade.Vec2(
-            math.floor(x),
-            math.floor(y)
-        )
 
     def _move(self, delta_time: float) -> None:
         self.center_x += self.change_x
         self.center_y += self.change_y
-        self._update_grid_coordinate()
 
         current_animation = self.animations[self.state]
         current_animation.update_animation(delta_time)
         current_animation[0].center_x = self.center_x
         current_animation[0].center_y = self.center_y
 
-    def _eat_pacgum(self, cell: Cell) -> None:
+    def _eat_pacgum(self, cell: Cell, maze: Maze) -> None:
         if cell.pacgum and cell.has_pacgum():
             cell.hide_pacgum()
             self._update_score(cell.pacgum.point)
-            self._maze.pacgum_eaten()
+            maze.pacgum_eaten()
+            
             if cell.pacgum.is_super:
                 for ghost in self.ghosts:
                     ghost.state = GhostState.FLEE
@@ -139,16 +114,16 @@ class Player(arcade.Sprite):
         if not self._invicibility:
             self._current_lives -= 1
 
-    def update(self, delta_time: float = 1 / 60,
-               *args: object, **kwargs: object) -> None:
+    def update(self, maze: Maze, delta_time: float = 1 / 60) -> None:
         self._move(delta_time)
+        self._grid_coordinate = maze.convert_pos_to_grid(arcade.Vec2(self.center_x, self.center_y))
 
-        cell = self.get_current_cell()
+        cell = self.get_current_cell(maze)
         if cell.center:
             px, py = int(self.center_x), int(self.center_y)
             cx, cy = int(cell.center.x), int(cell.center.y)
             if (px, py) == (cx, cy):
-                self._eat_pacgum(cell)
+                self._eat_pacgum(cell, maze)
                 self.move_to_next_cell(cell)
 
     def _update_score(self, value: int) -> None:
@@ -220,9 +195,3 @@ class Player(arcade.Sprite):
 
     def draw(self) -> None:
         self.animations[self.state].draw()
-
-        for (i, live) in enumerate(self.lives):
-            if i >= self._current_lives:
-                live.alpha = 0
-
-        self.lives.draw()

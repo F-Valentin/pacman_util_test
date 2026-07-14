@@ -1,6 +1,6 @@
 NAME = pac_man
 PYTHON = python3
-VENV = venv
+VENV = .venv
 BIN = $(VENV)/bin
 MAIN = src/pac-man.py
 CONFIG_FILE ?= config/config.json
@@ -9,9 +9,7 @@ CONFIG_FILE ?= config/config.json
 .SILENT:
 
 install:
-	$(PYTHON) -m venv $(VENV)
-	$(BIN)/pip install --upgrade pip
-	$(BIN)/pip install -r config/requirements.txt
+    uv sync
 
 run:
 	$(BIN)/python $(MAIN) $(CONFIG_FILE)

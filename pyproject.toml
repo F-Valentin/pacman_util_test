@@ -1,0 +1,11 @@
+[project]
+name = "pacman"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+dependencies = [
+    "flake8",
+    "mypy",
+    "hjson",
+    "arcade"
+]

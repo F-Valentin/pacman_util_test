@@ -190,30 +190,20 @@ class Game:
         maze.setup(self._game_config.points_per_pacgum,
                    self._game_config.points_per_super_pacgum)
 
-        player = Player(maze)
-        player.score = current_score
 
         half = maze_width * cell_size // 2
         offset = 0 if maze_width % 2 != 0 else -cell_size // 2
         x = int(offset_x + half + offset)
         y = int(offset_y + half + offset)
+        
+        player = Player(arcade.Vec2(x, y), current_score)
+        player.score = current_score
 
-        score_ui_y = offset_y + maze_height * cell_size + 100
-        hp_bar_pos = arcade.Vec2(offset_x, offset_y - 100)
-
-        p_position = arcade.Vec2(x, y)
-        score_ui_pos = arcade.Vec2(offset_x, score_ui_y)
-
-        player.setup(
-            p_position,
-            score_ui_pos,
-            hp_bar_pos,
-            self._game_config.lives)
 
         ghosts: list[Ghost] = []
         for g in config["ghosts"]:
             ghost = Ghost(g["sprite"], g["difficulty_id"], g["speed"],
-                          maze, player)
+                          maze)
             position = maze.get_cell(g["col"], g["row"])
             ghost.setup(position)
             ghosts.append(ghost)
