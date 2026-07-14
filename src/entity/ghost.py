@@ -22,10 +22,11 @@ class Ghost(arcade.Sprite):
 
     def __init__(self, position: arcade.Vec2, path_to_sprite: str, difficulty_id: int,
                  speed: float, _internal: bool = False) -> None:
+        """Do not use the default constructor"""
         if not _internal:
                 raise RuntimeError("Use Ghost.at_cell() instead")
         super().__init__()
-        
+
         self.center_x = position.x
         self.center_y = position.y
         self.state: GhostState = GhostState.MOVE
@@ -44,15 +45,15 @@ class Ghost(arcade.Sprite):
 
 
     @classmethod
-    def at_cell(cls, 
+    def at_cell(cls,
         cell: Cell, path_to_sprite: str, difficulty_id: int,
             speed: float) -> Ghost:
-                
+
         # if not cell.center:
             # return
-                
-        position = arcade.Vec2(cell.center.x, cell.center.y) 
-        
+
+        position = arcade.Vec2(cell.center.x, cell.center.y)
+
         g = cls(position, path_to_sprite, difficulty_id, speed, _internal=True)
         g._spawn_cell = cell
 
@@ -66,7 +67,7 @@ class Ghost(arcade.Sprite):
         flee_animation = arcade.Sprite(self._flee_image)
         flee_animation.position = self.position
         flee_animation.scale = 0.08
-        
+
         move_sprite_list: arcade.SpriteList = arcade.SpriteList()
         move_sprite_list.append(move_animation)
 
@@ -200,12 +201,12 @@ class Ghost(arcade.Sprite):
         self.center_y += self.change_y
 
         pos = arcade.Vec2(self.center_x, self.center_y)
-        
+
         self._grid_coordinate = maze.convert_pos_to_grid(pos)
 
         self._sync_animations(delta_time)
 
-        cell = maze.convert_pos_to_cell(pos) 
+        cell = maze.convert_pos_to_cell(pos)
 
         if cell.center:
             gx, gy = int(self.center_x), int(self.center_y)

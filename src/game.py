@@ -202,7 +202,6 @@ class Game:
         for g in config["ghosts"]:
             position = maze.get_cell(g["col"], g["row"])
             ghost = Ghost.at_cell(position, g["sprite"], g["difficulty_id"], g["speed"])
-            
             ghosts.append(ghost)
 
         player.ghosts = ghosts
