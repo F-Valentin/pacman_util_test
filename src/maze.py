@@ -144,7 +144,7 @@ class Maze:
 
                     cell.add_pacgum(pacgum)
 
-    def _get_valid_cell_neighbors(self, cell: Cell) -> Optional[list[Cell]]:
+    def get_valid_cell_neighbors(self, cell: Cell) -> Optional[list[Cell]]:
         north, south, east, west = 0b0001, 0b0100, 0b0010, 0b1000
 
         def is_open(n_x: int, n_y: int) -> bool:

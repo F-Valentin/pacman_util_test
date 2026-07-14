@@ -78,7 +78,7 @@ class Level(arcade.View):
             if self._player.collide_with_ghosts():
                 self._player.take_damage()
 
-                if not self._player.current_lives + 1:
+                if not self._player.current_lives:
                     self._game.game_over(self._player.score)
                     return
 
@@ -89,9 +89,9 @@ class Level(arcade.View):
             x = self._player.center_x
             y = self._player.center_y
             p_cell: Cell = self._maze.convert_pos_to_cell(arcade.Vec2(x, y))
-            
+
             for ghost in self._ghosts:
-                ghost.update(p_cell)
+                ghost.update(p_cell, self._maze)
 
             self._time_accumulator -= time_step
             self._time_to_finish -= time_step
@@ -117,15 +117,15 @@ class Level(arcade.View):
         self.clear()
 
         self._maze.draw()
-        
+
         self._player.draw()
-        
+
         # for (i, live) in enumerate(self.player_lives_ui):
         #     if i >= self._player.current_lives:
         #         live.alpha = 0
 
         # self.player_lives_ui.draw()
-        
+
         for ghost in self._ghosts:
             ghost.draw()
 

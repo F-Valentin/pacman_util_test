@@ -197,15 +197,12 @@ class Game:
         y = int(offset_y + half + offset)
         
         player = Player(arcade.Vec2(x, y), current_score)
-        player.score = current_score
-
 
         ghosts: list[Ghost] = []
         for g in config["ghosts"]:
-            ghost = Ghost(g["sprite"], g["difficulty_id"], g["speed"],
-                          maze)
             position = maze.get_cell(g["col"], g["row"])
-            ghost.setup(position)
+            ghost = Ghost.at_cell(position, g["sprite"], g["difficulty_id"], g["speed"])
+            
             ghosts.append(ghost)
 
         player.ghosts = ghosts

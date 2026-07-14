@@ -9,7 +9,7 @@ CONFIG_FILE ?= config/config.json
 .SILENT:
 
 install:
-    uv sync
+	uv sync
 
 run:
 	$(BIN)/python $(MAIN) $(CONFIG_FILE)

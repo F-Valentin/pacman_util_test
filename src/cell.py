@@ -12,7 +12,7 @@ class Cell:
         self._size = size
         self._walls = walls
         self.pacgum: Optional[Pacgum] = None
-        self.center: Optional[arcade.Vec2] = None
+        self.center: arcade.Vec2
 
         x = grid_pos.x
         y = grid_pos.y
