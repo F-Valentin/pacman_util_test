@@ -5,7 +5,7 @@ import math
 from enum import Enum
 from typing import Optional
 from maze import Maze
-from cell import Cell
+from cell import Cell, Walls
 from entity.ghost import Ghost, GhostState
 
 
@@ -133,7 +133,6 @@ class Player(arcade.Sprite):
 
     def move_to_next_cell(self, p_cell: Cell) -> None:
         """Move the player toward the next open adjacent maze cell."""
-        north, east, south, west = 0b0001, 0b0010, 0b0100, 0b1000
         sprite: arcade.TextureAnimationSprite = self.animations[self.state][0]
         speed = self.speed
 
@@ -143,25 +142,25 @@ class Player(arcade.Sprite):
         self.change_x = 0.0
         self.change_y = 0.0
 
-        if next_direction == PlayerDirection.UP and not p_cell.walls & north:
+        if next_direction == PlayerDirection.UP and not p_cell.walls & Walls.NORTH:
             sprite.angle = -90
             self.change_y = speed
             self.direction = next_direction
             self.next_direction = None
         elif (next_direction == PlayerDirection.DOWN
-              and not p_cell.walls & south):
+              and not p_cell.walls & Walls.SOUTH):
             sprite.angle = 90
             self.change_y = -speed
             self.direction = next_direction
             self.next_direction = None
         elif (next_direction == PlayerDirection.RIGHT
-              and not p_cell.walls & east):
+              and not p_cell.walls & Walls.EAST):
             sprite.angle = 0
             self.change_x = speed
             self.direction = next_direction
             self.next_direction = None
         elif (next_direction == PlayerDirection.LEFT
-              and not p_cell.walls & west):
+              and not p_cell.walls & Walls.WEST):
             sprite.angle = 180
             self.change_x = -speed
             self.direction = next_direction

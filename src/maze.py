@@ -3,7 +3,7 @@ from typing import Optional
 import arcade
 import math
 from arcade import Vec2
-from cell import Cell
+from cell import Cell, Walls
 from pacgum import Pacgum, draw_pacgum
 from mazegenerator import MazeGenerator
 
@@ -69,8 +69,7 @@ class Maze:
     def _build_wall_points(self) -> list[tuple[float, float]]:
         wall_points: list[tuple[float, float]] = []
         cell_size: int = self._cell_size
-        north, east, south, west = 0b0001, 0b0010, 0b0100, 0b1000
-
+        
         for cells in self.grid:
             for cell in cells:
                 point_x = cell.grid_x * cell_size + self.bottom_left_pos.x
@@ -85,13 +84,13 @@ class Maze:
                 bottom_left = (point_x, point_y)
                 bottom_right = (point_x + cell_size, point_y)
 
-                if cell.walls & north:
+                if cell.walls & Walls.NORTH:
                     wall_points += [top_left, top_right]
-                if cell.walls & east:
+                if cell.walls & Walls.EAST:
                     wall_points += [top_right, bottom_right]
-                if cell.walls & south:
+                if cell.walls & Walls.SOUTH:
                     wall_points += [bottom_left, bottom_right]
-                if cell.walls & west:
+                if cell.walls & Walls.WEST:
                     wall_points += [top_left, bottom_left]
 
         return wall_points
@@ -145,21 +144,19 @@ class Maze:
                     cell.add_pacgum(pacgum)
 
     def get_valid_cell_neighbors(self, cell: Cell) -> Optional[list[Cell]]:
-        north, south, east, west = 0b0001, 0b0100, 0b0010, 0b1000
-
         def is_open(n_x: int, n_y: int) -> bool:
             if not (
                     0 <= n_x < self.width and 0 <= n_y < self.height
             ):
                 return False
             n_cell = self.get_cell(n_x, n_y)
-            if cell.grid_y + 1 == n_y and not n_cell.walls & north:
+            if cell.grid_y + 1 == n_y and not n_cell.walls & Walls.NORTH:
                 return True
-            if cell.grid_y - 1 == n_y and not n_cell.walls & south:
+            if cell.grid_y - 1 == n_y and not n_cell.walls & Walls.SOUTH:
                 return True
-            if cell.grid_x + 1 == n_x and not n_cell.walls & west:
+            if cell.grid_x + 1 == n_x and not n_cell.walls & Walls.WEST:
                 return True
-            if cell.grid_x - 1 == n_x and not n_cell.walls & east:
+            if cell.grid_x - 1 == n_x and not n_cell.walls & Walls.EAST:
                 return True
             return False
 
