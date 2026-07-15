@@ -50,13 +50,6 @@ class Button:
     def draw(self) -> None:
         self._sprite_list.draw()
 
-    def collide_with_point(self, point: arcade.Vec2) -> bool:
-        rect = self.collision_rect
-        if (point.x < rect.x or point.x > rect.x + rect.width
-                or point.y > rect.y or point.y < rect.y - rect.height):
-            return False
-        return True
-
 
 class CheckButton(Button):
     def __init__(self, name: str, x: float, y: float,
@@ -143,7 +136,7 @@ class ButtonGroup:
         """Vérifie TOUS les boutons, pas seulement le focus."""
         point = arcade.Vec2(x, y)
         for button in self._buttons:
-            if button.collide_with_point(point):
+            if button.collision_rect.collide_with_point(point):
                 button.trigger()
 
                 if self.current_button_focus and self.current_button_focus != button:
@@ -157,7 +150,7 @@ class ButtonGroup:
     def on_mouse_motion(self, x: int, y: int) -> None:
         point = arcade.Vec2(x, y)
         for idx, button in enumerate(self._buttons):
-            if button.collide_with_point(point):
+            if button.collision_rect.collide_with_point(point):
                 if (self.current_button_focus
                         and self.current_button_focus != button):
                     self.current_button_focus.set_alpha(255)

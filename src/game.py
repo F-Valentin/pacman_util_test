@@ -190,11 +190,6 @@ class Game:
         maze.setup(self._game_config.points_per_pacgum,
                    self._game_config.points_per_super_pacgum)
 
-        half = maze_width * cell_size // 2
-        offset = 0 if maze_width % 2 != 0 else -cell_size // 2
-        x = int(offset_x + half + offset)
-        y = int(offset_y + half + offset)
-
         ghosts: list[Ghost] = []
         for g in config["ghosts"]:
             position = maze.get_cell(g["col"], g["row"])
@@ -206,15 +201,20 @@ class Game:
                 maze)
             ghosts.append(ghost)
 
+        half = maze_width * cell_size // 2
+        offset = 0 if maze_width % 2 != 0 else -cell_size // 2
+        x = int(offset_x + half + offset)
+        y = int(offset_y + half + offset)
+
         player = Player(arcade.Vec2(x, y), current_score, maze, ghosts)
 
         level = Level(player, maze, ghosts, time_limit, self)
         self.cheat_mode.player_inviciblity = player.invicibility
-        self.cheat_mode.can_skip_levels = self.skip_levels
+        self.cheat_mode.can_skip_levels = self._skip_levels
         self.cheat_mode.ghosts_freeze = [g.toggle_freeze for g in ghosts]
         self._window.show_view(level)
 
-    def skip_levels(self) -> None:
+    def _skip_levels(self) -> None:
         self.can_skip_levels = not self.can_skip_levels
 
     def next_level(self, score: int) -> None:
@@ -230,6 +230,3 @@ class Game:
         """Show the game-over screen immediately."""
         self._window.show_view(
             EndGameView(False, score, self._menu_view))
-
-    def pause(self) -> None:
-        pass

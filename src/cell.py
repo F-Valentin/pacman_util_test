@@ -3,11 +3,13 @@ from typing import Optional
 from pacgum import Pacgum
 from enum import IntEnum
 
+
 class Walls(IntEnum):
     NORTH = 0b0001
-    EAST  = 0b0010
+    EAST = 0b0010
     SOUTH = 0b0100
-    WEST  = 0b1000
+    WEST = 0b1000
+
 
 class Cell:
     """Represent one tile in the maze grid, including its walls and pacgum."""
