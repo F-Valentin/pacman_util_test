@@ -3,7 +3,6 @@ from typing import TYPE_CHECKING
 import arcade
 import hjson
 
-from highscore import update_highscore_file
 from button import Button, CheckButton, ButtonGroup
 from cheatmode import CheatMode
 
@@ -137,6 +136,8 @@ class EndGameView(arcade.View):
         self.highscore = 0
         self._menu_view = menu_view
         self._button_group: ButtonGroup = ButtonGroup(2)
+        self.current_name: str = ""
+        self.data = {}
 
     def on_show_view(self) -> None:
         menu_button = Button(
@@ -161,24 +162,55 @@ class EndGameView(arcade.View):
         quit_button.set_scale(2)
         self._button_group.add_button(menu_button)
         self._button_group.add_button(quit_button)
-
-        highscore = 0
+        
+        path = "highscore.json"
         try:
-            with open("highscore.json", 'r', encoding='utf-8') as f:
-                print("open")
+            with open(path, 'r', encoding='utf-8') as f:
                 data = hjson.load(f)
-                highscore = data.get("highscore", 0)
+                
+                if self.current_name not in data:
+                    print("not in data")
+                    print(data)
+                    self.highscore = self.score
+                    self.data = data
+                    return
+                    
+                highscore = data.get(self.current_name, 0)
                 self.highscore = highscore
+                self.data = data
+                
         except (FileNotFoundError, hjson.HjsonDecodeError) as e:
             print(e)
+            
+        if self.score < self.highscore:
+            return
+            
+        self.highscore = self.score
+        self.data[self.current_name] = self.score
 
-        if self.score > highscore:
-            print("update")
-            update_highscore_file("highscore.json", self.score)
-            self.highscore = self.score
+        
+
+    def save_highscore(self) -> None:
+        print("save")
+        path = "highscore.json"
+        print(self.data)
+        self.data[self.current_name] = self.score
+
+        with open(path, "w") as f:
+            hjson.dump(self.data, f, ensure_ascii=False, indent=4)
+
+        
 
     def on_key_press(self, symbol: int, modifiers: int) -> None:
         self._button_group.on_key_press(key=symbol)
+
+        c = chr(symbol)
+        if c.isalpha() and c.isascii():
+            self.current_name += c
+
+        if symbol == arcade.key.ENTER and len(self.current_name) > 0:
+            self.save_highscore()
+        
 
     def on_mouse_press(self, x: int, y: int, button: int,
                        modifiers: int) -> None:
@@ -187,6 +219,17 @@ class EndGameView(arcade.View):
     def on_draw(self) -> None:
         self.clear()
 
+        t = arcade.Text("Enter your name: ", 
+            self.window.width // 2,
+            self.window.height // 2 - 200)
+
+        t.draw()
+        
+        r = arcade.Text(f" {self.current_name}", 
+            self.window.width // 2 + 135,
+            self.window.height // 2 - 200)
+        r.draw()
+        
         result_text = arcade.Text(
             f"{self.text}  —  Score : {self.score}",
             self.window.width // 2,

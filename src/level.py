@@ -125,6 +125,8 @@ class Level(arcade.View):
         elif symbol == arcade.key.N:
             if self._game.can_skip_levels:
                 self._game.next_level(self._player.score)
+        elif symbol == arcade.key.ENTER:
+            self._game.game_over(0)
 
     def on_draw(self) -> None:
         self.clear()
