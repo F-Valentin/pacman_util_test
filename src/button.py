@@ -1,5 +1,5 @@
 import arcade
-from utils import Rect
+from utils import HitBox
 from collections.abc import Callable
 from typing import Optional
 
@@ -26,7 +26,7 @@ class Button:
             return
         top_left_x = self.center.x - sprite.width // 2
         top_left_y = self.center.y + sprite.height // 2
-        self.collision_rect: Rect = Rect(
+        self.collision_rect: HitBox = HitBox(
             top_left_x, top_left_y, sprite.width, sprite.height)
         self._sprite = sprite
 

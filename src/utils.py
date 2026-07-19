@@ -1,8 +1,8 @@
 import arcade
 
 
-class Rect:
-    """Simple rectangle helper used by button hit-testing."""
+class HitBox:
+    """Hit-test rectangle. x/y = top-left corner (arcade coords: y increases upward)."""
 
     def __init__(self, x: float, y: float,
                  width: float,

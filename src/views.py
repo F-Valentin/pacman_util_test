@@ -5,6 +5,7 @@ import hjson
 
 from button import Button, CheckButton, ButtonGroup
 from cheatmode import CheatMode
+from utils import HitBox
 
 """Menu, pause, and end-of-game views used by the Arcade window."""
 
@@ -119,6 +120,8 @@ class PauseView(arcade.View):
                        modifiers: int) -> None:
         self._button_group.on_mouse_press(x, y)
 
+        
+
     def on_draw(self) -> None:
         self.clear()
         self._previous_view.on_draw()
@@ -127,7 +130,11 @@ class PauseView(arcade.View):
 
 class EndGameView(arcade.View):
     """Show the outcome of the session and return to the menu."""
-
+    BOX_LEFT   = 75
+    BOX_RIGHT  = 360
+    BOX_TOP    = 720
+    BOX_BOTTOM = 530 
+    
     def __init__(self, win: bool, score: int,
                  menu_view: MenuView) -> None:
         super().__init__()
@@ -135,117 +142,137 @@ class EndGameView(arcade.View):
         self.score = score
         self.highscore = 0
         self._menu_view = menu_view
-        self._button_group: ButtonGroup = ButtonGroup(2)
+        self._button_group: ButtonGroup = ButtonGroup(3)
         self.current_name: str = ""
+        self.old_name: str = ""
+        self.enter_your_name_btn_pressed: bool = False
         self.data = {}
+        
+        self._input_rect: HitBox
+    
+        
 
     def on_show_view(self) -> None:
+        btn_x = 160
+
+        label = arcade.Text("Enter your name :", self.BOX_LEFT, 0, font_size=13)
+        rect_x = self.BOX_LEFT + label.content_width + 5
+        self._input_rect = HitBox(x=rect_x, y=self.BOX_BOTTOM - 55, width=160, height=20)
+
         menu_button = Button(
             "menu_button",
-            self.window.width // 2,
-            self.window.height // 2 + 100,
+            btn_x,
+            350,
             ["assets/button/menu/menu.png"],
             lambda: self.window.show_view(self._menu_view)
         )
-
         menu_button.set_alpha(200)
         menu_button.set_scale(2)
 
         quit_button = Button(
             "quit",
-            self.window.width // 2,
-            self.window.height // 2,
+            btn_x,
+            260,
             ["assets/button/quit/quit.png"],
             lambda: arcade.exit()
         )
-
         quit_button.set_scale(2)
+
         self._button_group.add_button(menu_button)
         self._button_group.add_button(quit_button)
-        
+
         path = "highscore.json"
         try:
             with open(path, 'r', encoding='utf-8') as f:
                 data = hjson.load(f)
-                
-                if self.current_name not in data:
-                    print("not in data")
-                    print(data)
-                    self.highscore = self.score
-                    self.data = data
-                    return
-                    
-                highscore = data.get(self.current_name, 0)
-                self.highscore = highscore
                 self.data = data
                 
+                if self.current_name not in data:
+                    self.highscore = self.score
+                    return
+                    
+                self.highscore = data.get(self.current_name, 0)
         except (FileNotFoundError, hjson.HjsonDecodeError) as e:
             print(e)
-            
-        if self.score < self.highscore:
-            return
-            
-        self.highscore = self.score
-        self.data[self.current_name] = self.score
 
-        
+        if self.score >= self.highscore:
+            self.highscore = self.score
+            self.data[self.current_name] = self.score
 
     def save_highscore(self) -> None:
-        print("save")
+        self.enter_your_name_btn_pressed = False
+        
+        if len(self.old_name) > 0 and self.old_name != self.current_name:
+           del self.data[self.old_name] 
+           
         path = "highscore.json"
-        print(self.data)
         self.data[self.current_name] = self.score
 
+        self.old_name = self.current_name
         with open(path, "w") as f:
             hjson.dump(self.data, f, ensure_ascii=False, indent=4)
 
-        
-
     def on_key_press(self, symbol: int, modifiers: int) -> None:
-        self._button_group.on_key_press(key=symbol)
-
-        c = chr(symbol)
-        if c.isalpha() and c.isascii():
-            self.current_name += c
-
-        if symbol == arcade.key.ENTER and len(self.current_name) > 0:
+        if not self.enter_your_name_btn_pressed:
+            self._button_group.on_key_press(key=symbol)
+            return
+    
+        if symbol == arcade.key.BACKSPACE and len(self.current_name) > 0:
+            self.current_name = self.current_name[:-1]
+        elif symbol == arcade.key.ENTER and len(self.current_name) > 0:
             self.save_highscore()
-        
+        else:
+            c = chr(symbol)
+            if c.isalpha() and c.isascii():
+                self.current_name += c
 
     def on_mouse_press(self, x: int, y: int, button: int,
                        modifiers: int) -> None:
         self._button_group.on_mouse_press(x, y)
+        
+        if self._input_rect.collide_with_point(arcade.Vec2(x, y)):
+            self.enter_your_name_btn_pressed = True
 
     def on_draw(self) -> None:
         self.clear()
 
-        t = arcade.Text("Enter your name: ", 
-            self.window.width // 2,
-            self.window.height // 2 - 200)
+       
+        rect = arcade.LRBT(self.BOX_LEFT, self.BOX_RIGHT, self.BOX_BOTTOM, self.BOX_TOP)
+        arcade.draw_rect_outline(rect, arcade.color.WHITE, border_width=2)
 
-        t.draw()
+        arcade.Text(
+            self.text,
+            self.BOX_LEFT + 15, self.BOX_TOP - 45,
+            font_size=18,
+        ).draw()
+
+        arcade.Text(
+            f"Your score : {self.score}",
+            self.BOX_LEFT + 15, self.BOX_TOP - 95,
+            font_size=14,
+        ).draw()
+
+        arcade.Text(
+            f"Your Highscore : {self.highscore}",
+            self.BOX_LEFT + 15, self.BOX_TOP - 145,
+            font_size=14,
+        ).draw()
+
+        arcade.Text(
+            "(type inside the rect oultine and then type any letter on your keyboard then press enter to save your score)",
+            self.BOX_LEFT, self.BOX_BOTTOM - 28,
+            font_size=10,
+            color=arcade.color.LIGHT_GRAY,
+        ).draw()
         
-        r = arcade.Text(f" {self.current_name}", 
-            self.window.width // 2 + 135,
-            self.window.height // 2 - 200)
-        r.draw()
+        label = arcade.Text("Enter your name :", self.BOX_LEFT, self.BOX_BOTTOM - 70, font_size=13)
+        label.draw()
         
-        result_text = arcade.Text(
-            f"{self.text}  —  Score : {self.score}",
-            self.window.width // 2,
-            self.window.height // 2 + 220,
-            anchor_x="center",
-        )
-        result_text.draw()
-
-        highscore_text = arcade.Text(
-            f"HighScore : {self.highscore}",
-            self.window.width // 2,
-            self.window.height // 2 + 120,
-            anchor_x="center",
-        )
-
-        highscore_text.draw()
+        rect_x = self.BOX_LEFT + label.content_width + 5
+        input_rect = arcade.LRBT(rect_x, rect_x + 160, self.BOX_BOTTOM - 75, self.BOX_BOTTOM - 55)
+        arcade.draw_rect_outline(input_rect, arcade.color.WHITE, border_width=2)
+        
+        arcade.Text(self.current_name, rect_x + 5, self.BOX_BOTTOM - 72, font_size=12).draw()
         self._button_group.draw()
 
 
