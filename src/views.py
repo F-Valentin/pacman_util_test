@@ -2,6 +2,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 import arcade
 import hjson
+import json
 
 from button import Button, CheckButton, ButtonGroup
 from cheatmode import CheatMode
@@ -147,6 +148,7 @@ class EndGameView(arcade.View):
         self.old_name: str = ""
         self.enter_your_name_btn_pressed: bool = False
         self.data = {}
+        self.tmp_data = {}
         
         self._input_rect: HitBox
     
@@ -177,40 +179,43 @@ class EndGameView(arcade.View):
             lambda: arcade.exit()
         )
         quit_button.set_scale(2)
-
-        self._button_group.add_button(menu_button)
-        self._button_group.add_button(quit_button)
-
+        
         path = "highscore.json"
         try:
             with open(path, 'r', encoding='utf-8') as f:
                 data = hjson.load(f)
                 self.data = data
-                
-                if self.current_name not in data:
-                    self.highscore = self.score
-                    return
-                    
-                self.highscore = data.get(self.current_name, 0)
+                self.tmp_data = data.copy()
         except (FileNotFoundError, hjson.HjsonDecodeError) as e:
             print(e)
 
-        if self.score >= self.highscore:
-            self.highscore = self.score
-            self.data[self.current_name] = self.score
+        self._button_group.add_button(menu_button)
+        self._button_group.add_button(quit_button)
 
     def save_highscore(self) -> None:
+        path = "highscore.json"
+        
+        self.highscore = self.data.get(self.current_name, self.score)
+        print(f"{self.current_name}, highscore: {self.highscore}")
+
+        if self.score >= self.highscore:
+            self.highscore = self.score
+
+        if self.current_name not in self.data and len(self.old_name) == 0:
+            print("not in data")
+            self.old_name = self.current_name
+
         self.enter_your_name_btn_pressed = False
         
         if len(self.old_name) > 0 and self.old_name != self.current_name:
-           del self.data[self.old_name] 
+            print("del")
+            del self.tmp_data[self.old_name] 
+            self.old_name = ""
            
-        path = "highscore.json"
-        self.data[self.current_name] = self.score
-
-        self.old_name = self.current_name
+        self.tmp_data[self.current_name] = self.highscore
+        
         with open(path, "w") as f:
-            hjson.dump(self.data, f, ensure_ascii=False, indent=4)
+            json.dump(self.tmp_data, f, ensure_ascii=False, indent=4)
 
     def on_key_press(self, symbol: int, modifiers: int) -> None:
         if not self.enter_your_name_btn_pressed:
