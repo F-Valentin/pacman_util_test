@@ -71,11 +71,11 @@ class Ghost(arcade.Sprite):
     def _init_animation(self) -> None:
         move_animation = arcade.Sprite(self._sprite_image)
         move_animation.position = self.position
-        move_animation.scale = 0.08
+        move_animation.scale = 0.06
 
         flee_animation = arcade.Sprite(self._flee_image)
         flee_animation.position = self.position
-        flee_animation.scale = 0.08
+        flee_animation.scale = 0.06
 
         move_sprite_list: arcade.SpriteList = arcade.SpriteList()
         move_sprite_list.append(move_animation)

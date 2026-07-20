@@ -55,7 +55,7 @@ class Player(arcade.Sprite):
     def _init_animation(self) -> None:
         move_animation = arcade.load_animated_gif("assets/pacman.gif")
         move_animation.position = self.position
-        move_animation.scale = 0.12
+        move_animation.scale = 0.08
 
         move_sprite_list: arcade.SpriteList = arcade.SpriteList()
         move_sprite_list.append(move_animation)

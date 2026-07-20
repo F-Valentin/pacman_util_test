@@ -17,7 +17,7 @@ class Game:
     LEVEL_CATALOG = [
         # Niveau 1 — 7×7, 1 fantôme très lent mais pas idiot
         {
-            "maze_width": 7, "maze_height": 7, "time_limit": 60,
+            "maze_width": 15, "maze_height": 15, "time_limit": 60,
             "ghosts": [
                 {"sprite": "assets/blinky.png",
                  "difficulty_id": 40, "col": 0, "row": 0, "speed": 1.5},
@@ -58,7 +58,7 @@ class Game:
             "maze_width": 9, "maze_height": 9, "time_limit": 80,
             "ghosts": [
                 {"sprite": "assets/blinky.png",
-                 "difficulty_id": 18, "col": 0, "row": 0, "speed": 2.25},
+                 "difficulty_id": 18, "col": 0, "row": 0, "speed": 2.4},
                 {"sprite": "assets/pinky.png",
                  "difficulty_id": 22, "col": 8, "row": 8, "speed": 2.0},
                 {"sprite": "assets/clyde.png",
@@ -70,9 +70,9 @@ class Game:
             "maze_width": 11, "maze_height": 11, "time_limit": 100,
             "ghosts": [
                 {"sprite": "assets/blinky.png",
-                 "difficulty_id": 14, "col": 0, "row": 0, "speed": 2.25},
+                 "difficulty_id": 14, "col": 0, "row": 0, "speed": 2.4},
                 {"sprite": "assets/inky.png",
-                 "difficulty_id": 17, "col": 10, "row": 0, "speed": 2.25},
+                 "difficulty_id": 17, "col": 10, "row": 0, "speed": 2.4},
                 {"sprite": "assets/clyde.png",
                  "difficulty_id": 20, "col": 0, "row": 10, "speed": 2.0},
             ],
@@ -84,9 +84,9 @@ class Game:
                 {"sprite": "assets/blinky.png",
                  "difficulty_id": 10, "col": 0, "row": 0, "speed": 3.0},
                 {"sprite": "assets/pinky.png",
-                 "difficulty_id": 13, "col": 10, "row": 0, "speed": 2.25},
+                 "difficulty_id": 13, "col": 10, "row": 0, "speed": 2.4},
                 {"sprite": "assets/inky.png",
-                 "difficulty_id": 16, "col": 0, "row": 10, "speed": 2.25},
+                 "difficulty_id": 16, "col": 0, "row": 10, "speed": 2.4},
                 {"sprite": "assets/clyde.png",
                  "difficulty_id": 19, "col": 10, "row": 10, "speed": 2.0},
             ],
@@ -102,7 +102,7 @@ class Game:
                 {"sprite": "assets/inky.png",
                  "difficulty_id": 12, "col": 0, "row": 10, "speed": 3.0},
                 {"sprite": "assets/clyde.png",
-                 "difficulty_id": 15, "col": 10, "row": 10, "speed": 2.25},
+                 "difficulty_id": 15, "col": 10, "row": 10, "speed": 2.4},
             ],
         },
         # Niveau 9 — 11×11, très rapides et très malins
@@ -165,7 +165,7 @@ class Game:
 
         maze_width: int = int(config["maze_width"])
         maze_height: int = int(config["maze_height"])
-        cell_size = 72
+        cell_size = self._game_config.tile_size
         time_limit: int = int(config["time_limit"])
 
         offset_x: int = (
