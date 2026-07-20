@@ -21,7 +21,7 @@ class GhostState(str, Enum):
 class Ghost(arcade.Sprite):
     """Represent an enemy ghost that pursues the player through the maze."""
 
-    def __init__(self, position: arcade.Vec2, path_to_sprite: str, difficulty_id: int,
+    def __init__(self, position: arcade.Vec2, point: int, path_to_sprite: str, difficulty_id: int,
                  speed: float, maze: Maze, _internal: bool = False) -> None:
         """Do not use the default constructor"""
         if not _internal:
@@ -42,12 +42,13 @@ class Ghost(arcade.Sprite):
         self._freeze = False
         self._spawn_cell: Cell
         self._maze = maze
+        self.point = point
 
         self._init_animation()
 
     @classmethod
     def at_cell(cls,
-                cell: Cell, path_to_sprite: str, difficulty_id: int,
+                cell: Cell, point: int, path_to_sprite: str, difficulty_id: int,
                 speed: float, maze: Maze) -> Ghost:
 
         # if not cell.center:
@@ -57,6 +58,7 @@ class Ghost(arcade.Sprite):
 
         g = cls(
             position,
+            point,
             path_to_sprite,
             difficulty_id,
             speed,

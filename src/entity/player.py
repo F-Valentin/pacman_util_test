@@ -185,6 +185,7 @@ class Player(arcade.Sprite):
                     and ghost.state == GhostState.FLEE):
                 ghost.restart_position()
                 ghost.state = GhostState.MOVE
+                self._update_score(ghost.point)
                 return False
             elif distance <= (p_radius + g_radius):
                 return True

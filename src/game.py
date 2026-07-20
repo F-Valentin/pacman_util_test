@@ -195,6 +195,7 @@ class Game:
             position = maze.get_cell(g["col"], g["row"])
             ghost = Ghost.at_cell(
                 position,
+                self._game_config.points_per_ghost,
                 g["sprite"],
                 g["difficulty_id"],
                 g["speed"],
