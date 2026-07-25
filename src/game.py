@@ -1,14 +1,15 @@
 """Core game orchestration for the Pac-Man prototype."""
 
 import arcade
-from level import Level
-from entity.player import Player
-from maze import Maze
-from views import MenuView, EndGameView
+
 from button import ButtonGroup
-from entity.ghost import Ghost
-from game_configuration import GameConfig
 from cheatmode import CheatMode
+from entity.ghost import Ghost
+from entity.player import Player
+from game_configuration import GameConfig
+from level import Level
+from maze import Maze
+from views import EndGameView, MenuView
 
 
 class Game:
@@ -17,7 +18,7 @@ class Game:
     LEVEL_CATALOG = [
         # Niveau 1 — 7×7, 1 fantôme très lent mais pas idiot
         {
-            "maze_width": 15, "maze_height": 15, "time_limit": 60,
+            "maze_width": 10, "maze_height": 10, "time_limit": 60,
             "ghosts": [
                 {"sprite": "assets/blinky.png",
                  "difficulty_id": 40, "col": 0, "row": 0, "speed": 1.5},
@@ -58,7 +59,7 @@ class Game:
             "maze_width": 9, "maze_height": 9, "time_limit": 80,
             "ghosts": [
                 {"sprite": "assets/blinky.png",
-                 "difficulty_id": 18, "col": 0, "row": 0, "speed": 2.4},
+                 "difficulty_id": 18, "col": 0, "row": 0, "speed": 2.5},
                 {"sprite": "assets/pinky.png",
                  "difficulty_id": 22, "col": 8, "row": 8, "speed": 2.0},
                 {"sprite": "assets/clyde.png",
@@ -70,7 +71,7 @@ class Game:
             "maze_width": 11, "maze_height": 11, "time_limit": 100,
             "ghosts": [
                 {"sprite": "assets/blinky.png",
-                 "difficulty_id": 14, "col": 0, "row": 0, "speed": 2.4},
+                 "difficulty_id": 14, "col": 0, "row": 0, "speed": 2.5},
                 {"sprite": "assets/inky.png",
                  "difficulty_id": 17, "col": 10, "row": 0, "speed": 2.4},
                 {"sprite": "assets/clyde.png",
@@ -207,7 +208,9 @@ class Game:
         x = int(offset_x + half + offset)
         y = int(offset_y + half + offset)
 
-        player = Player(arcade.Vec2(x, y), current_score, maze, ghosts)
+        pos = arcade.Vec2(x, y)
+        player = Player(pos, current_score, maze, ghosts)
+        maze.convert_pos_to_cell(pos).hide_pacgum();
 
         level = Level(player, maze, ghosts, time_limit, self)
         self.cheat_mode.player_inviciblity = player.invicibility
