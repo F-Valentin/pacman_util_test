@@ -4,6 +4,7 @@ import arcade
 import math
 from enum import Enum
 from typing import Optional
+from arcade.math import lerp_2d
 from maze import Maze
 from cell import Cell, Walls
 from entity.ghost import Ghost, GhostState
@@ -20,6 +21,36 @@ class PlayerDirection(Enum):
     DOWN = "down"
     LEFT = "left"
     RIGHT = "right"
+
+# _PlayerOppositeDirection: dict[PlayerDirection, PlayerDirection] = {
+#     PlayerDirection.UP: PlayerDirection.DOWN,
+#     PlayerDirection.DOWN: PlayerDirection.UP,
+#     PlayerDirection.LEFT: PlayerDirection.RIGHT,
+#     PlayerDirection.RIGHT: PlayerDirection.LEFT
+# }
+
+
+
+_DIRECTION_DELTA: dict[PlayerDirection, tuple[float, float]] = {
+    PlayerDirection.UP: (0.0, 1.0),
+    PlayerDirection.DOWN: (0.0, -1.0),
+    PlayerDirection.LEFT: (-1.0, 0.0),
+    PlayerDirection.RIGHT: (1.0, 0.0),
+}
+
+_DIRECTION_ANGLE: dict[PlayerDirection, float] = {
+    PlayerDirection.UP: -90,
+    PlayerDirection.DOWN: 90,
+    PlayerDirection.LEFT: 180,
+    PlayerDirection.RIGHT: 0,
+}
+
+_DIRECTION_WALL: dict[PlayerDirection, Walls] = {
+    PlayerDirection.UP: Walls.NORTH,
+    PlayerDirection.DOWN: Walls.SOUTH,
+    PlayerDirection.LEFT: Walls.WEST,
+    PlayerDirection.RIGHT: Walls.EAST,
+}
 
 
 class Player(arcade.Sprite):
@@ -38,14 +69,16 @@ class Player(arcade.Sprite):
         self.speed: float = 4.0
         self.state: PlayerState = PlayerState.MOVE
         self.animations: dict[str, arcade.SpriteList] = {}
-        self._grid_coordinate: arcade.Vec2 = arcade.Vec2(0.0, 0.0)
         self.direction: Optional[PlayerDirection] = None
         self.score: int = score
         self.ghosts: list[Ghost] = ghosts
         self._invicibility = False
         self._maze = maze
 
-        # self._update_grid_coordinate()
+        self._start_center: arcade.Vec2 = position
+        self._target_center: arcade.Vec2 = position
+        self._t: float = 1.0
+
         self._init_animation()
 
     @property
@@ -67,9 +100,11 @@ class Player(arcade.Sprite):
         self.center_x = self._default_position.x
         self.center_y = self._default_position.y
         self.velocity = 0.0, 0.0
+        self._start_center = self._default_position
+        self._target_center = self._default_position
+        self._t = 1.0
         self.direction = None
         self.next_direction = None
-
     def set_next_direction(self, key: int) -> None:
         """Store the next direction chosen by the player from keyboard input."""
         match key:
@@ -83,18 +118,45 @@ class Player(arcade.Sprite):
                 self.next_direction = PlayerDirection.RIGHT
 
     def get_grid_coordinate(self) -> arcade.Vec2:
-        return self._grid_coordinate
+        return self._maze.convert_pos_to_grid(
+            arcade.Vec2(self.center_x, self.center_y))
 
     def get_current_cell(self) -> Cell:
-        c_x = int(self._grid_coordinate.x)
-        c_y = int(self._grid_coordinate.y)
-        p_cell: Cell = self._maze.get_cell(c_x, c_y)
+        return self._maze.convert_pos_to_cell(
+            arcade.Vec2(self.center_x, self.center_y))
+        
+    def _set_facing(self, direction: PlayerDirection) -> None:
+        self.direction = direction
+        self.animations[self.state][0].angle = _DIRECTION_ANGLE[direction]
 
-        return p_cell
+    def _advance_position(self) -> None:
+        if self.next_direction and self._opposite_direction(self.next_direction):
+            tmp = self._start_center
+            self._start_center = self._target_center
+            self._target_center = tmp
+            self._t = 1.0 - self._t
+            self._set_facing(self.next_direction)
+            self.next_direction = None
+                
+        if self._t < 1.0:
+            self._t += self.speed / self._maze.cell_size
+        
+        if self._t >= 1.0:
+            overshoot = self._t - 1.0
+            
+            self.center_x, self.center_y = self._target_center
+            
+            cell = self._maze.convert_pos_to_cell(self._target_center)
+            self._eat_pacgum(cell)
+            
+            if (self.move_to_next_cell(cell)):
+                self._t = overshoot
+        else:
+            self.center_x, self.center_y = arcade.math.lerp_2d(self._start_center, self._target_center, self._t)
+            
 
     def _move(self, delta_time: float) -> None:
-        self.center_x += self.change_x
-        self.center_y += self.change_y
+        self._advance_position()
 
         current_animation = self.animations[self.state]
         current_animation.update_animation(delta_time)
@@ -117,56 +179,49 @@ class Player(arcade.Sprite):
 
     def update(self, delta_time: float = 1 / 60) -> None:
         self._move(delta_time)
-        self._grid_coordinate = self._maze.convert_pos_to_grid(
-            arcade.Vec2(self.center_x, self.center_y))
-
-        cell = self.get_current_cell()
-        if cell.center:
-            px, py = int(self.center_x), int(self.center_y)
-            cx, cy = int(cell.center.x), int(cell.center.y)
-            if (px, py) == (cx, cy):
-                self._eat_pacgum(cell)
-                self.move_to_next_cell(cell)
 
     def _update_score(self, value: int) -> None:
         self.score += value
+        
+    def _opposite_direction(self, direction: PlayerDirection) -> bool:
+        opp: PlayerDirection
+        
+        match direction:
+            case PlayerDirection.UP:
+               opp = PlayerDirection.DOWN 
+            case PlayerDirection.DOWN:
+               opp = PlayerDirection.UP
+            case PlayerDirection.LEFT:
+               opp = PlayerDirection.RIGHT 
+            case PlayerDirection.RIGHT:
+               opp = PlayerDirection.LEFT 
 
-    def move_to_next_cell(self, p_cell: Cell) -> None:
-        """Move the player toward the next open adjacent maze cell."""
-        sprite: arcade.TextureAnimationSprite = self.animations[self.state][0]
-        speed = self.speed
-
-        next_direction: Optional[PlayerDirection] = (
+        return opp == self.direction
+            
+    def move_to_next_cell(self, p_cell: Cell) -> bool:
+        candidate: Optional[PlayerDirection] = (
             self.next_direction or self.direction)
 
-        self.change_x = 0.0
-        self.change_y = 0.0
+        if candidate is None:
+            return False
 
-        if next_direction == PlayerDirection.UP and not p_cell.walls & Walls.NORTH:
-            sprite.angle = -90
-            self.change_y = speed
-            self.direction = next_direction
-            self.next_direction = None
-        elif (next_direction == PlayerDirection.DOWN
-              and not p_cell.walls & Walls.SOUTH):
-            sprite.angle = 90
-            self.change_y = -speed
-            self.direction = next_direction
-            self.next_direction = None
-        elif (next_direction == PlayerDirection.RIGHT
-              and not p_cell.walls & Walls.EAST):
-            sprite.angle = 0
-            self.change_x = speed
-            self.direction = next_direction
-            self.next_direction = None
-        elif (next_direction == PlayerDirection.LEFT
-              and not p_cell.walls & Walls.WEST):
-            sprite.angle = 180
-            self.change_x = -speed
-            self.direction = next_direction
-            self.next_direction = None
-        else:
+        if p_cell.walls & _DIRECTION_WALL[candidate]:
             self.next_direction = self.direction
+            return False
+
+        dx, dy = _DIRECTION_DELTA[candidate]
+        sprite: arcade.TextureAnimationSprite = self.animations[self.state][0]
+        sprite.angle = _DIRECTION_ANGLE[candidate]
+
+        self._start_center = arcade.Vec2(self.center_x, self.center_y)
+        self._target_center = arcade.Vec2(
+            self._start_center.x + dx * self._maze.cell_size,
+            self._start_center.y + dy * self._maze.cell_size,
+        )
+
+        self.direction = candidate
+        self.next_direction = None
+        return True
 
     def collide_with_ghosts(self) -> bool:
         """Return whether the player overlaps any ghost sprite."""
