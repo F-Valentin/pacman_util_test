@@ -1,10 +1,12 @@
 from __future__ import annotations
+
+import json
 from typing import TYPE_CHECKING
+
 import arcade
 import hjson
-import json
 
-from button import Button, CheckButton, ButtonGroup
+from button import Button, ButtonGroup, CheckButton
 from cheatmode import CheatMode
 from utils import HitBox
 
@@ -121,7 +123,7 @@ class PauseView(arcade.View):
                        modifiers: int) -> None:
         self._button_group.on_mouse_press(x, y)
 
-        
+
 
     def on_draw(self) -> None:
         self.clear()
@@ -134,8 +136,8 @@ class EndGameView(arcade.View):
     BOX_LEFT   = 75
     BOX_RIGHT  = 360
     BOX_TOP    = 720
-    BOX_BOTTOM = 530 
-    
+    BOX_BOTTOM = 530
+
     def __init__(self, win: bool, score: int,
                  menu_view: MenuView) -> None:
         super().__init__()
@@ -149,10 +151,10 @@ class EndGameView(arcade.View):
         self.enter_your_name_btn_pressed: bool = False
         self.data = {}
         self.tmp_data = {}
-        
+
         self._input_rect: HitBox
-    
-        
+
+
 
     def on_show_view(self) -> None:
         btn_x = 160
@@ -179,7 +181,7 @@ class EndGameView(arcade.View):
             lambda: arcade.exit()
         )
         quit_button.set_scale(2)
-        
+
         path = "highscore.json"
         try:
             with open(path, 'r', encoding='utf-8') as f:
@@ -194,26 +196,25 @@ class EndGameView(arcade.View):
 
     def save_highscore(self) -> None:
         path = "highscore.json"
-        
+
         self.highscore = self.data.get(self.current_name, self.score)
         print(f"{self.current_name}, highscore: {self.highscore}")
 
-        if self.score >= self.highscore:
-            self.highscore = self.score
+        self.highscore = max(self.score, self.highscore)
 
         if self.current_name not in self.data and len(self.old_name) == 0:
             print("not in data")
             self.old_name = self.current_name
 
         self.enter_your_name_btn_pressed = False
-        
+
         if len(self.old_name) > 0 and self.old_name != self.current_name:
             print("del")
-            del self.tmp_data[self.old_name] 
+            del self.tmp_data[self.old_name]
             self.old_name = ""
-           
+
         self.tmp_data[self.current_name] = self.highscore
-        
+
         with open(path, "w") as f:
             json.dump(self.tmp_data, f, ensure_ascii=False, indent=4)
 
@@ -221,7 +222,7 @@ class EndGameView(arcade.View):
         if not self.enter_your_name_btn_pressed:
             self._button_group.on_key_press(key=symbol)
             return
-    
+
         if symbol == arcade.key.BACKSPACE and len(self.current_name) > 0:
             self.current_name = self.current_name[:-1]
         elif symbol == arcade.key.ENTER and len(self.current_name) > 0:
@@ -234,14 +235,14 @@ class EndGameView(arcade.View):
     def on_mouse_press(self, x: int, y: int, button: int,
                        modifiers: int) -> None:
         self._button_group.on_mouse_press(x, y)
-        
+
         if self._input_rect.collide_with_point(arcade.Vec2(x, y)):
             self.enter_your_name_btn_pressed = True
 
     def on_draw(self) -> None:
         self.clear()
 
-       
+
         rect = arcade.LRBT(self.BOX_LEFT, self.BOX_RIGHT, self.BOX_BOTTOM, self.BOX_TOP)
         arcade.draw_rect_outline(rect, arcade.color.WHITE, border_width=2)
 
@@ -269,14 +270,14 @@ class EndGameView(arcade.View):
             font_size=10,
             color=arcade.color.LIGHT_GRAY,
         ).draw()
-        
+
         label = arcade.Text("Enter your name :", self.BOX_LEFT, self.BOX_BOTTOM - 70, font_size=13)
         label.draw()
-        
+
         rect_x = self.BOX_LEFT + label.content_width + 5
         input_rect = arcade.LRBT(rect_x, rect_x + 160, self.BOX_BOTTOM - 75, self.BOX_BOTTOM - 55)
         arcade.draw_rect_outline(input_rect, arcade.color.WHITE, border_width=2)
-        
+
         arcade.Text(self.current_name, rect_x + 5, self.BOX_BOTTOM - 72, font_size=12).draw()
         self._button_group.draw()
 

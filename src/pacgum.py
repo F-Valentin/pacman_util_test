@@ -1,5 +1,6 @@
-import arcade
 from dataclasses import dataclass
+
+import arcade
 
 
 @dataclass

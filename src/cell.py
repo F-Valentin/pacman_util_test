@@ -1,7 +1,9 @@
-import arcade
-from typing import Optional
-from pacgum import Pacgum
+
 from enum import IntEnum
+
+import arcade
+
+from pacgum import Pacgum
 
 
 class Walls(IntEnum):
@@ -19,7 +21,7 @@ class Cell:
         self._grid_y: float = grid_pos.y
         self._size = size
         self._walls = walls
-        self.pacgum: Optional[Pacgum] = None
+        self.pacgum: Pacgum | None = None
         self.center: arcade.Vec2
 
         x = grid_pos.x
@@ -44,16 +46,6 @@ class Cell:
     def walls(self) -> int:
         return self._walls
 
-    def add_pacgum(self, pacgum: Pacgum) -> None:
-        """Attach a pacgum object to this cell after validating its type."""
-        function_name = "add_pacgum"
-
-        if not isinstance(pacgum, Pacgum):
-            raise ValueError(
-                f"[Error] in {function_name}: pacgum must be a Pacgum type")
-
-        self.pacgum = pacgum
-
     def set_pacgum(
         self,
         radius: float,
@@ -63,19 +55,14 @@ class Cell:
         function_name: str = "set_pacgum"
 
         if not isinstance(radius, float):
-            raise ValueError(
+            raise TypeError(
                 f"[Error] in {function_name}: "
                 "radius must be a float"
             )
 
-        if not isinstance(color, tuple):
-            raise ValueError(
-                f"[Error] in {function_name}: "
-                "color must be a tuple[int, int, int, int]"
-            )
-
         if self.pacgum:
             self.pacgum.radius = radius
+            self.pacgum.color = color
 
     def hide_pacgum(self) -> None:
         """Hide the pacgum when the player eats it."""

@@ -112,10 +112,10 @@ class Ghost(arcade.Sprite):
         start_coord = (start.grid_x, start.grid_y)
         dest_coord = (target_cell.grid_x, target_cell.grid_y)
 
-        queue: Deque[Cell] = deque([start])
+        queue: deque[Cell] = deque([start])
 
         came_from: dict[tuple[float, float],
-                        Optional[tuple[float, float]]] = {start_coord: None}
+                        tuple[float, float] | None] = {start_coord: None}
 
         cell_registry: dict[tuple[float, float], Cell] = {start_coord: start}
 
@@ -140,7 +140,7 @@ class Ghost(arcade.Sprite):
                     queue.append(neighbor)
 
         path = []
-        curr: Optional[tuple[float, float]] = dest_coord
+        curr: tuple[float, float] | None = dest_coord
 
         while curr:
             path.append(cell_registry[curr])
@@ -166,7 +166,7 @@ class Ghost(arcade.Sprite):
             self.change_x = 0.0
             self.change_y = self.speed
 
-    def _navigate_to(self, target: Cell, limit: Optional[int] = None) -> None:
+    def _navigate_to(self, target: Cell, limit: int | None = None) -> None:
         if not self.path:
             path = self._path_to_cell(self.get_current_cell(), target)
             if not path or len(path) <= 1:
@@ -188,7 +188,7 @@ class Ghost(arcade.Sprite):
                 anim[0].center_x = self.center_x
                 anim[0].center_y = self.center_y
                 anim.update_animation(delta_time)
-
+            
     def update(self, p_cell: Cell, delta_time: float = 1 / 60) -> None:
         """Move the ghost and recompute its path when it reaches a cell."""
         if self._freeze:

@@ -65,11 +65,11 @@ class Player(arcade.Sprite):
 
         self._current_lives: int = 3
         self._default_position: arcade.Vec2 = position
-        self.next_direction: Optional[PlayerDirection] = None
+        self.next_direction: PlayerDirection | None = None
         self.speed: float = 4.0
         self.state: PlayerState = PlayerState.MOVE
         self.animations: dict[str, arcade.SpriteList] = {}
-        self.direction: Optional[PlayerDirection] = None
+        self.direction: PlayerDirection | None = None
         self.score: int = score
         self.ghosts: list[Ghost] = ghosts
         self._invicibility = False
@@ -105,6 +105,7 @@ class Player(arcade.Sprite):
         self._t = 1.0
         self.direction = None
         self.next_direction = None
+        
     def set_next_direction(self, key: int) -> None:
         """Store the next direction chosen by the player from keyboard input."""
         match key:
@@ -199,7 +200,7 @@ class Player(arcade.Sprite):
         return opp == self.direction
             
     def move_to_next_cell(self, p_cell: Cell) -> bool:
-        candidate: Optional[PlayerDirection] = (
+        candidate: PlayerDirection | None = (
             self.next_direction or self.direction)
 
         if candidate is None:

@@ -1,5 +1,6 @@
-import hjson
 import os
+
+import hjson
 
 
 class GameConfig:
@@ -28,16 +29,17 @@ class GameConfig:
     def _parse_bool(value: object, key: str) -> bool:
         """Validate and return a boolean configuration value."""
         if not isinstance(value, bool):
-            raise ValueError(
+            raise TypeError(
                 f"'{key}' must be a boolean (true/false), "
                 f"got {type(value).__name__!r} instead.")
+            
         return value
 
     @staticmethod
     def _parse_int(value: object, key: str) -> int:
         """Validate and return an integer configuration value."""
         if not isinstance(value, int) or isinstance(value, bool):
-            raise ValueError(
+            raise TypeError(
                 f"'{key}' must be an integer, "
                 f"got {type(value).__name__!r} instead.")
         return value
@@ -57,13 +59,10 @@ class GameConfig:
             raise PermissionError(
                 "Permission denied when accessing the config file.") from e
 
-        try:
-            self.custom = self._parse_bool(
-                self.raw_data.get("custom", False), "custom")
-            if self.custom:
-                self.lives = self._parse_int(
-                    self.raw_data.get("lives", 3), "lives")
-                self.level_max_time = self._parse_int(
-                    self.raw_data.get("level_max_time", 90), "level_max_time")
-        except ValueError:
-            raise
+        self.custom = self._parse_bool(
+            self.raw_data.get("custom", False), "custom")
+        if self.custom:
+            self.lives = self._parse_int(
+                self.raw_data.get("lives", 3), "lives")
+            self.level_max_time = self._parse_int(
+                self.raw_data.get("level_max_time", 90), "level_max_time")

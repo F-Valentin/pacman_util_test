@@ -2,15 +2,16 @@
 
 from __future__ import annotations
 
-import arcade
 from typing import TYPE_CHECKING
 
+import arcade
+
+from cell import Cell
 from entity.ghost import Ghost
 from entity.player import Player
 from maze import Maze
-from cell import Cell
-from views import PauseView
 from score import ScoreUi
+from views import PauseView
 
 if TYPE_CHECKING:
     from game import Game

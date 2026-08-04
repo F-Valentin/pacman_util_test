@@ -1,12 +1,11 @@
-from typing import Optional
+import math
 
 import arcade
-import math
 from arcade import Vec2
-from arcade.draw import point
+
 from cell import Cell, Walls
-from pacgum import Pacgum, draw_pacgum
 from mazegenerator import MazeGenerator
+from pacgum import Pacgum, draw_pacgum
 
 
 class Maze:
@@ -134,7 +133,7 @@ class Maze:
                         super_pacgum_color, True
                     )
 
-                    cell.add_pacgum(super_pacgum)
+                    cell.pacgum = super_pacgum 
 
                 elif cell.walls != blocked:
                     pacgum = Pacgum(
@@ -142,9 +141,9 @@ class Maze:
                         True, pacgum_radius, pacgum_point, pacgum_color, False
                     )
 
-                    cell.add_pacgum(pacgum)
+                    cell.pacgum = pacgum
 
-    def get_valid_cell_neighbors(self, cell: Cell) -> Optional[list[Cell]]:
+    def get_valid_cell_neighbors(self, cell: Cell) -> list[Cell] | None:
         def is_open(n_x: int, n_y: int) -> bool:
             if not (
                     0 <= n_x < self.width and 0 <= n_y < self.height

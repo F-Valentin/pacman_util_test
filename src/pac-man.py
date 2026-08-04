@@ -1,5 +1,7 @@
-import arcade
 import sys
+
+import arcade
+
 from game import Game
 from game_configuration import GameConfig
 
