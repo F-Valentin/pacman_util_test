@@ -1,6 +1,8 @@
-from typing import Callable
+from collections.abc import Callable
+
 import arcade
-from button import CheckButton, ButtonGroup
+
+from button import ButtonGroup, CheckButton
 
 
 class CheatMode:

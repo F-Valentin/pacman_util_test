@@ -188,8 +188,8 @@ class Game:
             cell_size
         )
 
-        maze.setup(self._game_config.points_per_pacgum,
-                   self._game_config.points_per_super_pacgum)
+        maze.set_pacgums(self._game_config.points_per_pacgum)
+        maze.set_super_pacgums(self._game_config.points_per_super_pacgum)
 
         ghosts: list[Ghost] = []
         for g in config["ghosts"]:
