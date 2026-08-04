@@ -37,6 +37,14 @@ class Button:
     @property
     def trigger(self) -> Callable:
         return self._trigger
+ 
+    @property
+    def width(self) -> float:
+        return self._sprite.width if self._sprite else 0.0
+        
+    @property
+    def height(self) -> float:
+        return self._sprite.height if self._sprite else 0.0
 
     def set_alpha(self, value: int) -> None:
         for sprite in self._sprite_list:
@@ -95,7 +103,11 @@ class ButtonGroup:
         self.size: int = 0
         self.capacity: int = capacity
         self.current_button_idx: int = 0
-        self.current_button_focus: Optional[Button] = None
+        self.current_button_focus: Button | None = None
+
+    @property
+    def buttons(self) -> list[Button]:
+        return self._buttons
 
     def add_button(self, button: Button) -> bool:
         if not self.size:

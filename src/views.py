@@ -7,7 +7,7 @@ import arcade
 import hjson
 
 from button import Button, ButtonGroup, CheckButton
-from cheatmode import CheatMode
+from cheatmode import CheatMode, compute_panel_bounds
 from utils import HitBox
 
 """Menu, pause, and end-of-game views used by the Arcade window."""
@@ -82,7 +82,7 @@ class MenuView(arcade.View):
 
 class PauseView(arcade.View):
     """Display the pause overlay and allow the player to resume."""
-
+ 
     def __init__(self, previous_view: arcade.View,
                  cheat_mode: CheatMode) -> None:
         super().__init__()
@@ -90,11 +90,12 @@ class PauseView(arcade.View):
         self._cheat_mode = cheat_mode
         self._resume_button: Button
         self._button_group: ButtonGroup = ButtonGroup(4)
-
+        self._panel_rect: arcade.types.Rect | None = None
+ 
     def resume(self) -> None:
         print("continue")
         self.window.show_view(self._previous_view)
-
+ 
     def on_show_view(self) -> None:
         # Bouton Resume
         self._resume_button = Button(
@@ -105,30 +106,44 @@ class PauseView(arcade.View):
             self.resume
         )
         self._resume_button.set_scale(0.4)
-
+ 
         cheat_group = self._cheat_mode.button_group
-
+ 
         self._button_group.add_button(self._resume_button)
-
-        for btn in cheat_group._buttons:
+ 
+        for btn in cheat_group.buttons:
             self._button_group.add_button(btn)
-
+ 
+        # Computed once here rather than every frame - the panel only
+        # needs to be resized if buttons are added/removed at setup time.
+        self._panel_rect = compute_panel_bounds(
+            self._button_group.buttons,
+            self._cheat_mode.labels,
+            padding=20,
+        )
+ 
     def on_key_press(self, symbol: int, modifiers: int) -> None:
         self._button_group.on_key_press(key=symbol)
-
+ 
     def on_mouse_motion(self, x: int, y: int, dx: int, dy: int) -> None:
         self._button_group.on_mouse_motion(x, y)
-
+ 
     def on_mouse_press(self, x: int, y: int, button: int,
                        modifiers: int) -> None:
         self._button_group.on_mouse_press(x, y)
-
-
-
+ 
     def on_draw(self) -> None:
         self.clear()
         self._previous_view.on_draw()
-        self._button_group.draw()
+ 
+        # Cached in on_show_view - just draw it.
+        if self._panel_rect is not None:
+            arcade.draw_rect_filled(self._panel_rect, arcade.color.BLACK)
+            arcade.draw_rect_outline(self._panel_rect, arcade.color.WHITE, border_width=2)
+ 
+        self._cheat_mode.draw()
+        self._resume_button.draw()
+ 
 
 
 class EndGameView(arcade.View):
