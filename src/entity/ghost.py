@@ -1,9 +1,9 @@
 from __future__ import annotations
-import arcade
 
-from enum import Enum
 from collections import deque
-from typing import Deque, Optional
+from enum import Enum
+
+import arcade
 
 from cell import Cell
 from maze import Maze

@@ -1,13 +1,13 @@
 """Player entity and movement logic for the Pac-Man prototype."""
 
-import arcade
 import math
 from enum import Enum
-from typing import Optional
-from arcade.math import lerp_2d
-from maze import Maze
+
+import arcade
+
 from cell import Cell, Walls
 from entity.ghost import Ghost, GhostState
+from maze import Maze
 
 
 class PlayerState(str, Enum):
@@ -21,15 +21,6 @@ class PlayerDirection(Enum):
     DOWN = "down"
     LEFT = "left"
     RIGHT = "right"
-
-# _PlayerOppositeDirection: dict[PlayerDirection, PlayerDirection] = {
-#     PlayerDirection.UP: PlayerDirection.DOWN,
-#     PlayerDirection.DOWN: PlayerDirection.UP,
-#     PlayerDirection.LEFT: PlayerDirection.RIGHT,
-#     PlayerDirection.RIGHT: PlayerDirection.LEFT
-# }
-
-
 
 _DIRECTION_DELTA: dict[PlayerDirection, tuple[float, float]] = {
     PlayerDirection.UP: (0.0, 1.0),
