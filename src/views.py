@@ -220,10 +220,32 @@ class EndGameView(arcade.View):
     def save_highscore(self) -> None:
         path = "highscore.json"
 
+        values: list[int] = list(self.data.values())
+        values.sort()
+
+        min_key = ""
+        
         self.highscore = self.data.get(self.current_name, self.score)
         print(f"{self.current_name}, highscore: {self.highscore}")
 
         self.highscore = max(self.score, self.highscore)
+        
+        print(len(self.data))
+        if len(self.data) + 1 > 10:
+            print("sup")
+            print(values[0])
+            for (key, value) in self.data.items():
+                if value == values[0]:
+                    min_key = key
+                    break
+
+            if self.highscore <= values[0]:
+                print("inf")
+                return
+                
+            del self.tmp_data[min_key]
+            
+
 
         if self.current_name not in self.data and len(self.old_name) == 0:
             print("not in data")
