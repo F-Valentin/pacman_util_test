@@ -153,10 +153,7 @@ class ButtonGroup:
             if button.collision_rect.collide_with_point(point):
                 button.trigger()
 
-                if (
-                    self.current_button_focus
-                    and self.current_button_focus != button
-                ):
+                if self.current_button_focus and self.current_button_focus != button:
                     self.current_button_focus.set_alpha(255)
 
                 self.current_button_focus = button

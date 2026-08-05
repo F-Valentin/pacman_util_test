@@ -4,6 +4,7 @@ from collections import deque
 from enum import Enum
 
 import arcade
+from typing_extensions import Any
 
 from cell import Cell
 from maze import Maze
@@ -196,8 +197,13 @@ class Ghost(arcade.Sprite):
                 anim[0].center_y = self.center_y
                 anim.update_animation(delta_time)
 
-    def update(self, p_cell: Cell, delta_time: float = 1 / 60) -> None:
+    def update(self, delta_time: float = 1 / 60, *args: Any, **kwargs: Any) -> None:
         """Move the ghost and recompute its path when it reaches a cell."""
+        p_cell: Cell | None = kwargs.get("p_cell")
+
+        if not p_cell:
+            return
+        
         if self._freeze:
             self._sync_animations(delta_time)
             return

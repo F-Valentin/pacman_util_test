@@ -197,7 +197,7 @@ class Maze:
         self._pacgums[self._height * self._width -
                       1].point = point_par_super_pacgum
 
-    def convert_pos_to_grid(self, pos: arcade.Vec2):
+    def convert_pos_to_grid(self, pos: arcade.Vec2) -> arcade.Vec2:
         cell_size: int = self.cell_size
         bottom_left_pos = self.bottom_left_pos
 
@@ -210,7 +210,7 @@ class Maze:
             math.floor(y)
         )
 
-    def convert_pos_to_cell(self, pos: arcade.Vec2):
+    def convert_pos_to_cell(self, pos: arcade.Vec2) -> Cell:
         grid_pos = self.convert_pos_to_grid(pos)
 
         return self.get_cell(int(grid_pos.x), int(grid_pos.y))

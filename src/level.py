@@ -102,10 +102,10 @@ class Level(arcade.View):
 
             self._player.update(time_step)
 
-            p_cell: Cell = self._player.get_current_cell()
+            current_player_pos: Cell = self._player.get_current_cell()
 
             for ghost in self._ghosts:
-                ghost.update(p_cell)
+                ghost.update(p_cell=current_player_pos)
 
             self._time_accumulator -= time_step
             self._time_to_finish -= time_step

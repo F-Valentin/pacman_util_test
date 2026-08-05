@@ -166,8 +166,8 @@ class EndGameView(arcade.View):
         self.current_name: str = ""
         self.old_name: str = ""
         self.enter_your_name_btn_pressed: bool = False
-        self.data = {}
-        self.tmp_data = {}
+        self.data: dict[str, int] = {}
+        self.tmp_data: dict[str, int] = {}
 
         self._input_rect: HitBox
 
