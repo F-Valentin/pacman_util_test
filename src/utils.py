@@ -14,8 +14,8 @@ class HitBox:
 
     def collide_with_point(self, point: arcade.Vec2) -> bool:
         rect = self
-        
+
         return not (
-            point.x < rect.x or point.x > rect.x + rect.width 
+            point.x < rect.x or point.x > rect.x + rect.width
             or point.y > rect.y or point.y < rect.y - rect.height
         )

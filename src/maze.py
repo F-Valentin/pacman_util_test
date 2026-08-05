@@ -96,10 +96,10 @@ class Maze:
 
     def _setup_cells(self) -> None:
         cell_size: int = self._cell_size
-        
+
         point_par_pacgum = 5
         point_par_super_pacgum = 10
-        
+
         blocked: int = 0x0F
         corner = [(0, 0),
                   (0, (len(self._grid) - 1)),
@@ -133,7 +133,7 @@ class Maze:
                         super_pacgum_color, True
                     )
 
-                    cell.pacgum = super_pacgum 
+                    cell.pacgum = super_pacgum
 
                 elif cell.walls != blocked:
                     pacgum = Pacgum(
@@ -149,9 +149,9 @@ class Maze:
                     0 <= n_x < self.width and 0 <= n_y < self.height
             ):
                 return False
-                
+
             n_cell = self.get_cell(n_x, n_y)
-            
+
             if cell.grid_y + 1 == n_y and not n_cell.walls & Walls.NORTH:
                 return True
             if cell.grid_y - 1 == n_y and not n_cell.walls & Walls.SOUTH:
@@ -160,7 +160,7 @@ class Maze:
                 return True
             if cell.grid_x - 1 == n_x and not n_cell.walls & Walls.EAST:
                 return True
-                
+
             return False
 
         valid_coords = filter(lambda c: is_open(int(c[0]), int(c[1])),
@@ -192,9 +192,11 @@ class Maze:
     def set_super_pacgums(self, point_par_super_pacgum: int) -> None:
         self._pacgums[0].point = point_par_super_pacgum
         self._pacgums[self._width - 1].point = point_par_super_pacgum
-        self._pacgums[self._height * self.width - self.width].point = point_par_super_pacgum
-        self._pacgums[self._height * self._width - 1].point = point_par_super_pacgum
-        
+        self._pacgums[self._height * self.width -
+                      self.width].point = point_par_super_pacgum
+        self._pacgums[self._height * self._width -
+                      1].point = point_par_super_pacgum
+
     def convert_pos_to_grid(self, pos: arcade.Vec2):
         cell_size: int = self.cell_size
         bottom_left_pos = self.bottom_left_pos

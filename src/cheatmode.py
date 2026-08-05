@@ -82,7 +82,10 @@ class CheatMode:
             "skip_level",
             center_x,
             base_y,
-            ["assets/button/uncheckbutton.png", "assets/button/checkbutton.png"],
+            [
+                "assets/button/uncheckbutton.png",
+                "assets/button/checkbutton.png"
+            ],
             target=self.can_skip_levels
         )
         skip_btn.set_scale(0.1)
@@ -92,7 +95,10 @@ class CheatMode:
             "invincibility",
             center_x,
             base_y - 60,
-            ["assets/button/uncheckbutton.png", "assets/button/checkbutton.png"],
+            [
+                "assets/button/uncheckbutton.png",
+                "assets/button/checkbutton.png"
+            ],
             target=self.player_inviciblity
         )
         invincible_btn.set_scale(0.1)
@@ -102,7 +108,10 @@ class CheatMode:
             "freeze_ghosts",
             center_x,
             base_y - 120,
-            ["assets/button/uncheckbutton.png", "assets/button/checkbutton.png"],
+            [
+                "assets/button/uncheckbutton.png",
+                "assets/button/checkbutton.png"
+            ],
             target=self._freeze_all
         )
         freeze_btn.set_scale(0.1)

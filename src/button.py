@@ -1,12 +1,14 @@
-import arcade
-from utils import HitBox
 from collections.abc import Callable
-from typing import Optional
+
+import arcade
+
+from utils import HitBox
 
 
 class Button:
     def __init__(self, name: str, x: float, y: float,
-                 path_to_images: list[str], trigger: Callable | None = None) -> None:
+                 path_to_images: list[str], trigger: Callable | None = None
+                 ) -> None:
         self._name = name
         self.center: arcade.Vec2 = arcade.Vec2(x, y)
         self._sprite_list: arcade.SpriteList = arcade.SpriteList()
@@ -37,11 +39,11 @@ class Button:
     @property
     def trigger(self) -> Callable:
         return self._trigger
- 
+
     @property
     def width(self) -> float:
         return self._sprite.width if self._sprite else 0.0
-        
+
     @property
     def height(self) -> float:
         return self._sprite.height if self._sprite else 0.0
@@ -151,7 +153,10 @@ class ButtonGroup:
             if button.collision_rect.collide_with_point(point):
                 button.trigger()
 
-                if self.current_button_focus and self.current_button_focus != button:
+                if (
+                    self.current_button_focus
+                    and self.current_button_focus != button
+                ):
                     self.current_button_focus.set_alpha(255)
 
                 self.current_button_focus = button

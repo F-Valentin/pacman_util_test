@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 import arcade
+from arcade import Sprite, SpriteList
 
 from cell import Cell
 from entity.ghost import Ghost
@@ -32,8 +33,7 @@ class Level(arcade.View):
         self._ghosts = ghosts
         self._game = game
         self.score_ui: ScoreUi
-        self.player_lives_ui: arcade.SpriteList[arcade.Sprite] = arcade.SpriteList(
-        )
+        self.player_lives_ui: SpriteList[Sprite] = arcade.SpriteList()
         self._init_ui()
 
     def _init_ui(self) -> None:

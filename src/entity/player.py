@@ -22,6 +22,7 @@ class PlayerDirection(Enum):
     LEFT = "left"
     RIGHT = "right"
 
+
 _DIRECTION_DELTA: dict[PlayerDirection, tuple[float, float]] = {
     PlayerDirection.UP: (0.0, 1.0),
     PlayerDirection.DOWN: (0.0, -1.0),
@@ -96,7 +97,7 @@ class Player(arcade.Sprite):
         self._t = 1.0
         self.direction = None
         self.next_direction = None
-        
+
     def set_next_direction(self, key: int) -> None:
         """Store the next direction chosen by the player from keyboard input."""
         match key:
@@ -116,36 +117,37 @@ class Player(arcade.Sprite):
     def get_current_cell(self) -> Cell:
         return self._maze.convert_pos_to_cell(
             arcade.Vec2(self.center_x, self.center_y))
-        
+
     def _set_facing(self, direction: PlayerDirection) -> None:
         self.direction = direction
         self.animations[self.state][0].angle = _DIRECTION_ANGLE[direction]
 
     def _advance_position(self) -> None:
-        if self.next_direction and self._opposite_direction(self.next_direction):
+        if self.next_direction and self._opposite_direction(
+                self.next_direction):
             tmp = self._start_center
             self._start_center = self._target_center
             self._target_center = tmp
             self._t = 1.0 - self._t
             self._set_facing(self.next_direction)
             self.next_direction = None
-                
+
         if self._t < 1.0:
             self._t += self.speed / self._maze.cell_size
-        
+
         if self._t >= 1.0:
             overshoot = self._t - 1.0
-            
+
             self.center_x, self.center_y = self._target_center
-            
+
             cell = self._maze.convert_pos_to_cell(self._target_center)
             self._eat_pacgum(cell)
-            
+
             if (self.move_to_next_cell(cell)):
                 self._t = overshoot
         else:
-            self.center_x, self.center_y = arcade.math.lerp_2d(self._start_center, self._target_center, self._t)
-            
+            self.center_x, self.center_y = arcade.math.lerp_2d(
+                self._start_center, self._target_center, self._t)
 
     def _move(self, delta_time: float) -> None:
         self._advance_position()
@@ -174,22 +176,22 @@ class Player(arcade.Sprite):
 
     def _update_score(self, value: int) -> None:
         self.score += value
-        
+
     def _opposite_direction(self, direction: PlayerDirection) -> bool:
         opp: PlayerDirection
-        
+
         match direction:
             case PlayerDirection.UP:
-               opp = PlayerDirection.DOWN 
+                opp = PlayerDirection.DOWN
             case PlayerDirection.DOWN:
-               opp = PlayerDirection.UP
+                opp = PlayerDirection.UP
             case PlayerDirection.LEFT:
-               opp = PlayerDirection.RIGHT 
+                opp = PlayerDirection.RIGHT
             case PlayerDirection.RIGHT:
-               opp = PlayerDirection.LEFT 
+                opp = PlayerDirection.LEFT
 
         return opp == self.direction
-            
+
     def move_to_next_cell(self, p_cell: Cell) -> bool:
         candidate: PlayerDirection | None = (
             self.next_direction or self.direction)

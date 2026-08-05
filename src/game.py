@@ -210,7 +210,7 @@ class Game:
 
         pos = arcade.Vec2(x, y)
         player = Player(pos, current_score, maze, ghosts)
-        maze.convert_pos_to_cell(pos).hide_pacgum();
+        maze.convert_pos_to_cell(pos).hide_pacgum()
 
         level = Level(player, maze, ghosts, time_limit, self)
         self.cheat_mode.player_inviciblity = player.invicibility

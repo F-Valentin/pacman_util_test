@@ -32,7 +32,7 @@ class GameConfig:
             raise TypeError(
                 f"'{key}' must be a boolean (true/false), "
                 f"got {type(value).__name__!r} instead.")
-            
+
         return value
 
     @staticmethod
