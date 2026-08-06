@@ -475,13 +475,12 @@ class TopHighscoreView(arcade.View):
         )
         self._labels.append(title_label)
 
-        # Create score labels, centered vertically
         start_y = self.window.height - 160
         y_pos = 0
         for idx, (name, score) in enumerate(sorted_scores):
             y_pos = start_y - (idx * 30)
             label = arcade.Text(
-                f"{name}: {score}",
+                f"{idx + 1}. {name}: {score}",
                 self.window.width // 2,
                 y_pos,
                 font_size=16,
@@ -490,7 +489,6 @@ class TopHighscoreView(arcade.View):
             )
             self._labels.append(label)
 
-        # If no scores yet, show message
         if not sorted_scores:
             label = arcade.Text(
                 "No scores recorded yet!",
@@ -502,7 +500,6 @@ class TopHighscoreView(arcade.View):
             )
             self._labels.append(label)
 
-        # Back button
         self._back_button = Button(
             "back",
             self.window.width // 2,
