@@ -7,30 +7,48 @@ from utils import HitBox
 
 class Button:
     def __init__(self, name: str, x: float, y: float,
-                 path_to_images: list[str], trigger: Callable | None = None
-                 ) -> None:
+                 width: float, height: float,
+                 trigger: Callable | None = None,
+                 background_color: tuple[int, int, int, int] = (0, 0, 0, 255),
+                 border_color: tuple[int, int, int, int] = (255, 255, 255, 255),
+                 border_width: int = 2) -> None:
         self._name = name
         self.center: arcade.Vec2 = arcade.Vec2(x, y)
-        self._sprite_list: arcade.SpriteList = arcade.SpriteList()
-
-        for image in path_to_images:
-            sprite = arcade.Sprite(image)
-            sprite.position = self.center
-            self._sprite_list.append(sprite)
+        self._width = width
+        self._height = height
+        self._background_color = background_color
+        self._border_color = border_color
+        self._border_width = border_width
+        self._alpha = 255
+        self._scale = 1.0
 
         self._trigger = trigger if trigger else lambda: ()
-        self._current_sprite_idx = 0
         self._update_collision_rect()
 
     def _update_collision_rect(self) -> None:
-        sprite = self._sprite_list[0] if len(self._sprite_list) > 0 else None
-        if sprite is None:
-            return
-        top_left_x = self.center.x - sprite.width // 2
-        top_left_y = self.center.y + sprite.height // 2
-        self.collision_rect: HitBox = HitBox(
-            top_left_x, top_left_y, sprite.width, sprite.height)
-        self._sprite = sprite
+        w = self._width * self._scale
+        h = self._height * self._scale
+        top_left_x = self.center.x - w / 2
+        top_left_y = self.center.y + h / 2
+        self.collision_rect: HitBox = HitBox(top_left_x, top_left_y, w, h)
+
+    def _draw_background(self) -> None:
+        rect = arcade.LRBT(
+            self.center.x - self.width / 2,
+            self.center.x + self.width / 2,
+            self.center.y - self.height / 2,
+            self.center.y + self.height / 2
+        )
+        
+        r, g, b, a = self._background_color
+        bg_color = (r, g, b, int(self._alpha * (a / 255)))
+        
+        r, g, b, a = self._border_color
+        border_color = (r, g, b, int(self._alpha * (a / 255)))
+
+        arcade.draw_rect_filled(rect, bg_color)
+        if self._border_width > 0:
+            arcade.draw_rect_outline(rect, border_color, self._border_width)
 
     @property
     def name(self) -> str:
@@ -42,61 +60,80 @@ class Button:
 
     @property
     def width(self) -> float:
-        return self._sprite.width if self._sprite else 0.0
+        return self._width * self._scale
 
     @property
     def height(self) -> float:
-        return self._sprite.height if self._sprite else 0.0
+        return self._height * self._scale
 
     def set_alpha(self, value: int) -> None:
-        for sprite in self._sprite_list:
-            sprite.alpha = value
+        self._alpha = value
 
     def set_scale(self, value: float) -> None:
-        for sprite in self._sprite_list:
-            sprite.scale = value
+        self._scale = value
         self._update_collision_rect()
 
     def draw(self) -> None:
-        self._sprite_list.draw()
+        self._draw_background()
+
+        r, g, b, a = arcade.color.WHITE
+        text_color = (r, g, b, int(self._alpha * (a / 255)))
+        
+        arcade.Text(
+            self._name,
+            self.center.x,
+            self.center.y,
+            color=text_color,
+            font_size=max(10, int(self.height / 4)),
+            anchor_x="center",
+            anchor_y="center"
+        ).draw()
 
 
 class CheckButton(Button):
     def __init__(self, name: str, x: float, y: float,
-                 path_to_images: list[str], trigger: Callable | None = None,
-                 target: Callable | None = None) -> None:
+                 width: float, height: float,
+                 trigger: Callable | None = None,
+                 target: Callable | None = None,
+                 background_color: tuple[int, int, int, int] = (0, 0, 0, 255),
+                 border_color: tuple[int, int, int, int] = (255, 255, 255, 255),
+                 border_width: int = 2) -> None:
         self._check = False
         self.target = target
-        self._tmp_sprite_list: arcade.SpriteList = arcade.SpriteList()
-
-        for image in path_to_images:
-            sprite = arcade.Sprite(image)
-            sprite.position = arcade.Vec2(x, y)
-            self._tmp_sprite_list.append(sprite)
-
         actual_trigger = trigger if trigger else lambda: self.check()
-
-        super().__init__(name, x, y,
-                         [path_to_images[0]] if path_to_images else [],
-                         actual_trigger)
+        
+        super().__init__(name, x, y, width, height, actual_trigger,
+                         background_color, border_color, border_width)
 
     def check(self) -> None:
         self._check = not self._check
-
-        idx = 1 if self._check else 0
-        if idx < len(self._tmp_sprite_list):
-            new_sprite = self._tmp_sprite_list[idx]
-            new_sprite.position = self.center
-            new_sprite.scale = self._sprite.scale
-            new_sprite.alpha = self._sprite.alpha
-
-            self._sprite_list.clear()
-            self._sprite_list.append(new_sprite)
-            self._sprite = new_sprite
-            self._update_collision_rect()
-
         if self.target:
             self.target()
+
+    def draw(self) -> None:
+        # Only draw the background and border, skip drawing the name
+        self._draw_background()
+        
+        if self._check:
+            w = self.width * 0.3
+            h = self.height * 0.3
+            cx = self.center.x
+            cy = self.center.y
+            
+            r, g, b, a = arcade.color.WHITE
+            line_color = (r, g, b, int(self._alpha * (a / 255)))
+
+            # Two lines to create the V-shape
+            arcade.draw_line(
+                cx - w / 2, cy - h / 4,
+                cx, cy - h / 2,
+                line_color, 2
+            )
+            arcade.draw_line(
+                cx, cy - h / 2,
+                cx + w / 2, cy + h / 2,
+                line_color, 2
+            )
 
 
 class ButtonGroup:

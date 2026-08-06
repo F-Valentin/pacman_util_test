@@ -2,7 +2,7 @@ from collections.abc import Callable
 
 import arcade
 
-from button import Button, ButtonGroup, CheckButton
+from button import Button, CheckButton
 
 
 def compute_panel_bounds(
@@ -76,50 +76,42 @@ class CheatMode:
 
         center_x = self._window.width // 2
         base_y = self._window.height // 2
-        label_offset = 25
+        
+        btn_w = 40
+        btn_h = 40
+        padding = 30  # Space between buttons
+        step_y = btn_h + padding
+        label_offset = btn_h / 2 + 5  # Place label just above the button
 
         skip_btn = CheckButton(
             "skip_level",
             center_x,
             base_y,
-            [
-                "assets/button/uncheckbutton.png",
-                "assets/button/checkbutton.png"
-            ],
+            btn_w, btn_h,
             target=self.can_skip_levels
         )
-        skip_btn.set_scale(0.1)
+        self._buttons.append(skip_btn)
         self._add_label("Skip Level", center_x, base_y + label_offset)
 
         invincible_btn = CheckButton(
             "invincibility",
             center_x,
-            base_y - 60,
-            [
-                "assets/button/uncheckbutton.png",
-                "assets/button/checkbutton.png"
-            ],
+            base_y - step_y,
+            btn_w, btn_h,
             target=self.player_inviciblity
         )
-        invincible_btn.set_scale(0.1)
-        self._add_label("Invincibility", center_x, base_y - 60 + label_offset)
+        self._buttons.append(invincible_btn)
+        self._add_label("Invincibility", center_x, base_y - step_y + label_offset)
 
         freeze_btn = CheckButton(
             "freeze_ghosts",
             center_x,
-            base_y - 120,
-            [
-                "assets/button/uncheckbutton.png",
-                "assets/button/checkbutton.png"
-            ],
+            base_y - 2 * step_y,
+            btn_w, btn_h,
             target=self._freeze_all
         )
-        freeze_btn.set_scale(0.1)
-        self._add_label("Freeze Ghosts", center_x, base_y - 120 + label_offset)
-
-        self._buttons.append(skip_btn)
-        self._buttons.append(invincible_btn)
         self._buttons.append(freeze_btn)
+        self._add_label("Freeze Ghosts", center_x, base_y - 2 * step_y + label_offset)
 
         self._buttons_initialized = True
 

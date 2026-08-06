@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from curses import window
-import json
 from typing import TYPE_CHECKING
 
 import arcade
@@ -32,47 +30,48 @@ class MenuView(arcade.View):
 
     def on_show_view(self) -> None:
         """Create the menu buttons and wire them to their handlers."""
+        btn_w = 200
+        btn_h = 50
+        center_x = self.window.width // 2
+        center_y = self.window.height // 2
+
         start_button = Button(
             "start",
-            self.window.width // 2,
-            self.window.height // 2 + 100,
-            ["assets/button/start/start.png"],
+            center_x,
+            center_y + 150,
+            btn_w, btn_h,
             self.game.start
         )
-
         start_button.set_alpha(200)
-        start_button.set_scale(2)
-
-        exit_btn = Button(
-            "quit",
-            self.window.width // 2,
-            self.window.height // 2 + 300,
-            ["assets/button/quit/quit.png"],
-            lambda: arcade.exit()
-        )
-
-        exit_btn.set_scale(2)
 
         instruction = Button(
             "instruction",
-            self.window.width // 2,
-            self.window.height // 2 + 200,
-            ["assets/Single PNGs/ENTER.png"],
+            center_x,
+            center_y + 50,
+            btn_w, btn_h,
             lambda: self.window.show_view(InstructionView(self))
         )
 
         top_highscore = Button(
-            "top_highscore", 
-            self.window.width // 2, 
-            self.window.height // 2 + 400, 
-            ["assets/button/b1.png"], 
+            "top_highscore",
+            center_x,
+            center_y - 50,
+            btn_w, btn_h,
             lambda: self.window.show_view(TopHighscoreView(self))
+        )
+
+        exit_btn = Button(
+            "quit",
+            center_x,
+            center_y - 150,
+            btn_w, btn_h,
+            lambda: arcade.exit()
         )
 
         self._button_group.add_button(start_button)
         self._button_group.add_button(instruction)
-        self._button_group.add_button(exit_btn)
         self._button_group.add_button(top_highscore)
+        self._button_group.add_button(exit_btn)
 
     def on_key_press(self, symbol: int, modifiers: int) -> None:
         self._button_group.on_key_press(key=symbol)
@@ -108,21 +107,23 @@ class PauseView(arcade.View):
         self.window.show_view(self._previous_view)
 
     def on_show_view(self) -> None:
+        btn_w = 150
+        btn_h = 40
+        
         # Bouton Resume
         self._resume_button = Button(
             "resume",
             self.window.width // 2,
             self.window.height // 2 + 100,
-            ["assets/button/back01.png"],
+            btn_w, btn_h,
             self.resume
         )
-        self._resume_button.set_scale(0.4)
 
         back_button = Button(
             "back_button",
             self.window.width // 2,
             self.window.height // 2 + 150,
-            ["assets/button/quit/quit.png"],
+            btn_w, btn_h,
             lambda: self.window.show_view(self._menu_view)
         )
         cheat_group_buttons = self._cheat_mode.buttons
@@ -192,6 +193,8 @@ class EndGameView(arcade.View):
 
     def on_show_view(self) -> None:
         btn_x = 160
+        btn_w = 150
+        btn_h = 40
 
         label = arcade.Text(
             "Enter your name :",
@@ -209,20 +212,18 @@ class EndGameView(arcade.View):
             "menu_button",
             btn_x,
             350,
-            ["assets/button/menu/menu.png"],
+            btn_w, btn_h,
             lambda: self.window.show_view(self._menu_view)
         )
         menu_button.set_alpha(200)
-        menu_button.set_scale(2)
 
         quit_button = Button(
             "quit",
             btn_x,
             260,
-            ["assets/button/quit/quit.png"],
+            btn_w, btn_h,
             lambda: arcade.exit()
         )
-        quit_button.set_scale(2)
 
         path = "highscore.json"
         try:
@@ -263,8 +264,6 @@ class EndGameView(arcade.View):
                 return
                 
             del self.tmp_data[min_key]
-            
-
 
         if self.current_name not in self.data and len(self.old_name) == 0:
             print("not in data")
@@ -280,6 +279,7 @@ class EndGameView(arcade.View):
         self.tmp_data[self.current_name] = self.highscore
 
         with open(path, "w") as f:
+            import json
             json.dump(self.tmp_data, f, ensure_ascii=False, indent=4)
 
     def on_key_press(self, symbol: int, modifiers: int) -> None:
@@ -398,16 +398,14 @@ class InstructionView(arcade.View):
         skip_level = CheckButton(
             "skip level",
             pos_r.x + 50, pos_u.y,
-            ["assets/button/checkbutton.png",
-             "assets/button/uncheckbutton.png"]
+            150, 40
         )
-        skip_level.set_scale(0.1)
 
         quit_button = Button(
             "quit",
             self.window.width // 2,
             self.window.height // 2,
-            ["assets/button/quit/quit.png"],
+            150, 40,
             lambda: self.window.show_view(self._menu_view)
         )
 
@@ -434,6 +432,7 @@ class InstructionView(arcade.View):
         self._button_group.draw()
         self.move_wasd.draw()
         text.draw()
+
 
 class TopHighscoreView(arcade.View):
     def __init__(self, menu_view: MenuView) -> None:
@@ -480,7 +479,7 @@ class TopHighscoreView(arcade.View):
         for idx, (name, score) in enumerate(sorted_scores):
             y_pos = start_y - (idx * 30)
             label = arcade.Text(
-                f"{idx + 1}. {name}: {score}",
+                f"{name}: {score}",
                 self.window.width // 2,
                 y_pos,
                 font_size=16,
@@ -490,10 +489,11 @@ class TopHighscoreView(arcade.View):
             self._labels.append(label)
 
         if not sorted_scores:
+            y_pos = self.window.height // 2
             label = arcade.Text(
                 "No scores recorded yet!",
                 self.window.width // 2,
-                self.window.height // 2,
+                y_pos,
                 font_size=16,
                 anchor_x="center",
                 color=arcade.color.LIGHT_GRAY
@@ -504,10 +504,9 @@ class TopHighscoreView(arcade.View):
             "back",
             self.window.width // 2,
             y_pos - 100,
-            ["assets/button/quit/quit.png"],
+            150, 40,
             lambda: self.window.show_view(self._menu_view)
         )
-        self._back_button.set_scale(2.0)
         self._button_group.add_button(self._back_button)
 
     def on_mouse_motion(self, x: int, y: int, dx: int, dy: int) -> None:
