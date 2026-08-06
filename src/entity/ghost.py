@@ -59,9 +59,6 @@ class Ghost(arcade.Sprite):
         speed: float, maze: Maze
     ) -> Ghost:
 
-        # if not cell.center:
-        # return
-
         position = arcade.Vec2(cell.center.x, cell.center.y)
 
         g = cls(

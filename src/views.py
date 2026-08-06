@@ -103,14 +103,12 @@ class PauseView(arcade.View):
         self._panel_rect: arcade.types.Rect | None = None
 
     def resume(self) -> None:
-        print("continue")
         self.window.show_view(self._previous_view)
 
     def on_show_view(self) -> None:
         btn_w = 150
         btn_h = 40
         
-        # Bouton Resume
         self._resume_button = Button(
             "resume",
             self.window.width // 2,
@@ -134,8 +132,6 @@ class PauseView(arcade.View):
         for btn in cheat_group_buttons:
             self._button_group.add_button(btn)
 
-        # Computed once here rather than every frame - the panel only
-        # needs to be resized if buttons are added/removed at setup time.
         self._panel_rect = compute_panel_bounds(
             self._button_group.buttons,
             self._cheat_mode.labels,
@@ -156,7 +152,6 @@ class PauseView(arcade.View):
         self.clear()
         self._previous_view.on_draw()
 
-        # Cached in on_show_view - just draw it.
         if self._panel_rect is not None:
             arcade.draw_rect_filled(self._panel_rect, arcade.color.BLACK)
             arcade.draw_rect_outline(
@@ -246,33 +241,26 @@ class EndGameView(arcade.View):
         min_key = ""
         
         self.highscore = self.data.get(self.current_name, self.score)
-        print(f"{self.current_name}, highscore: {self.highscore}")
 
         self.highscore = max(self.score, self.highscore)
         
-        print(len(self.data))
         if len(self.data) + 1 > 10:
-            print("sup")
-            print(values[0])
             for (key, value) in self.data.items():
                 if value == values[0]:
                     min_key = key
                     break
 
             if self.highscore <= values[0]:
-                print("inf")
                 return
                 
             del self.tmp_data[min_key]
 
         if self.current_name not in self.data and len(self.old_name) == 0:
-            print("not in data")
             self.old_name = self.current_name
 
         self.enter_your_name_btn_pressed = False
 
         if len(self.old_name) > 0 and self.old_name != self.current_name:
-            print("del")
             del self.tmp_data[self.old_name]
             self.old_name = ""
 
@@ -443,7 +431,6 @@ class TopHighscoreView(arcade.View):
         self._back_button: Button | None = None
 
     def on_show_view(self) -> None:
-        # Load highscore data
         path = "highscore.json"
         data: dict[str, int] = {}
         
@@ -452,18 +439,15 @@ class TopHighscoreView(arcade.View):
                 data = hjson.load(f)
         except (FileNotFoundError, hjson.HjsonDecodeError) as e:
             print(e)
-            # Handle empty file case
             if isinstance(data, dict) == False:
                 data = {}
 
-        # Sort by score descending (highest first), keep only top 10
         sorted_scores = sorted(
             [(name, score) for name, score in data.items()],
             key=lambda x: x[1],
             reverse=True
         )[:10]
 
-        # Create title label
         title_label = arcade.Text(
             "Top Highscore",
             self.window.width // 2,
@@ -521,10 +505,8 @@ class TopHighscoreView(arcade.View):
     def on_draw(self) -> None:
         self.clear()
         
-        # Draw all labels
         for label in self._labels:
             label.draw()
         
-        # Draw back button
         if self._back_button:
             self._back_button.draw()

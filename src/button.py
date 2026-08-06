@@ -111,7 +111,6 @@ class CheckButton(Button):
             self.target()
 
     def draw(self) -> None:
-        # Only draw the background and border, skip drawing the name
         self._draw_background()
         
         if self._check:

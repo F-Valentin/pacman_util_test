@@ -79,7 +79,7 @@ class CheatMode:
         
         btn_w = 40
         btn_h = 40
-        padding = 30  # Space between buttons
+        padding = 30
         step_y = btn_h + padding
         label_offset = btn_h / 2 + 5  # Place label just above the button
 
