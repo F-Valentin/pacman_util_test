@@ -213,7 +213,7 @@ class Game:
         maze.convert_pos_to_cell(pos).hide_pacgum()
 
         level = Level(player, maze, ghosts, time_limit, self)
-        self.cheat_mode.player_inviciblity = player.invicibility
+        self.cheat_mode.player_inviciblity = player.toggle_invicibility
         self.cheat_mode.can_skip_levels = self._skip_levels
         self.cheat_mode.ghosts_freeze = [g.toggle_freeze for g in ghosts]
         self._window.show_view(level)

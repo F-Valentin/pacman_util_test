@@ -208,6 +208,7 @@ class Ghost(arcade.Sprite):
             self._sync_animations(delta_time)
             return
 
+            
         self.center_x += self.change_x
         self.center_y += self.change_y
 

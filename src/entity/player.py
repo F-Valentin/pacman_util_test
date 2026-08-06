@@ -241,7 +241,11 @@ class Player(arcade.Sprite):
 
         return False
 
-    def invicibility(self) -> None:
+    @property
+    def invivibility(self) -> bool:
+        return self._invicibility
+
+    def toggle_invicibility(self) -> None:
         self._invicibility = not self._invicibility
 
     def draw(self) -> None:

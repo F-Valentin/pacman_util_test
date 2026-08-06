@@ -67,7 +67,7 @@ class Level(arcade.View):
             f"score: {self._player.score}", x, y)
 
     def refresh_lives_ui(self) -> None:
-        if self._player.current_lives < 0:
+        if self._player.current_lives < 0 or self._player.invivibility:
             return
 
         last = self.player_lives_ui[self._player.current_lives]
