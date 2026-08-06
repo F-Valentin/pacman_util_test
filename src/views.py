@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from curses import window
 import json
 from typing import TYPE_CHECKING
 
@@ -60,9 +61,18 @@ class MenuView(arcade.View):
             lambda: self.window.show_view(InstructionView(self))
         )
 
+        top_highscore = Button(
+            "top_highscore", 
+            self.window.width // 2, 
+            self.window.height // 2 + 400, 
+            ["assets/button/b1.png"], 
+            lambda: self.window.show_view(TopHighscoreView(self))
+        )
+
         self._button_group.add_button(start_button)
         self._button_group.add_button(instruction)
         self._button_group.add_button(exit_btn)
+        self._button_group.add_button(top_highscore)
 
     def on_key_press(self, symbol: int, modifiers: int) -> None:
         self._button_group.on_key_press(key=symbol)
@@ -84,12 +94,13 @@ class PauseView(arcade.View):
     """Display the pause overlay and allow the player to resume."""
 
     def __init__(self, previous_view: arcade.View,
-                 cheat_mode: CheatMode) -> None:
+                 cheat_mode: CheatMode, menu_view: MenuView) -> None:
         super().__init__()
         self._previous_view = previous_view
         self._cheat_mode = cheat_mode
+        self._menu_view = menu_view
         self._resume_button: Button
-        self._button_group: ButtonGroup = ButtonGroup(4)
+        self._button_group: ButtonGroup = ButtonGroup(5)
         self._panel_rect: arcade.types.Rect | None = None
 
     def resume(self) -> None:
@@ -107,11 +118,19 @@ class PauseView(arcade.View):
         )
         self._resume_button.set_scale(0.4)
 
-        cheat_group = self._cheat_mode.button_group
+        back_button = Button(
+            "back_button",
+            self.window.width // 2,
+            self.window.height // 2 + 150,
+            ["assets/button/quit/quit.png"],
+            lambda: self.window.show_view(self._menu_view)
+        )
+        cheat_group_buttons = self._cheat_mode.buttons
 
+        self._button_group.add_button(back_button)
         self._button_group.add_button(self._resume_button)
 
-        for btn in cheat_group.buttons:
+        for btn in cheat_group_buttons:
             self._button_group.add_button(btn)
 
         # Computed once here rather than every frame - the panel only
@@ -145,7 +164,7 @@ class PauseView(arcade.View):
                 border_width=2)
 
         self._cheat_mode.draw()
-        self._resume_button.draw()
+        self._button_group.draw()
 
 
 class EndGameView(arcade.View):
@@ -415,3 +434,101 @@ class InstructionView(arcade.View):
         self._button_group.draw()
         self.move_wasd.draw()
         text.draw()
+
+class TopHighscoreView(arcade.View):
+    def __init__(self, menu_view: MenuView) -> None:
+        super().__init__()
+        self._menu_view = menu_view
+        self._button_group: ButtonGroup = ButtonGroup(1)
+        self._labels: list[arcade.Text] = []
+        self._back_button: Button | None = None
+
+    def on_show_view(self) -> None:
+        # Load highscore data
+        path = "highscore.json"
+        data: dict[str, int] = {}
+        
+        try:
+            with open(path, 'r', encoding='utf-8') as f:
+                data = hjson.load(f)
+        except (FileNotFoundError, hjson.HjsonDecodeError) as e:
+            print(e)
+            # Handle empty file case
+            if isinstance(data, dict) == False:
+                data = {}
+
+        # Sort by score descending (highest first), keep only top 10
+        sorted_scores = sorted(
+            [(name, score) for name, score in data.items()],
+            key=lambda x: x[1],
+            reverse=True
+        )[:10]
+
+        # Create title label
+        title_label = arcade.Text(
+            "Top Highscore",
+            self.window.width // 2,
+            self.window.height - 80,
+            font_size=24,
+            anchor_x="center",
+            color=arcade.color.WHITE
+        )
+        self._labels.append(title_label)
+
+        # Create score labels, centered vertically
+        start_y = self.window.height - 160
+        y_pos = 0
+        for idx, (name, score) in enumerate(sorted_scores):
+            y_pos = start_y - (idx * 30)
+            label = arcade.Text(
+                f"{name}: {score}",
+                self.window.width // 2,
+                y_pos,
+                font_size=16,
+                anchor_x="center",
+                color=arcade.color.WHITE
+            )
+            self._labels.append(label)
+
+        # If no scores yet, show message
+        if not sorted_scores:
+            label = arcade.Text(
+                "No scores recorded yet!",
+                self.window.width // 2,
+                self.window.height // 2,
+                font_size=16,
+                anchor_x="center",
+                color=arcade.color.LIGHT_GRAY
+            )
+            self._labels.append(label)
+
+        # Back button
+        self._back_button = Button(
+            "back",
+            self.window.width // 2,
+            y_pos - 100,
+            ["assets/button/quit/quit.png"],
+            lambda: self.window.show_view(self._menu_view)
+        )
+        self._back_button.set_scale(2.0)
+        self._button_group.add_button(self._back_button)
+
+    def on_mouse_motion(self, x: int, y: int, dx: int, dy: int) -> None:
+        self._button_group.on_mouse_motion(x, y)
+
+    def on_mouse_press(self, x: int, y: int, button: int, modifiers: int) -> None:
+        self._button_group.on_mouse_press(x, y)
+
+    def on_key_press(self, symbol: int, modifiers: int) -> None:
+        self._button_group.on_key_press(key=symbol)
+
+    def on_draw(self) -> None:
+        self.clear()
+        
+        # Draw all labels
+        for label in self._labels:
+            label.draw()
+        
+        # Draw back button
+        if self._back_button:
+            self._back_button.draw()

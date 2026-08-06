@@ -54,7 +54,7 @@ class CheatMode:
         self.can_skip_levels: Callable
 
         self._window = window
-        self._button_group: ButtonGroup = ButtonGroup(3)
+        self._buttons: list[Button] = []
         self._buttons_initialized: bool = False
         self._labels: list[arcade.Text] = []
 
@@ -117,9 +117,9 @@ class CheatMode:
         freeze_btn.set_scale(0.1)
         self._add_label("Freeze Ghosts", center_x, base_y - 120 + label_offset)
 
-        self._button_group.add_button(skip_btn)
-        self._button_group.add_button(invincible_btn)
-        self._button_group.add_button(freeze_btn)
+        self._buttons.append(skip_btn)
+        self._buttons.append(invincible_btn)
+        self._buttons.append(freeze_btn)
 
         self._buttons_initialized = True
 
@@ -128,10 +128,10 @@ class CheatMode:
             freeze()
 
     @property
-    def button_group(self) -> ButtonGroup:
+    def buttons(self) -> list[Button]:
         if not self._buttons_initialized:
             self._init_buttons()
-        return self._button_group
+        return self._buttons
 
     @property
     def labels(self) -> list[arcade.Text]:
@@ -140,8 +140,5 @@ class CheatMode:
         return self._labels
 
     def draw(self) -> None:
-        if not self._buttons_initialized:
-            self._init_buttons()
-        self._button_group.draw()
         for label in self._labels:
             label.draw()

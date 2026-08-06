@@ -147,6 +147,10 @@ class Game:
         self.cheat_mode: CheatMode = CheatMode(window)
         self.can_skip_levels = False
 
+    @property
+    def menu_view(self) -> MenuView:
+        return self._menu_view
+
     def run(self) -> None:
         """Display the menu view and start the Arcade event loop."""
         self._menu_view = MenuView(self)
