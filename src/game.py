@@ -144,7 +144,7 @@ class Game:
         self._button_group: ButtonGroup
 
         self._current_level_index: int = 0
-        self.cheat_mode: CheatMode = CheatMode(window)
+        self.cheat_mode: CheatMode 
         self.can_skip_levels = False
 
     @property
@@ -160,6 +160,7 @@ class Game:
 
     def start(self) -> None:
         """Reset progression and load the first level."""
+        self.cheat_mode = CheatMode(self._window)
         self._current_level_index = 0
         self.load_level(current_score=0)
 
