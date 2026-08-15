@@ -49,13 +49,14 @@ class Player(arcade.Sprite):
     """Represent the controlled player character on the maze grid."""
 
     def __init__(self, position: arcade.Vec2, score: int,
-                 maze: Maze, ghosts: list[Ghost]) -> None:
+                 maze: Maze, ghosts: list[Ghost],
+                 lives: int = 3) -> None:
         super().__init__()
 
         self.center_x = position.x
         self.center_y = position.y
 
-        self._current_lives: int = 3
+        self._current_lives: int = lives
         self._default_position: arcade.Vec2 = position
         self.next_direction: PlayerDirection | None = None
         self.speed: float = 4.0

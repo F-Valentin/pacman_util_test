@@ -1,3 +1,4 @@
 {
-  "custom": false
+  "custom": true,
+  "lives": 10
 }

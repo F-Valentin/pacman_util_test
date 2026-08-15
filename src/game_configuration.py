@@ -6,6 +6,11 @@ import hjson
 class GameConfig:
     """Load and validate runtime settings from the configuration file."""
 
+    MIN_LIVES = 1
+    MAX_LIVES = 10
+    MIN_LEVEL_MAX_TIME = 1
+    MAX_LEVEL_MAX_TIME = 1000
+
     def __init__(self, file_path: str):
         self.file_path = file_path
 
@@ -59,6 +64,34 @@ class GameConfig:
             return default
         return value
 
+    @staticmethod
+    def _parse_bounded_int(value: object, key: str, default: int,
+                           minimum: int = 1,
+                           maximum: int | None = None) -> int:
+        """
+            Validate an integer configuration value that must fall
+            within [minimum, maximum]. ``maximum=None`` means no
+            upper bound.
+
+            Reuses ``_parse_int`` for the type check, then falls back
+            to ``default`` if the value is out of range (e.g. zero or
+            negative lives/time, or a value above the allowed cap).
+        """
+        parsed = GameConfig._parse_int(value, key, default)
+
+        if parsed < minimum or (maximum is not None and parsed > maximum):
+            bound = (
+                f">= {minimum}" if maximum is None
+                else f"between {minimum} and {maximum}"
+            )
+            print(
+                f"[Config Warning] '{key}' must be an integer {bound}, "
+                f"got {parsed}. Using default: {default}."
+            )
+            return default
+
+        return parsed
+
     def _load_config(self) -> None:
         """Read the JSON file and apply any custom gameplay values."""
         if not os.path.exists(self.file_path):
@@ -85,12 +118,18 @@ class GameConfig:
             self.raw_data.get("custom", False), "custom", default=False)
 
         if self.custom:
-            self.lives = self._parse_int(
+            self.lives = self._parse_bounded_int(
                 self.raw_data.get("lives", self.lives),
-                "lives", default=self.lives)
-            self.level_max_time = self._parse_int(
+                "lives", default=self.lives,
+                minimum=self.MIN_LIVES, maximum=self.MAX_LIVES)
+            self.level_max_time = self._parse_bounded_int(
                 self.raw_data.get("level_max_time", self.level_max_time),
-                "level_max_time", default=self.level_max_time)
-            self.seed = self._parse_int(
+                "level_max_time", default=self.level_max_time,
+                minimum=self.MIN_LEVEL_MAX_TIME,
+                maximum=self.MAX_LEVEL_MAX_TIME)
+            # 0 is a valid, meaningful seed (it means "random maze" -
+            # see MazeGenerator.generate), so only negative values are
+            # rejected here; there's no natural upper bound to cap.
+            self.seed = self._parse_bounded_int(
                 self.raw_data.get("seed", self.seed),
-                "seed", default=self.seed)
+                "seed", default=self.seed, minimum=0)

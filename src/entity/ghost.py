@@ -191,6 +191,7 @@ class Ghost(arcade.Sprite):
         self._navigate_to(p_cell, limit=self.difficulty_id)
 
     def flee(self) -> None:
+        self.path = []
         self._navigate_to(self._spawn_cell)
 
     def _sync_animations(self, delta_time: float) -> None:

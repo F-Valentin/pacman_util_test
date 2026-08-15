@@ -173,7 +173,15 @@ class Game:
         maze_width: int = int(config["maze_width"])
         maze_height: int = int(config["maze_height"])
         cell_size = self._game_config.tile_size
-        time_limit: int = int(config["time_limit"])
+
+        # In custom mode the config file's flat level_max_time overrides
+        # the catalog's per-level difficulty curve; otherwise each level
+        # keeps its own scripted time limit.
+        time_limit: int = (
+            self._game_config.level_max_time
+            if self._game_config.custom
+            else int(config["time_limit"])
+        )
 
         offset_x: int = (
             (self._game_config.screen_width -
@@ -228,7 +236,8 @@ class Game:
         y = int(offset_y + half + offset)
 
         pos = arcade.Vec2(x, y)
-        player = Player(pos, current_score, maze, ghosts)
+        player = Player(pos, current_score, maze, ghosts,
+                        lives=self._game_config.lives)
         maze.convert_pos_to_cell(pos).hide_pacgum()
 
         level = Level(player, maze, ghosts, time_limit, self)
