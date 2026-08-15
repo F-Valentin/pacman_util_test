@@ -75,7 +75,7 @@ class Game:
                 {"sprite": "assets/blinky.png",
                  "difficulty_id": 14, "col": 0, "row": 0, "speed": 2.5},
                 {"sprite": "assets/inky.png",
-                 "difficulty_id": 17, "col": 10, "row": 0, "speed": 2.4},
+                 "difficulty_id": 17, "col": 10, "row": 0, "speed": 2.5},
                 {"sprite": "assets/clyde.png",
                  "difficulty_id": 20, "col": 0, "row": 10, "speed": 2.0},
             ],
@@ -87,9 +87,9 @@ class Game:
                 {"sprite": "assets/blinky.png",
                  "difficulty_id": 10, "col": 0, "row": 0, "speed": 3.0},
                 {"sprite": "assets/pinky.png",
-                 "difficulty_id": 13, "col": 10, "row": 0, "speed": 2.4},
+                 "difficulty_id": 13, "col": 10, "row": 0, "speed": 2.5},
                 {"sprite": "assets/inky.png",
-                 "difficulty_id": 16, "col": 0, "row": 10, "speed": 2.4},
+                 "difficulty_id": 16, "col": 0, "row": 10, "speed": 2.5},
                 {"sprite": "assets/clyde.png",
                  "difficulty_id": 19, "col": 10, "row": 10, "speed": 2.0},
             ],
@@ -105,7 +105,7 @@ class Game:
                 {"sprite": "assets/inky.png",
                  "difficulty_id": 12, "col": 0, "row": 10, "speed": 3.0},
                 {"sprite": "assets/clyde.png",
-                 "difficulty_id": 15, "col": 10, "row": 10, "speed": 2.4},
+                 "difficulty_id": 15, "col": 10, "row": 10, "speed": 2.5},
             ],
         },
         # Niveau 9 — 11×11, très rapides et très malins
@@ -173,15 +173,7 @@ class Game:
         maze_width: int = int(config["maze_width"])
         maze_height: int = int(config["maze_height"])
         cell_size = self._game_config.tile_size
-
-        # In custom mode the config file's flat level_max_time overrides
-        # the catalog's per-level difficulty curve; otherwise each level
-        # keeps its own scripted time limit.
-        time_limit: int = (
-            self._game_config.level_max_time
-            if self._game_config.custom
-            else int(config["time_limit"])
-        )
+        time_limit: int = int(config["time_limit"])
 
         offset_x: int = (
             (self._game_config.screen_width -
@@ -236,8 +228,7 @@ class Game:
         y = int(offset_y + half + offset)
 
         pos = arcade.Vec2(x, y)
-        player = Player(pos, current_score, maze, ghosts,
-                        lives=self._game_config.lives)
+        player = Player(pos, current_score, maze, ghosts)
         maze.convert_pos_to_cell(pos).hide_pacgum()
 
         level = Level(player, maze, ghosts, time_limit, self)
