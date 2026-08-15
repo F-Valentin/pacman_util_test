@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING
 import arcade
 import hjson
 
-from button import Button, ButtonGroup, CheckButton
+from button import Button, ButtonGroup
 from cheatmode import CheatMode, compute_panel_bounds
 from utils import HitBox
 
@@ -359,52 +359,48 @@ class EndGameView(arcade.View):
 
 
 class InstructionView(arcade.View):
+    """Show the game controls as simple text."""
+
+    CONTROLS: list[str] = [
+        "Move: Arrow Keys or WASD",
+        "Pause: SPACE",
+    ]
+
     def __init__(self, menu_view: MenuView) -> None:
         super().__init__()
-        from arcade import Sprite
-        self._button_group: ButtonGroup = ButtonGroup(2)
         self._menu_view = menu_view
+        self._button_group: ButtonGroup = ButtonGroup(1)
 
-        pos_d = arcade.Vec2(
-            self.window.width // 2 + 100, self.window.height // 2)
-        pos_r = arcade.Vec2(pos_d.x + 20, pos_d.y)
-        pos_l = arcade.Vec2(pos_d.x - 20, pos_d.y)
-        pos_u = arcade.Vec2(pos_d.x, pos_d.y + 20)
+        center_x = self.window.width // 2
+        center_y = self.window.height // 2
 
-        arrow_d = Sprite("assets/Single PNGs/ARROWDOWN.png",
-                         1, pos_d.x, pos_d.y)
-        arrow_l = Sprite("assets/Single PNGs/ARROWLEFT.png",
-                         1, pos_l.x, pos_l.y)
-        arrow_r = Sprite("assets/Single PNGs/ARROWRIGHT.png",
-                         1, pos_r.x, pos_r.y)
-        arrow_u = Sprite("assets/Single PNGs/ARROWUP.png",
-                         1, pos_u.x, pos_u.y)
-
-        self.move_wasd = arcade.Text(
-            "You can move using the key arrows or wasd",
-            pos_l.x - 20, pos_u.y + 20)
-        self.arrows: arcade.SpriteList = arcade.SpriteList()
-        self.arrows.append(arrow_d)
-        self.arrows.append(arrow_l)
-        self.arrows.append(arrow_r)
-        self.arrows.append(arrow_u)
-
-        skip_level = CheckButton(
-            "skip level",
-            pos_r.x + 50, pos_u.y,
-            150, 40
+        self._title = arcade.Text(
+            "Instructions",
+            center_x,
+            center_y + 150,
+            font_size=24,
+            anchor_x="center",
         )
 
-        quit_button = Button(
-            "quit",
-            self.window.width // 2,
-            self.window.height // 2,
+        self._lines: list[arcade.Text] = [
+            arcade.Text(
+                line,
+                center_x,
+                center_y + 70 - (i * 40),
+                font_size=16,
+                anchor_x="center",
+            )
+            for i, line in enumerate(self.CONTROLS)
+        ]
+
+        back_button = Button(
+            "back",
+            center_x,
+            center_y - 150,
             150, 40,
             lambda: self.window.show_view(self._menu_view)
         )
-
-        self._button_group.add_button(quit_button)
-        self._button_group.add_button(skip_level)
+        self._button_group.add_button(back_button)
 
     def on_key_press(self, symbol: int, modifiers: int) -> None:
         self._button_group.on_key_press(key=symbol)
@@ -418,14 +414,10 @@ class InstructionView(arcade.View):
 
     def on_draw(self) -> None:
         self.clear()
-        text = arcade.Text(
-            "instruction",
-            self.window.width // 2,
-            self.window.height // 2 + 200)
-        self.arrows.draw()
+        self._title.draw()
+        for line in self._lines:
+            line.draw()
         self._button_group.draw()
-        self.move_wasd.draw()
-        text.draw()
 
 
 class TopHighscoreView(arcade.View):

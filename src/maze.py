@@ -8,16 +8,30 @@ from mazegenerator import MazeGenerator
 from pacgum import Pacgum, draw_pacgum
 
 
+class MazeGenerationError(Exception):
+    """Raised when the assigned A-Maze-ing package fails to build a maze."""
+
+
 class Maze:
     """Build and draw a maze grid with pacgums and wall geometry."""
 
     def __init__(self, width: int, height: int,
-                 bottom_left_pos: Vec2, cell_size: int) -> None:
+                 bottom_left_pos: Vec2, cell_size: int,
+                 seed: int = 0) -> None:
+        """
+            Build a maze.
+
+            seed: passed straight through to the assigned A-Maze-ing
+            package. A value > 0 produces a reproducible maze
+            (used for the first level); 0 produces a random maze
+            (used for every subsequent level).
+        """
         self._grid: list[list[Cell]] = []
         self._width = width
         self._height = height
         self._bottom_left_pos = bottom_left_pos
         self._cell_size = cell_size
+        self._seed = seed
         self._wall_points: list[tuple[float, float]] = []
         self._pacgums: list[Pacgum] = []
         self._nb_of_pacgums_visible = 0
@@ -58,7 +72,19 @@ class Maze:
             self._nb_of_pacgums_visible -= 1
 
     def _init_grid(self) -> None:
-        maze_generator = MazeGenerator((self.width, self.height))
+        try:
+            maze_generator = MazeGenerator(
+                (self.width, self.height),
+                perfect=False,
+                seed=self._seed,
+            )
+        except Exception as e:
+            raise MazeGenerationError(
+                "The maze generator failed to build a "
+                f"{self.width}x{self.height} maze "
+                f"(seed={self._seed}): {e}"
+            ) from e
+
         grid: list[list[Cell]] = []
 
         for (y, row) in enumerate(maze_generator.maze):

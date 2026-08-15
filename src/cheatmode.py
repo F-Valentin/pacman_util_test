@@ -49,9 +49,9 @@ def compute_panel_bounds(
 
 class CheatMode:
     def __init__(self, window: arcade.Window) -> None:
-        self.player_inviciblity: Callable
-        self.ghosts_freeze: list[Callable] = []
-        self.can_skip_levels: Callable
+        self.player_inviciblity: Callable[[], None]
+        self.ghosts_freeze: list[Callable[[], None]] = []
+        self.can_skip_levels: Callable[[], None]
 
         self._window = window
         self._buttons: list[Button] = []

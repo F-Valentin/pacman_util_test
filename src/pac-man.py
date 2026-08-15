@@ -14,7 +14,11 @@ def main() -> None:
 
     file_path = sys.argv[1]
 
-    game_config = GameConfig(file_path)
+    try:
+        game_config = GameConfig(file_path)
+    except (FileNotFoundError, ValueError, PermissionError) as e:
+        print(f"[Config Error] {e}")
+        return
 
     window = arcade.Window(game_config.screen_width,
                            game_config.screen_height)

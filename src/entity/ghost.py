@@ -36,7 +36,7 @@ class Ghost(arcade.Sprite):
         self.center_x = position.x
         self.center_y = position.y
         self.state: GhostState = GhostState.MOVE
-        self.animations: dict[str, arcade.SpriteList] = {}
+        self.animations: dict[str, arcade.SpriteList[arcade.Sprite]] = {}
         self._grid_coordinate: arcade.Vec2 = arcade.Vec2(0.0, 0.0)
         self.path: list[Cell] = []
         self.difficulty_id = difficulty_id
@@ -82,10 +82,14 @@ class Ghost(arcade.Sprite):
         flee_animation.position = self.position
         flee_animation.scale = 0.06
 
-        move_sprite_list: arcade.SpriteList = arcade.SpriteList()
+        move_sprite_list: arcade.SpriteList[arcade.Sprite] = (
+            arcade.SpriteList()
+        )
         move_sprite_list.append(move_animation)
 
-        flee_sprite_list: arcade.SpriteList = arcade.SpriteList()
+        flee_sprite_list: arcade.SpriteList[arcade.Sprite] = (
+            arcade.SpriteList()
+        )
         flee_sprite_list.append(flee_animation)
 
         self.animations["move"] = move_sprite_list

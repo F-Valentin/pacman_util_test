@@ -1,5 +1,7 @@
 """Core game orchestration for the Pac-Man prototype."""
 
+from typing import Any
+
 import arcade
 
 from button import ButtonGroup
@@ -8,7 +10,7 @@ from entity.ghost import Ghost
 from entity.player import Player
 from game_configuration import GameConfig
 from level import Level
-from maze import Maze
+from maze import Maze, MazeGenerationError
 from views import EndGameView, MenuView
 
 
@@ -166,7 +168,7 @@ class Game:
     def load_level(self, current_score: int) -> None:
         """Read the catalog at the current index and build + show the level."""
 
-        config: dict = self.LEVEL_CATALOG[self._current_level_index]
+        config: dict[str, Any] = self.LEVEL_CATALOG[self._current_level_index]
 
         maze_width: int = int(config["maze_width"])
         maze_height: int = int(config["maze_height"])
@@ -183,14 +185,27 @@ class Game:
              maze_height * cell_size) // 2
         )
 
-        maze = Maze(
-            maze_width,
-            maze_height,
-            arcade.Vec2(
-                offset_x,
-                offset_y),
-            cell_size
+        # First level uses the configured fixed seed (reproducible maze),
+        # every subsequent level is randomly generated (seed=0).
+        level_seed = (
+            self._game_config.seed
+            if self._current_level_index == 0 else 0
         )
+
+        try:
+            maze = Maze(
+                maze_width,
+                maze_height,
+                arcade.Vec2(
+                    offset_x,
+                    offset_y),
+                cell_size,
+                seed=level_seed,
+            )
+        except MazeGenerationError as e:
+            print(f"[Maze Error] {e}")
+            self.game_over(current_score)
+            return
 
         maze.set_pacgums(self._game_config.points_per_pacgum)
         maze.set_super_pacgums(self._game_config.points_per_super_pacgum)

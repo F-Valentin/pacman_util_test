@@ -60,7 +60,9 @@ class Player(arcade.Sprite):
         self.next_direction: PlayerDirection | None = None
         self.speed: float = 4.0
         self.state: PlayerState = PlayerState.MOVE
-        self.animations: dict[str, arcade.SpriteList] = {}
+        self.animations: dict[
+            str, arcade.SpriteList[arcade.TextureAnimationSprite]
+        ] = {}
         self.direction: PlayerDirection | None = None
         self.score: int = score
         self.ghosts: list[Ghost] = ghosts
@@ -82,7 +84,9 @@ class Player(arcade.Sprite):
         move_animation.position = self.position
         move_animation.scale = 0.08
 
-        move_sprite_list: arcade.SpriteList = arcade.SpriteList()
+        move_sprite_list: arcade.SpriteList[arcade.TextureAnimationSprite] = (
+            arcade.SpriteList()
+        )
         move_sprite_list.append(move_animation)
 
         self.animations["move"] = move_sprite_list
