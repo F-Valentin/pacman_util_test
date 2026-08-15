@@ -48,7 +48,6 @@ class MazeGenerator:
         self._generate_maze(self._entryx, self._entryy, 0)
         self._find_short_path()
 
-
     def _create_empty_maze(self) -> None:
         self._maze = [[8] + [0] * (self._width - 2) +
                       [2] for _ in range(self._height - 2)]

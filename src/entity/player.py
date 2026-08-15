@@ -99,7 +99,10 @@ class Player(arcade.Sprite):
         self.next_direction = None
 
     def set_next_direction(self, key: int) -> None:
-        """Store the next direction chosen by the player from keyboard input."""
+        """
+            Store the next direction chosen
+            by the player from keyboard input.
+        """
         match key:
             case arcade.key.UP | arcade.key.W:
                 self.next_direction = PlayerDirection.UP

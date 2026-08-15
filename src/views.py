@@ -108,7 +108,7 @@ class PauseView(arcade.View):
     def on_show_view(self) -> None:
         btn_w = 150
         btn_h = 40
-        
+
         self._resume_button = Button(
             "resume",
             self.window.width // 2,
@@ -173,10 +173,10 @@ class EndGameView(arcade.View):
     def __init__(self, win: bool, score: int,
                  menu_view: MenuView) -> None:
         super().__init__()
-        self.text = "Win" if win else "Game Over"
-        self.score = score
-        self.highscore = 0
-        self._menu_view = menu_view
+        self.text: str = "Win" if win else "Game Over"
+        self.score: int = score
+        self.highscore: int = 0
+        self._menu_view: MenuView = menu_view
         self._button_group: ButtonGroup = ButtonGroup(3)
         self.current_name: str = ""
         self.old_name: str = ""
@@ -239,11 +239,11 @@ class EndGameView(arcade.View):
         values.sort()
 
         min_key = ""
-        
+
         self.highscore = self.data.get(self.current_name, self.score)
 
         self.highscore = max(self.score, self.highscore)
-        
+
         if len(self.data) + 1 > 10:
             for (key, value) in self.data.items():
                 if value == values[0]:
@@ -252,7 +252,7 @@ class EndGameView(arcade.View):
 
             if self.highscore <= values[0]:
                 return
-                
+
             del self.tmp_data[min_key]
 
         if self.current_name not in self.data and len(self.old_name) == 0:
@@ -290,6 +290,8 @@ class EndGameView(arcade.View):
 
         if self._input_rect.collide_with_point(arcade.Vec2(x, y)):
             self.enter_your_name_btn_pressed = True
+        else:
+            self.enter_your_name_btn_pressed = False
 
     def on_draw(self) -> None:
         self.clear()
@@ -320,7 +322,11 @@ class EndGameView(arcade.View):
         ).draw()
 
         arcade.Text(
-            "(type inside the rect oultine and then type any letter on your keyboard then press enter to save your score)",
+            (
+                "(type inside the rect oultine and then"
+                "type any letter on your keyboard"
+                "then press enter to save your score)"
+            ),
             self.BOX_LEFT, self.BOX_BOTTOM - 28,
             font_size=10,
             color=arcade.color.LIGHT_GRAY,
@@ -433,13 +439,13 @@ class TopHighscoreView(arcade.View):
     def on_show_view(self) -> None:
         path = "highscore.json"
         data: dict[str, int] = {}
-        
+
         try:
             with open(path, 'r', encoding='utf-8') as f:
                 data = hjson.load(f)
         except (FileNotFoundError, hjson.HjsonDecodeError) as e:
             print(e)
-            if isinstance(data, dict) == False:
+            if not isinstance(data, dict):
                 data = {}
 
         sorted_scores = sorted(
@@ -496,7 +502,8 @@ class TopHighscoreView(arcade.View):
     def on_mouse_motion(self, x: int, y: int, dx: int, dy: int) -> None:
         self._button_group.on_mouse_motion(x, y)
 
-    def on_mouse_press(self, x: int, y: int, button: int, modifiers: int) -> None:
+    def on_mouse_press(self, x: int, y: int, button: int,
+                       modifiers: int) -> None:
         self._button_group.on_mouse_press(x, y)
 
     def on_key_press(self, symbol: int, modifiers: int) -> None:
@@ -504,9 +511,9 @@ class TopHighscoreView(arcade.View):
 
     def on_draw(self) -> None:
         self.clear()
-        
+
         for label in self._labels:
             label.draw()
-        
+
         if self._back_button:
             self._back_button.draw()

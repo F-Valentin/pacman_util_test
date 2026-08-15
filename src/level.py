@@ -19,7 +19,10 @@ if TYPE_CHECKING:
 
 
 class Level(arcade.View):
-    """Represent the main level view where the player interacts with the maze."""
+    """
+        Represent the main level view
+        where the player interacts with the maze.
+    """
 
     def __init__(self, player: Player, maze: Maze,
                  ghosts: list[Ghost], time_to_finish: int,
@@ -122,7 +125,11 @@ class Level(arcade.View):
         self._player.set_next_direction(key=symbol)
 
         if symbol == arcade.key.SPACE:
-            self.window.show_view(PauseView(self, self._game.cheat_mode, self._game.menu_view))
+            self.window.show_view(
+                PauseView(
+                    self,
+                    self._game.cheat_mode,
+                    self._game.menu_view))
         elif symbol == arcade.key.N:
             if self._game.can_skip_levels:
                 self._game.next_level(self._player.score)

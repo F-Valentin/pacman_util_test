@@ -142,9 +142,8 @@ class Game:
         self._game_config = game_config
         self._menu_view: MenuView
         self._button_group: ButtonGroup
-
         self._current_level_index: int = 0
-        self.cheat_mode: CheatMode 
+        self.cheat_mode: CheatMode
         self.can_skip_levels = False
 
     @property

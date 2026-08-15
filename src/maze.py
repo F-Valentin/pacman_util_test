@@ -50,7 +50,10 @@ class Maze:
         return self._cell_size
 
     def pacgum_eaten(self) -> None:
-        """Decrease the visible pacgum counter after the player consumes one."""
+        """
+            Decrease the visible pacgum counter
+            after the player consumes one.
+        """
         if self._nb_of_pacgums_visible > 0:
             self._nb_of_pacgums_visible -= 1
 

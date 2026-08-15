@@ -112,7 +112,10 @@ class Ghost(arcade.Sprite):
         self.change_y = 0.0
 
     def _path_to_cell(self, start: Cell, target_cell: Cell) -> list[Cell]:
-        """Compute a simple shortest path from the ghost to the player's cell."""
+        """
+            Compute a simple shortest path
+            from the ghost to the player's cell.
+        """
 
         start_coord = (start.grid_x, start.grid_y)
         dest_coord = (target_cell.grid_x, target_cell.grid_y)
@@ -194,18 +197,21 @@ class Ghost(arcade.Sprite):
                 anim[0].center_y = self.center_y
                 anim.update_animation(delta_time)
 
-    def update(self, delta_time: float = 1 / 60, *args: Any, **kwargs: Any) -> None:
+    def update(
+        self,
+        delta_time: float = 1 / 60,
+        *args: Any, **kwargs: Any
+    ) -> None:
         """Move the ghost and recompute its path when it reaches a cell."""
         p_cell: Cell | None = kwargs.get("p_cell")
 
         if not p_cell:
             return
-        
+
         if self._freeze:
             self._sync_animations(delta_time)
             return
 
-            
         self.center_x += self.change_x
         self.center_y += self.change_y
 

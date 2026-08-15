@@ -76,7 +76,7 @@ class CheatMode:
 
         center_x = self._window.width // 2
         base_y = self._window.height // 2
-        
+
         btn_w = 40
         btn_h = 40
         padding = 30
@@ -101,7 +101,12 @@ class CheatMode:
             target=self.player_inviciblity
         )
         self._buttons.append(invincible_btn)
-        self._add_label("Invincibility", center_x, base_y - step_y + label_offset)
+        self._add_label(
+            "Invincibility",
+            center_x,
+            base_y -
+            step_y +
+            label_offset)
 
         freeze_btn = CheckButton(
             "freeze_ghosts",
@@ -111,7 +116,13 @@ class CheatMode:
             target=self._freeze_all
         )
         self._buttons.append(freeze_btn)
-        self._add_label("Freeze Ghosts", center_x, base_y - 2 * step_y + label_offset)
+        self._add_label(
+            "Freeze Ghosts",
+            center_x,
+            base_y -
+            2 *
+            step_y +
+            label_offset)
 
         self._buttons_initialized = True
 

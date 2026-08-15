@@ -2,7 +2,10 @@ import arcade
 
 
 class HitBox:
-    """Hit-test rectangle. x/y = top-left corner (arcade coords: y increases upward)."""
+    """
+        Hit-test rectangle. x/y = top-left corner
+        (arcade coords: y increases upward).
+    """
 
     def __init__(self, x: float, y: float,
                  width: float,

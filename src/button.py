@@ -10,7 +10,8 @@ class Button:
                  width: float, height: float,
                  trigger: Callable | None = None,
                  background_color: tuple[int, int, int, int] = (0, 0, 0, 255),
-                 border_color: tuple[int, int, int, int] = (255, 255, 255, 255),
+                 border_color: tuple[int, int, int, int] = (
+                     255, 255, 255, 255),
                  border_width: int = 2) -> None:
         self._name = name
         self.center: arcade.Vec2 = arcade.Vec2(x, y)
@@ -39,10 +40,10 @@ class Button:
             self.center.y - self.height / 2,
             self.center.y + self.height / 2
         )
-        
+
         r, g, b, a = self._background_color
         bg_color = (r, g, b, int(self._alpha * (a / 255)))
-        
+
         r, g, b, a = self._border_color
         border_color = (r, g, b, int(self._alpha * (a / 255)))
 
@@ -78,7 +79,7 @@ class Button:
 
         r, g, b, a = arcade.color.WHITE
         text_color = (r, g, b, int(self._alpha * (a / 255)))
-        
+
         arcade.Text(
             self._name,
             self.center.x,
@@ -96,12 +97,13 @@ class CheckButton(Button):
                  trigger: Callable | None = None,
                  target: Callable | None = None,
                  background_color: tuple[int, int, int, int] = (0, 0, 0, 255),
-                 border_color: tuple[int, int, int, int] = (255, 255, 255, 255),
+                 border_color: tuple[int, int, int, int] = (
+                     255, 255, 255, 255),
                  border_width: int = 2) -> None:
         self._check = False
         self.target = target
         actual_trigger = trigger if trigger else lambda: self.check()
-        
+
         super().__init__(name, x, y, width, height, actual_trigger,
                          background_color, border_color, border_width)
 
@@ -112,13 +114,13 @@ class CheckButton(Button):
 
     def draw(self) -> None:
         self._draw_background()
-        
+
         if self._check:
             w = self.width * 0.3
             h = self.height * 0.3
             cx = self.center.x
             cy = self.center.y
-            
+
             r, g, b, a = arcade.color.WHITE
             line_color = (r, g, b, int(self._alpha * (a / 255)))
 
@@ -189,7 +191,10 @@ class ButtonGroup:
             if button.collision_rect.collide_with_point(point):
                 button.trigger()
 
-                if self.current_button_focus and self.current_button_focus != button:
+                if (
+                    self.current_button_focus
+                    and self.current_button_focus != button
+                ):
                     self.current_button_focus.set_alpha(255)
 
                 self.current_button_focus = button
