@@ -150,4 +150,3 @@ class MazeGenerator:
                 return
             distance += 1
         print("MazeGenerator Class error: no shortest path found.")
-        return
