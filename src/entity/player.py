@@ -8,6 +8,7 @@ import arcade
 from cell import Cell, Walls
 from entity.ghost import Ghost, GhostState
 from maze import Maze
+from paths import resource_path
 
 
 class PlayerState(str, Enum):
@@ -81,7 +82,8 @@ class Player(arcade.Sprite):
         return self._current_lives
 
     def _init_animation(self) -> None:
-        move_animation = arcade.load_animated_gif("assets/pacman.gif")
+        move_animation = arcade.load_animated_gif(
+            resource_path("assets/pacman.gif"))
         move_animation.position = self.position
         move_animation.scale = 0.08
 

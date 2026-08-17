@@ -11,6 +11,7 @@ from cell import Cell
 from entity.ghost import Ghost
 from entity.player import Player
 from maze import Maze
+from paths import resource_path
 from score import ScoreUi
 from views import PauseView
 
@@ -57,7 +58,7 @@ class Level(arcade.View):
         h_offset = 0
         for _ in range(self._player.current_lives):
             self.player_lives_ui.append(
-                arcade.Sprite("assets/hp.png", 1,
+                arcade.Sprite(resource_path("assets/hp.png"), 1,
                               hp_x + h_offset, hp_y)
             )
             h_offset += 40

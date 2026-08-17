@@ -8,6 +8,7 @@ from typing_extensions import Any
 
 from cell import Cell
 from maze import Maze
+from paths import resource_path
 
 """Ghost AI and movement helpers for the level."""
 
@@ -74,11 +75,11 @@ class Ghost(arcade.Sprite):
         return g
 
     def _init_animation(self) -> None:
-        move_animation = arcade.Sprite(self._sprite_image)
+        move_animation = arcade.Sprite(resource_path(self._sprite_image))
         move_animation.position = self.position
         move_animation.scale = 0.06
 
-        flee_animation = arcade.Sprite(self._flee_image)
+        flee_animation = arcade.Sprite(resource_path(self._flee_image))
         flee_animation.position = self.position
         flee_animation.scale = 0.06
 
@@ -191,7 +192,6 @@ class Ghost(arcade.Sprite):
         self._navigate_to(p_cell, limit=self.difficulty_id)
 
     def flee(self) -> None:
-        self.path = []
         self._navigate_to(self._spawn_cell)
 
     def _sync_animations(self, delta_time: float) -> None:

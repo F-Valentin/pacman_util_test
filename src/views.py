@@ -7,6 +7,7 @@ import hjson
 
 from button import Button, ButtonGroup
 from cheatmode import CheatMode, compute_panel_bounds
+from paths import persistent_path
 from utils import HitBox
 
 """Menu, pause, and end-of-game views used by the Arcade window."""
@@ -220,7 +221,7 @@ class EndGameView(arcade.View):
             lambda: arcade.exit()
         )
 
-        path = "highscore.json"
+        path = persistent_path("highscore.json")
         try:
             with open(path, 'r', encoding='utf-8') as f:
                 data = hjson.load(f)
@@ -233,7 +234,7 @@ class EndGameView(arcade.View):
         self._button_group.add_button(quit_button)
 
     def save_highscore(self) -> None:
-        path = "highscore.json"
+        path = persistent_path("highscore.json")
 
         values: list[int] = list(self.data.values())
         values.sort()
@@ -429,7 +430,7 @@ class TopHighscoreView(arcade.View):
         self._back_button: Button | None = None
 
     def on_show_view(self) -> None:
-        path = "highscore.json"
+        path = persistent_path("highscore.json")
         data: dict[str, int] = {}
 
         try:
