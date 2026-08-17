@@ -11,8 +11,3 @@ dependencies = [
     "autopep8>=2.3.2",
     "pyinstaller>=6.22.0",
 ]
-
-[dependency-groups]
-dev = [
-    "pyinstaller>=6.22.0",
-]
