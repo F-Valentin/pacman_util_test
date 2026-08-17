@@ -1,0 +1,35 @@
+name: Build Windows exe
+
+on:
+  workflow_dispatch:   # bouton "Run workflow" manuel sur GitHub
+  push:
+    tags:
+      - 'v*'            # optionnel : se déclenche aussi si tu pousses un tag genre v1.0
+
+jobs:
+  build:
+    runs-on: windows-latest   # <- la machine Windows fournie par GitHub
+
+    steps:
+      - name: Récupérer le code
+        uses: actions/checkout@v4
+
+      - name: Installer Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Installer uv
+        run: pip install uv
+
+      - name: Installer les dépendances
+        run: uv sync
+
+      - name: Builder l'exe
+        run: uv run pyinstaller pac_man.spec
+
+      - name: Publier l'exe comme artefact
+        uses: actions/upload-artifact@v4
+        with:
+          name: pac_man-windows
+          path: dist/pac_man.exe
