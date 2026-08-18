@@ -186,8 +186,6 @@ class Game:
              maze_height * cell_size) // 2
         )
 
-        # First level uses the configured fixed seed (reproducible maze),
-        # every subsequent level is randomly generated (seed=0).
         level_seed = (
             self._game_config.seed
             if self._current_level_index == 0 else 0
