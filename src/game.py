@@ -229,7 +229,13 @@ class Game:
         y = int(offset_y + half + offset)
 
         pos = arcade.Vec2(x, y)
-        player = Player(pos, current_score, maze, ghosts, lives=self._game_config.lives)
+        player = Player(
+            pos,
+            current_score,
+            maze,
+            ghosts,
+            lives=self._game_config.lives
+        )
         maze.convert_pos_to_cell(pos).hide_pacgum()
 
         level = Level(player, maze, ghosts, time_limit, self)

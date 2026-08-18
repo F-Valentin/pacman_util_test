@@ -134,7 +134,6 @@ class Level(arcade.View):
         if symbol == arcade.key.N and self._game.can_skip_levels:
             self._game.next_level(self._player.score)
 
-
     def on_draw(self) -> None:
         self.clear()
         self._maze.draw()
