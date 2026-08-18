@@ -16,7 +16,6 @@ class GameConfig:
 
         self.custom = False
         self.lives = 3
-        self.level_max_time = 90
         self.seed = 42
 
         self.points_per_pacgum = 5
@@ -122,14 +121,6 @@ class GameConfig:
                 self.raw_data.get("lives", self.lives),
                 "lives", default=self.lives,
                 minimum=self.MIN_LIVES, maximum=self.MAX_LIVES)
-            self.level_max_time = self._parse_bounded_int(
-                self.raw_data.get("level_max_time", self.level_max_time),
-                "level_max_time", default=self.level_max_time,
-                minimum=self.MIN_LEVEL_MAX_TIME,
-                maximum=self.MAX_LEVEL_MAX_TIME)
-            # 0 is a valid, meaningful seed (it means "random maze" -
-            # see MazeGenerator.generate), so only negative values are
-            # rejected here; there's no natural upper bound to cap.
             self.seed = self._parse_bounded_int(
                 self.raw_data.get("seed", self.seed),
                 "seed", default=self.seed, minimum=0)

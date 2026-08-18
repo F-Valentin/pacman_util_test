@@ -41,7 +41,7 @@ class Maze:
         self._wall_points = self._build_wall_points()
         self._setup_cells()
         self._pacgums = self._get_cells_pacgums()
-        self._nb_of_pacgums_visible = len(self._pacgums)
+        self._nb_of_pacgums_visible = len(self._pacgums) - 1
 
     @property
     def grid(self) -> list[list[Cell]]:

@@ -162,6 +162,7 @@ class Game:
     def start(self) -> None:
         """Reset progression and load the first level."""
         self.cheat_mode = CheatMode(self._window)
+        self.can_skip_levels = False
         self._current_level_index = 0
         self.load_level(current_score=0)
 
@@ -228,7 +229,7 @@ class Game:
         y = int(offset_y + half + offset)
 
         pos = arcade.Vec2(x, y)
-        player = Player(pos, current_score, maze, ghosts)
+        player = Player(pos, current_score, maze, ghosts, lives=self._game_config.lives)
         maze.convert_pos_to_cell(pos).hide_pacgum()
 
         level = Level(player, maze, ghosts, time_limit, self)

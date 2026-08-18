@@ -71,7 +71,7 @@ class Level(arcade.View):
             f"score: {self._player.score}", x, y)
 
     def refresh_lives_ui(self) -> None:
-        if self._player.current_lives < 0 or self._player.invivibility:
+        if self._player.current_lives < 0 or self._player.invicibility:
             return
 
         last = self.player_lives_ui[self._player.current_lives]
@@ -131,11 +131,9 @@ class Level(arcade.View):
                     self,
                     self._game.cheat_mode,
                     self._game.menu_view))
-        elif symbol == arcade.key.N:
-            if self._game.can_skip_levels:
-                self._game.next_level(self._player.score)
-        elif symbol == arcade.key.ENTER:
-            self._game.game_over(0)
+        if symbol == arcade.key.N and self._game.can_skip_levels:
+            self._game.next_level(self._player.score)
+
 
     def on_draw(self) -> None:
         self.clear()

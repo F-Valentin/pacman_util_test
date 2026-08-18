@@ -81,6 +81,10 @@ class Player(arcade.Sprite):
     def current_lives(self) -> int:
         return self._current_lives
 
+    @property
+    def invicibility(self) -> bool:
+        return self._invicibility
+
     def _init_animation(self) -> None:
         move_animation = arcade.load_animated_gif(
             resource_path("assets/pacman.gif"))
