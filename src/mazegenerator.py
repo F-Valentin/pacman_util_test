@@ -18,9 +18,9 @@ class MazeGenerator:
         self._entryy = (entry_cell[1]
                         if 0 <= entry_cell[1] < self._height else 0)
         self._exitx = (exit_cell[0]
-                       if 0 <= exit_cell[0] < self._width else self._width-1)
+                       if 0 <= exit_cell[0] < self._width else self._width - 1)
         self._exity = (exit_cell[1]
-                       if 0 <= exit_cell[1] < self._height else self._height-1)
+                       if 0 <= exit_cell[1] < self._height else self._height - 1)
         self._maze: list[list[int]] = []
         self._path: list[list[int]] = []
         self._shortest_path: str | bool = False
@@ -82,10 +82,10 @@ class MazeGenerator:
                     self._maze[ny][nx] &= ~opp
 
     def _create_empty_maze(self) -> None:
-        self._maze = [[8] + [0] * (self._width-2) +
-                      [2] for _ in range(self._height-2)]
-        self._maze.insert(0, [9] + [1] * (self._width-2) + [3])
-        self._maze.append([12] + [4] * (self._width-2) + [6])
+        self._maze = [[8] + [0] * (self._width - 2) +
+                      [2] for _ in range(self._height - 2)]
+        self._maze.insert(0, [9] + [1] * (self._width - 2) + [3])
+        self._maze.append([12] + [4] * (self._width - 2) + [6])
         self._path = [[0] * self._width for _ in range(self._height)]
 
     def _add_42_to_maze(self) -> None:
@@ -95,7 +95,8 @@ class MazeGenerator:
                     [0, 0, 1, 0, 1, 0, 0],
                     [0, 0, 1, 0, 1, 1, 1]
                     ]
-        if len(ft_small)*2 > self._height or len(ft_small[0])*2 > self._width:
+        if len(ft_small) * \
+                2 > self._height or len(ft_small[0]) * 2 > self._width:
             print("MazeGenerator Warning: maze is too small to add '42' in it")
             return
         posy = int((self._height - len(ft_small)) / 2)
@@ -103,12 +104,12 @@ class MazeGenerator:
         for y in range(len(ft_small)):
             for x in range(len(ft_small[0])):
                 if ft_small[y][x] == 1:
-                    self._maze[posy+y][posx+x] = 15
-                    self._maze[posy+y][posx+x-1] |= 2
-                    self._maze[posy+y][posx+x+1] |= 8
-                    self._maze[posy+y-1][posx+x] |= 4
-                    self._maze[posy+y+1][posx+x] |= 1
-                    self._path[posy+y][posx+x] = 1
+                    self._maze[posy + y][posx + x] = 15
+                    self._maze[posy + y][posx + x - 1] |= 2
+                    self._maze[posy + y][posx + x + 1] |= 8
+                    self._maze[posy + y - 1][posx + x] |= 4
+                    self._maze[posy + y + 1][posx + x] |= 1
+                    self._path[posy + y][posx + x] = 1
 
     def _is_available(self, x: int, y: int) -> bool:
         if (

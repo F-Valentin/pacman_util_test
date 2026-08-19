@@ -187,6 +187,14 @@ class EndGameView(arcade.View):
 
         self._input_rect: HitBox
 
+    def _on_menu_button(self) -> None:
+        self.save_highscore()
+        self.window.show_view(self._menu_view)
+
+    def _on_quit_button(self) -> None:
+        self.save_highscore()
+        arcade.exit()
+
     def on_show_view(self) -> None:
         btn_x = 160
         btn_w = 150
@@ -209,7 +217,7 @@ class EndGameView(arcade.View):
             btn_x,
             350,
             btn_w, btn_h,
-            lambda: (self.window.show_view(self._menu_view), self.save_highscore())
+            self._on_menu_button
         )
         menu_button.set_alpha(200)
 
@@ -218,7 +226,7 @@ class EndGameView(arcade.View):
             btn_x,
             260,
             btn_w, btn_h,
-            lambda: (self.save_highscore(), arcade.exit())
+            self._on_quit_button
         )
 
         path = persistent_path("highscore.json")
@@ -275,12 +283,16 @@ class EndGameView(arcade.View):
             self._button_group.on_key_press(key=symbol)
             return
 
-        if symbol == arcade.key.BACKSPACE and len(self.current_name) > 0:
+        if (
+            symbol == arcade.key.BACKSPACE
+            and len(self.current_name) > 0
+        ):
             self.current_name = self.current_name[:-1]
-        else:
-            c = chr(symbol)
-            if c.isalpha() and c.isascii() and len(self.current_name) < 10:
-                self.current_name += c
+            return
+
+        c = chr(symbol)
+        if c.isalpha() and c.isascii() and len(self.current_name) < 10:
+            self.current_name += c
 
     def on_mouse_press(self, x: int, y: int, button: int,
                        modifiers: int) -> None:
@@ -323,7 +335,6 @@ class EndGameView(arcade.View):
             (
                 "(type inside the rect oultine and then"
                 "type any letter on your keyboard"
-                "then press enter to save your score)"
             ),
             self.BOX_LEFT, self.BOX_BOTTOM - 28,
             font_size=10,
@@ -362,6 +373,9 @@ class InstructionView(arcade.View):
     CONTROLS: list[str] = [
         "Move: Arrow Keys or WASD",
         "Pause: SPACE",
+        "Navigate menu buttons: UP/DOWN, W/S or MOUSE",
+        "Select a button: SPACE/MOUSE",
+        "Skip level (Skip Level cheat active): N",
     ]
 
     def __init__(self, menu_view: MenuView) -> None:
@@ -391,14 +405,14 @@ class InstructionView(arcade.View):
             for i, line in enumerate(self.CONTROLS)
         ]
 
-        back_button = Button(
-            "back",
+        menu_button = Button(
+            "Menu",
             center_x,
             center_y - 150,
             150, 40,
             lambda: self.window.show_view(self._menu_view)
         )
-        self._button_group.add_button(back_button)
+        self._button_group.add_button(menu_button)
 
     def on_key_press(self, symbol: int, modifiers: int) -> None:
         self._button_group.on_key_press(key=symbol)
