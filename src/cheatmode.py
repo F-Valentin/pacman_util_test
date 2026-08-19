@@ -102,7 +102,7 @@ class CheatMode:
         )
         self._buttons.append(invincible_btn)
         self._add_label(
-            "Invincibility",
+            "Infinite Life",
             center_x,
             base_y -
             step_y +

@@ -37,7 +37,7 @@ class MenuView(arcade.View):
         center_y = self.window.height // 2
 
         start_button = Button(
-            "start",
+            "Start",
             center_x,
             center_y + 150,
             btn_w, btn_h,
@@ -46,7 +46,7 @@ class MenuView(arcade.View):
         start_button.set_alpha(200)
 
         instruction = Button(
-            "instruction",
+            "Instruction",
             center_x,
             center_y + 50,
             btn_w, btn_h,
@@ -54,7 +54,7 @@ class MenuView(arcade.View):
         )
 
         top_highscore = Button(
-            "top_highscore",
+            "Top Highscore",
             center_x,
             center_y - 50,
             btn_w, btn_h,
@@ -62,7 +62,7 @@ class MenuView(arcade.View):
         )
 
         exit_btn = Button(
-            "quit",
+            "Quit",
             center_x,
             center_y - 150,
             btn_w, btn_h,
@@ -111,7 +111,7 @@ class PauseView(arcade.View):
         btn_h = 40
 
         self._resume_button = Button(
-            "resume",
+            "Resume",
             self.window.width // 2,
             self.window.height // 2 + 100,
             btn_w, btn_h,
@@ -119,7 +119,7 @@ class PauseView(arcade.View):
         )
 
         back_button = Button(
-            "back_button",
+            "Menu",
             self.window.width // 2,
             self.window.height // 2 + 150,
             btn_w, btn_h,
@@ -205,7 +205,7 @@ class EndGameView(arcade.View):
             height=20)
 
         menu_button = Button(
-            "menu_button",
+            "Menu",
             btn_x,
             350,
             btn_w, btn_h,
@@ -214,7 +214,7 @@ class EndGameView(arcade.View):
         menu_button.set_alpha(200)
 
         quit_button = Button(
-            "quit",
+            "Quit",
             btn_x,
             260,
             btn_w, btn_h,
@@ -282,7 +282,7 @@ class EndGameView(arcade.View):
             self.save_highscore()
         else:
             c = chr(symbol)
-            if c.isalpha() and c.isascii():
+            if c.isalpha() and c.isascii() and len(self.current_name) < 10:
                 self.current_name += c
 
     def on_mouse_press(self, x: int, y: int, button: int,
@@ -484,7 +484,7 @@ class TopHighscoreView(arcade.View):
             self._labels.append(label)
 
         self._back_button = Button(
-            "back",
+            "Menu",
             self.window.width // 2,
             y_pos - 100,
             150, 40,
