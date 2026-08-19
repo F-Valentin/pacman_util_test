@@ -209,7 +209,7 @@ class EndGameView(arcade.View):
             btn_x,
             350,
             btn_w, btn_h,
-            lambda: self.window.show_view(self._menu_view)
+            lambda: (self.window.show_view(self._menu_view), self.save_highscore())
         )
         menu_button.set_alpha(200)
 
@@ -218,7 +218,7 @@ class EndGameView(arcade.View):
             btn_x,
             260,
             btn_w, btn_h,
-            lambda: arcade.exit()
+            lambda: (self.save_highscore(), arcade.exit())
         )
 
         path = persistent_path("highscore.json")
@@ -226,7 +226,6 @@ class EndGameView(arcade.View):
             with open(path, 'r', encoding='utf-8') as f:
                 data = hjson.load(f)
                 self.data = data
-                self.tmp_data = data.copy()
         except (FileNotFoundError, hjson.HjsonDecodeError) as e:
             print(e)
 
@@ -254,7 +253,7 @@ class EndGameView(arcade.View):
             if self.highscore <= values[0]:
                 return
 
-            del self.tmp_data[min_key]
+            del self.data[min_key]
 
         if self.current_name not in self.data and len(self.old_name) == 0:
             self.old_name = self.current_name
@@ -262,14 +261,14 @@ class EndGameView(arcade.View):
         self.enter_your_name_btn_pressed = False
 
         if len(self.old_name) > 0 and self.old_name != self.current_name:
-            del self.tmp_data[self.old_name]
+            del self.data[self.old_name]
             self.old_name = ""
 
-        self.tmp_data[self.current_name] = self.highscore
+        self.data[self.current_name] = self.highscore
 
         with open(path, "w") as f:
             import json
-            json.dump(self.tmp_data, f, ensure_ascii=False, indent=4)
+            json.dump(self.data, f, ensure_ascii=False, indent=4)
 
     def on_key_press(self, symbol: int, modifiers: int) -> None:
         if not self.enter_your_name_btn_pressed:
@@ -278,8 +277,6 @@ class EndGameView(arcade.View):
 
         if symbol == arcade.key.BACKSPACE and len(self.current_name) > 0:
             self.current_name = self.current_name[:-1]
-        elif symbol == arcade.key.ENTER and len(self.current_name) > 0:
-            self.save_highscore()
         else:
             c = chr(symbol)
             if c.isalpha() and c.isascii() and len(self.current_name) < 10:
