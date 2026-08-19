@@ -81,7 +81,7 @@ class CheatMode:
         btn_h = 40
         padding = 30
         step_y = btn_h + padding
-        label_offset = btn_h / 2 + 5  # Place label just above the button
+        label_offset = btn_h / 2 + 5
 
         skip_btn = CheckButton(
             "skip_level",

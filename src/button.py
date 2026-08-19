@@ -160,8 +160,12 @@ class ButtonGroup:
         return False
 
     def set_default_button(self, button: Button, idx: int) -> None:
+        if self.current_button_focus:
+            self.current_button_focus.set_alpha(255)
+
         self.current_button_focus = button
         self.current_button_idx = idx
+        self.current_button_focus.set_alpha(200)
 
     def on_key_press(self, key: int) -> None:
         old_current_button_idx: int = self.current_button_idx

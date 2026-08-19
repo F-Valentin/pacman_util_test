@@ -1,8 +1,10 @@
 import random
-from collections.abc import Iterator
+from collections import deque
+from typing import Iterator
 
 
 class MazeGenerator:
+
     def __init__(self, size: tuple[int, int] = (15, 15), perfect: bool = False,
                  entry_cell: tuple[int, int] = (0, 0),
                  exit_cell: tuple[int, int] = (-1, -1),
@@ -16,13 +18,14 @@ class MazeGenerator:
         self._entryy = (entry_cell[1]
                         if 0 <= entry_cell[1] < self._height else 0)
         self._exitx = (exit_cell[0]
-                       if 0 <= exit_cell[0] < self._width else self._width - 1)
+                       if 0 <= exit_cell[0] < self._width else self._width-1)
         self._exity = (exit_cell[1]
-                       if 0 <= exit_cell[1] < self._height else self._height - 1)
+                       if 0 <= exit_cell[1] < self._height else self._height-1)
         self._maze: list[list[int]] = []
         self._path: list[list[int]] = []
         self._shortest_path: str | bool = False
         self.generate(self._seed)
+        return None
 
     @property
     def maze(self) -> list[list[int]]:
@@ -46,13 +49,43 @@ class MazeGenerator:
         self._create_empty_maze()
         self._add_42_to_maze()
         self._generate_maze(self._entryx, self._entryy, 0)
+        if self._perfect is False:
+            self._braid()
         self._find_short_path()
 
+#    Private functions
+
+    def _braid(self) -> None:
+        # Pac-Man-compatible maze: remove every dead-end (a corridor with a
+        # single opening) by carving one extra passage, so a chased player is
+        # never trapped. The isolated '42' cells (value 15) and the outer
+        # border are left untouched. Opening a wall only raises both cells'
+        # degree, so a single pass cannot create a new dead-end.
+        directions = [(0, -1, 1, 4), (1, 0, 2, 8),
+                      (0, 1, 4, 1), (-1, 0, 8, 2)]   # dx, dy, code, opp_code
+        for y in range(self._height):
+            for x in range(self._width):
+                if self._maze[y][x] == 15:           # isolated '42' cell
+                    continue
+                while bin(self._maze[y][x] & 0xF).count('1') >= 3:
+                    options = []
+                    for dx, dy, code, opp in directions:
+                        nx, ny = x + dx, y + dy
+                        if (0 <= nx < self._width and 0 <= ny < self._height
+                                and (self._maze[y][x] & code)
+                                and self._maze[ny][nx] != 15):
+                            options.append((nx, ny, code, opp))
+                    if not options:
+                        break
+                    nx, ny, code, opp = random.choice(options)
+                    self._maze[y][x] &= ~code
+                    self._maze[ny][nx] &= ~opp
+
     def _create_empty_maze(self) -> None:
-        self._maze = [[8] + [0] * (self._width - 2) +
-                      [2] for _ in range(self._height - 2)]
-        self._maze.insert(0, [9] + [1] * (self._width - 2) + [3])
-        self._maze.append([12] + [4] * (self._width - 2) + [6])
+        self._maze = [[8] + [0] * (self._width-2) +
+                      [2] for _ in range(self._height-2)]
+        self._maze.insert(0, [9] + [1] * (self._width-2) + [3])
+        self._maze.append([12] + [4] * (self._width-2) + [6])
         self._path = [[0] * self._width for _ in range(self._height)]
 
     def _add_42_to_maze(self) -> None:
@@ -62,8 +95,7 @@ class MazeGenerator:
                     [0, 0, 1, 0, 1, 0, 0],
                     [0, 0, 1, 0, 1, 1, 1]
                     ]
-        if len(ft_small) * \
-                2 > self._height or len(ft_small[0]) * 2 > self._width:
+        if len(ft_small)*2 > self._height or len(ft_small[0])*2 > self._width:
             print("MazeGenerator Warning: maze is too small to add '42' in it")
             return
         posy = int((self._height - len(ft_small)) / 2)
@@ -71,12 +103,12 @@ class MazeGenerator:
         for y in range(len(ft_small)):
             for x in range(len(ft_small[0])):
                 if ft_small[y][x] == 1:
-                    self._maze[posy + y][posx + x] = 15
-                    self._maze[posy + y][posx + x - 1] |= 2
-                    self._maze[posy + y][posx + x + 1] |= 8
-                    self._maze[posy + y - 1][posx + x] |= 4
-                    self._maze[posy + y + 1][posx + x] |= 1
-                    self._path[posy + y][posx + x] = 1
+                    self._maze[posy+y][posx+x] = 15
+                    self._maze[posy+y][posx+x-1] |= 2
+                    self._maze[posy+y][posx+x+1] |= 8
+                    self._maze[posy+y-1][posx+x] |= 4
+                    self._maze[posy+y+1][posx+x] |= 1
+                    self._path[posy+y][posx+x] = 1
 
     def _is_available(self, x: int, y: int) -> bool:
         if (
@@ -108,46 +140,59 @@ class MazeGenerator:
                         self._maze[ny][nx] = self._maze[ny][nx] & (~opp_code)
 
     def _generate_maze(self, x: int, y: int, from_code: int) -> None:
-        self._path[y][x] = 1
-        non_mutable = self._maze[y][x]
-        self._maze[y][x] = 15 & ~from_code
-        for nx, ny, code, opp_code in self._get_neighbors(x, y):
-            if code & non_mutable:
-                continue
-            self._maze[y][x] = self._maze[y][x] & (~code)
-            self._generate_maze(nx, ny, opp_code)
+        # Iterative depth-first carving with an explicit stack, so very large
+        # mazes never hit Python's recursion limit. Each frame keeps its own
+        # neighbour generator, which preserves the original lazy evaluation
+        # order (and its random side effects) exactly as the recursive version.
+        def _enter(cx, cy, fcode):
+            self._path[cy][cx] = 1
+            non_mutable = self._maze[cy][cx]
+            self._maze[cy][cx] = 15 & ~fcode
+            return [cx, cy, non_mutable, self._get_neighbors(cx, cy)]
 
-    def _walk_rec(self, distance: int, x: int, y: int,
-                  visited: list[list[int]], ways: str) -> str | bool:
-        directions = [(0, 1, 4, 'S'), (1, 0, 2, 'E'),
-                      (-1, 0, 8, 'W'), (0, -1, 1, 'N')]
-        if x == self._exitx and y == self._exity:
-            return ways
-        if distance == 0:
-            return False
-        visited[y][x] = 1
-        for dx, dy, code, way in directions:
-            if (
-                    (self._maze[y][x] & code) == 0 and 0 <= x +
-                dx < self._width
-                    and 0 <= y + dy < self._height and visited[y + dy][x + dx] == 0
-            ):
-                rec = self._walk_rec(distance - 1, x + dx, y + dy,
-                                     visited, ways + way)
-                if rec is not False:
-                    return rec
-        visited[y][x] = 0
-        return False
+        stack = [_enter(x, y, from_code)]
+        while stack:
+            cx, cy, non_mutable, gen = stack[-1]
+            advanced = False
+            for nx, ny, code, opp_code in gen:
+                if code & non_mutable:
+                    continue
+                self._maze[cy][cx] = self._maze[cy][cx] & (~code)
+                stack.append(_enter(nx, ny, opp_code))
+                advanced = True
+                break
+            if not advanced:
+                stack.pop()
 
     def _find_short_path(self) -> None:
-        distance = 0
-        while distance <= self._width * self._height:
-            visited = [[0] * self._width for _ in range(self._height)]
-            ret = self._walk_rec(distance, self._entryx,
-                                 self._entryy, visited, '')
-            if ret is not False:
-                self._shortest_path = ret
-                return
-            distance += 1
-        print("MazeGenerator Class error: no shortest path found.")
+        # BFS: shortest entry->exit path in O(cells). Robust on looped (braided)
+        # mazes, where the previous depth-first search exploded exponentially.
+        moves = [(0, -1, 1, 'N'), (1, 0, 2, 'E'),
+                 (0, 1, 4, 'S'), (-1, 0, 8, 'W')]   # dx, dy, wall code, letter
+        start = (self._entryx, self._entryy)
+        goal = (self._exitx, self._exity)
+        prev: dict = {start: None}
+        queue = deque([start])
+        while queue:
+            x, y = queue.popleft()
+            if (x, y) == goal:
+                break
+            for dx, dy, code, letter in moves:
+                nx, ny = x + dx, y + dy
+                if (0 <= nx < self._width and 0 <= ny < self._height
+                        and (self._maze[y][x] & code) == 0
+                        and (nx, ny) not in prev):
+                    prev[(nx, ny)] = ((x, y), letter)
+                    queue.append((nx, ny))
+        if goal not in prev:
+            self._shortest_path = False
+            print("MazeGenerator Class error: no shortest path found.")
+            return
+        letters = []
+        cur = goal
+        while prev[cur] is not None:
+            parent, letter = prev[cur]
+            letters.append(letter)
+            cur = parent
+        self._shortest_path = ''.join(reversed(letters))
         return

@@ -126,9 +126,6 @@ class Maze:
     def _setup_cells(self) -> None:
         cell_size: int = self._cell_size
 
-        point_par_pacgum = 5
-        point_par_super_pacgum = 10
-
         blocked: int = 0x0F
         corner = [(0, 0),
                   (0, (len(self._grid) - 1)),
@@ -139,8 +136,8 @@ class Maze:
         super_pacgum_radius: float = 6.0
         pacgum_color: tuple[int, int, int, int] = arcade.color.WHITE
         super_pacgum_color: tuple[int, int, int, int] = arcade.color.BLUE
-        pacgum_point: int = point_par_pacgum
-        super_pacgum_point: int = point_par_super_pacgum
+        pacgum_point: int = 5
+        super_pacgum_point: int = 10
 
         for cells in self.grid:
             for cell in cells:
