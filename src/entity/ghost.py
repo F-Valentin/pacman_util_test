@@ -62,7 +62,7 @@ class Ghost(arcade.Sprite):
 
         position = arcade.Vec2(cell.center.x, cell.center.y)
 
-        g = cls(
+        ghost = cls(
             position,
             point,
             path_to_sprite,
@@ -70,9 +70,9 @@ class Ghost(arcade.Sprite):
             speed,
             maze,
             _internal=True)
-        g._spawn_cell = cell
+        ghost._spawn_cell = cell
 
-        return g
+        return ghost
 
     def _init_animation(self) -> None:
         move_animation = arcade.Sprite(resource_path(self._sprite_image))
