@@ -8,7 +8,7 @@ from typing_extensions import Any
 
 from cell import Cell
 from maze import Maze
-from paths import resource_path
+from paths import AssetLoadError, resource_path
 
 """Ghost AI and movement helpers for the level."""
 
@@ -75,11 +75,23 @@ class Ghost(arcade.Sprite):
         return ghost
 
     def _init_animation(self) -> None:
-        move_animation = arcade.Sprite(resource_path(self._sprite_image))
+        move_path = resource_path(self._sprite_image)
+        try:
+            move_animation = arcade.Sprite(move_path)
+        except (FileNotFoundError, OSError) as e:
+            raise AssetLoadError(
+                f"Could not load ghost sprite '{move_path}': {e}"
+            ) from e
         move_animation.position = self.position
         move_animation.scale = 0.06
 
-        flee_animation = arcade.Sprite(resource_path(self._flee_image))
+        flee_path = resource_path(self._flee_image)
+        try:
+            flee_animation = arcade.Sprite(flee_path)
+        except (FileNotFoundError, OSError) as e:
+            raise AssetLoadError(
+                f"Could not load ghost flee sprite '{flee_path}': {e}"
+            ) from e
         flee_animation.position = self.position
         flee_animation.scale = 0.06
 

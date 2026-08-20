@@ -15,6 +15,16 @@ import os
 import sys
 
 
+class AssetLoadError(Exception):
+    """
+        Raised when a bundled resource (sprite, animation, sound...)
+        cannot be loaded, so callers can catch it and fail gracefully
+        (e.g. abort loading the level with a clear message) instead
+        of crashing on an unhandled FileNotFoundError/OSError deep
+        inside entity initialization.
+    """
+
+
 def resource_path(relative_path: str) -> str:
     """
         Resolve the path to a bundled, read-only resource.

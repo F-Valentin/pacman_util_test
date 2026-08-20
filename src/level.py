@@ -50,6 +50,10 @@ class Level(arcade.View):
             text = arcade.Text("score: {0}", x, y)
             self.score_ui = ScoreUi(score_ui_pos, text)
 
+            level_number = self._game._current_level_index + 1
+            self.level_text = arcade.Text(
+                f"level: {level_number}", x, y + 30)
+
         origin = self._maze.bottom_left_pos
 
         hp_x = origin.x
@@ -71,7 +75,7 @@ class Level(arcade.View):
             f"score: {self._player.score}", x, y)
 
     def refresh_lives_ui(self) -> None:
-        if self._player.current_lives < 0 or self._player.invicibility:
+        if self._player.current_lives < 0 or self._player.infinite_life:
             return
 
         last = self.player_lives_ui[self._player.current_lives]
@@ -155,3 +159,4 @@ class Level(arcade.View):
             time.draw()
 
         self.score_ui.score_text.draw()
+        self.level_text.draw()

@@ -8,7 +8,7 @@ import arcade
 from cell import Cell, Walls
 from entity.ghost import Ghost, GhostState
 from maze import Maze
-from paths import resource_path
+from paths import AssetLoadError, resource_path
 
 
 class PlayerState(str, Enum):
@@ -68,7 +68,7 @@ class Player(arcade.Sprite):
         self.direction: PlayerDirection | None = None
         self.score: int = score
         self.ghosts: list[Ghost] = ghosts
-        self._invicibility = False
+        self.infinite_life = False
         self._maze = maze
 
         self._start_center: arcade.Vec2 = position
@@ -81,13 +81,15 @@ class Player(arcade.Sprite):
     def current_lives(self) -> int:
         return self._current_lives
 
-    @property
-    def invicibility(self) -> bool:
-        return self._invicibility
-
     def _init_animation(self) -> None:
-        move_animation = arcade.load_animated_gif(
-            resource_path("assets/pacman.gif"))
+        sprite_path = resource_path("assets/pacman.gif")
+        try:
+            move_animation = arcade.load_animated_gif(sprite_path)
+        except (FileNotFoundError, OSError) as e:
+            raise AssetLoadError(
+                f"Could not load player animation '{sprite_path}': {e}"
+            ) from e
+
         move_animation.position = self.position
         move_animation.scale = 0.08
 
@@ -182,7 +184,7 @@ class Player(arcade.Sprite):
                     ghost.state = GhostState.FLEE
 
     def take_damage(self) -> None:
-        if not self._invicibility:
+        if not self.infinite_life:
             self._current_lives -= 1
 
     def update(self, delta_time: float = 1 / 60) -> None:
@@ -255,8 +257,8 @@ class Player(arcade.Sprite):
 
         return False
 
-    def toggle_invicibility(self) -> None:
-        self._invicibility = not self._invicibility
+    def toggle_infinite_life(self) -> None:
+        self.infinite_life = not self.infinite_life
 
     def draw(self) -> None:
         self.animations[self.state].draw()

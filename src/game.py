@@ -11,6 +11,7 @@ from entity.player import Player
 from game_configuration import GameConfig
 from level import Level
 from maze import Maze, MazeGenerationError
+from paths import AssetLoadError
 from views import EndGameView, MenuView
 
 
@@ -19,14 +20,14 @@ class Game:
 
     LEVEL_CATALOG = [
         {
-            "maze_width": 10, "maze_height": 10, "time_limit": 60,
+            "maze_width": 7, "maze_height": 7, "time_limit": 60,
             "ghosts": [
                 {"sprite": "assets/blinky.png",
                  "difficulty_id": 40, "col": 0, "row": 0, "speed": 1.5},
             ],
         },
         {
-            "maze_width": 7, "maze_height": 7, "time_limit": 60,
+            "maze_width": 8, "maze_height": 8, "time_limit": 60,
             "ghosts": [
                 {"sprite": "assets/blinky.png",
                  "difficulty_id": 35, "col": 0, "row": 0, "speed": 1.5},
@@ -137,6 +138,8 @@ class Game:
         self._current_level_index: int = 0
         self.cheat_mode: CheatMode
         self.can_skip_levels = False
+        self.cheat_mode_init = False
+        self._player: Player
 
     @property
     def menu_view(self) -> MenuView:
@@ -153,10 +156,12 @@ class Game:
         """Reset progression and load the first level."""
         self.cheat_mode = CheatMode(self._window)
         self.can_skip_levels = False
+        self.cheat_mode_init = False
         self._current_level_index = 0
-        self.load_level(current_score=0)
+        self.load_level(current_score=0, player_infinite_life=False)
 
-    def load_level(self, current_score: int) -> None:
+    def load_level(self, current_score: int,
+                   player_infinite_life: bool) -> None:
         """Read the catalog at the current index and build + show the level."""
 
         config: dict[str, Any] = self.LEVEL_CATALOG[self._current_level_index]
@@ -199,37 +204,51 @@ class Game:
         maze.set_pacgums(self._game_config.points_per_pacgum)
         maze.set_super_pacgums(self._game_config.points_per_super_pacgum)
 
-        ghosts: list[Ghost] = []
-        for g in config["ghosts"]:
-            position = maze.get_cell(g["col"], g["row"])
-            ghost = Ghost.at_cell(
-                position,
-                self._game_config.points_per_ghost,
-                g["sprite"],
-                g["difficulty_id"],
-                g["speed"],
-                maze)
-            ghosts.append(ghost)
+        try:
+            ghosts: list[Ghost] = []
+            for g in config["ghosts"]:
+                position = maze.get_cell(g["col"], g["row"])
+                ghost = Ghost.at_cell(
+                    position,
+                    self._game_config.points_per_ghost,
+                    g["sprite"],
+                    g["difficulty_id"],
+                    g["speed"],
+                    maze)
+                ghosts.append(ghost)
 
-        half = maze_width * cell_size // 2
-        offset = 0 if maze_width % 2 != 0 else -cell_size // 2
-        x = int(offset_x + half + offset)
-        y = int(offset_y + half + offset)
+            half = maze_width * cell_size // 2
+            offset = 0 if maze_width % 2 != 0 else -cell_size // 2
+            x = int(offset_x + half + offset)
+            y = int(offset_y + half + offset)
 
-        pos = arcade.Vec2(x, y)
-        player = Player(
-            pos,
-            current_score,
-            maze,
-            ghosts,
-            lives=self._game_config.lives
-        )
+            pos = arcade.Vec2(x, y)
+            player = Player(
+                pos,
+                current_score,
+                maze,
+                ghosts,
+                lives=self._game_config.lives
+            )
+        except AssetLoadError as e:
+            print(f"[Asset Error] {e}")
+            self.game_over(current_score)
+            return
+
+        player.infinite_life = player_infinite_life
         maze.convert_pos_to_cell(pos).hide_pacgum()
 
         level = Level(player, maze, ghosts, time_limit, self)
-        self.cheat_mode.player_inviciblity = player.toggle_invicibility
-        self.cheat_mode.can_skip_levels = self._skip_levels
+
+        self.cheat_mode.player_infinite_life = player.toggle_infinite_life
         self.cheat_mode.ghosts_freeze = [g.toggle_freeze for g in ghosts]
+
+        if not self.cheat_mode_init:
+            self.cheat_mode.can_skip_levels = self._skip_levels
+            self.cheat_mode_init = True
+
+        self._player = player
+
         self._window.show_view(level)
 
     def _skip_levels(self) -> None:
@@ -239,7 +258,7 @@ class Game:
         """Advance to the next level, or show the final victory screen."""
         self._current_level_index += 1
         if self._current_level_index < len(self.LEVEL_CATALOG):
-            self.load_level(score)
+            self.load_level(score, self._player.infinite_life)
         else:
             self._window.show_view(
                 EndGameView(True, score, self._menu_view))

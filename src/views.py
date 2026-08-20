@@ -113,7 +113,7 @@ class PauseView(arcade.View):
         self._resume_button = Button(
             "Resume",
             self.window.width // 2,
-            self.window.height // 2 + 100,
+            self.window.height // 2 + 150,
             btn_w, btn_h,
             self.resume
         )
@@ -121,14 +121,14 @@ class PauseView(arcade.View):
         back_button = Button(
             "Menu",
             self.window.width // 2,
-            self.window.height // 2 + 150,
+            self.window.height // 2 + 100,
             btn_w, btn_h,
             lambda: self.window.show_view(self._menu_view)
         )
         cheat_group_buttons = self._cheat_mode.buttons
 
-        self._button_group.add_button(back_button)
         self._button_group.add_button(self._resume_button)
+        self._button_group.add_button(back_button)
 
         for btn in cheat_group_buttons:
             self._button_group.add_button(btn)
@@ -233,14 +233,22 @@ class EndGameView(arcade.View):
         try:
             with open(path, 'r', encoding='utf-8') as f:
                 data = hjson.load(f)
-                self.data = data
         except (FileNotFoundError, hjson.HjsonDecodeError) as e:
             print(e)
+            data = {}
+
+        if not isinstance(data, dict):
+            data = {}
+
+        self.data = data
 
         self._button_group.add_button(menu_button)
         self._button_group.add_button(quit_button)
 
     def save_highscore(self) -> None:
+        if not len(self.current_name):
+            return
+
         path = persistent_path("highscore.json")
 
         values: list[int] = list(self.data.values())
@@ -252,7 +260,7 @@ class EndGameView(arcade.View):
 
         self.highscore = max(self.score, self.highscore)
 
-        if len(self.data) + 1 > 10:
+        if len(self.data) + 1 > 10 and self.current_name not in self.data:
             for (key, value) in self.data.items():
                 if value == values[0]:
                     min_key = key
@@ -274,9 +282,12 @@ class EndGameView(arcade.View):
 
         self.data[self.current_name] = self.highscore
 
-        with open(path, "w") as f:
-            import json
-            json.dump(self.data, f, ensure_ascii=False, indent=4)
+        import json
+        try:
+            with open(path, "w", encoding="utf-8") as f:
+                json.dump(self.data, f, ensure_ascii=False, indent=4)
+        except OSError as e:
+            print(f"Could not save highscore to {path}: {e}")
 
     def on_key_press(self, symbol: int, modifiers: int) -> None:
         if not self.enter_your_name_btn_pressed:
@@ -290,8 +301,15 @@ class EndGameView(arcade.View):
             self.current_name = self.current_name[:-1]
             return
 
-        c = chr(symbol)
-        if c.isalpha() and c.isascii() and len(self.current_name) < 10:
+        try:
+            c = chr(symbol)
+        except ValueError:
+            return
+
+        if len(self.current_name) >= 10:
+            return
+
+        if c == " " or (c.isalpha() and c.isascii()):
             self.current_name += c
 
     def on_mouse_press(self, x: int, y: int, button: int,
@@ -449,8 +467,10 @@ class TopHighscoreView(arcade.View):
                 data = hjson.load(f)
         except (FileNotFoundError, hjson.HjsonDecodeError) as e:
             print(e)
-            if not isinstance(data, dict):
-                data = {}
+            data = {}
+
+        if not isinstance(data, dict):
+            data = {}
 
         sorted_scores = sorted(
             [(name, score) for name, score in data.items()],

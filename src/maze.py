@@ -129,8 +129,8 @@ class Maze:
         blocked: int = 0x0F
         corner = [(0, 0),
                   (0, (len(self._grid) - 1)),
-                  ((len(self._grid) - 1), 0),
-                  ((len(self._grid) - 1), (len(self._grid) - 1))]
+                  ((self.width - 1), 0),
+                  ((self.width - 1), (len(self._grid) - 1))]
 
         pacgum_radius: float = 3.0
         super_pacgum_radius: float = 6.0
