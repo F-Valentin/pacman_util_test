@@ -135,8 +135,6 @@ class Level(arcade.View):
                     self,
                     self._game.cheat_mode,
                     self._game.menu_view))
-        if symbol == arcade.key.ENTER:
-            self._game.game_over(0)
         if symbol == arcade.key.N and self._game.can_skip_levels:
             self._game.next_level(self._player.score)
 
