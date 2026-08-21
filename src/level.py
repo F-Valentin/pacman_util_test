@@ -126,7 +126,7 @@ class Level(arcade.View):
         for ghost in self._ghosts:
             ghost.restart_position()
 
-    def on_key_press(self, symbol: int, modifiers: int) -> None:
+    def on_key_press(self, symbol: int, _modifiers: int) -> None:
         self._player.set_next_direction(key=symbol)
 
         if symbol == arcade.key.SPACE:
