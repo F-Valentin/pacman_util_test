@@ -226,10 +226,9 @@ High-level relationships:
 
 ## Project Management
 
-The team tracked tasks, milestones, and risks using a Kanban board, with weekly
-check-ins to compare actual progress against the planned timeline. Full details —
-timeline, progress tracking, task ownership, risk analysis, and the acceptance test
-plan — are available in the [`project-management/`](./project-management) directory.
+We use Trello to manage our project. It was very helpful at the beginning for breaking down the project into different tasks and giving us a clear overview of what's next.
+
+[Link for our Trello](https://trello.com/b/S6yBA2BB/pacman)
 
 ## Resources
 
